@@ -16,6 +16,8 @@ export type { DropdownProps, DropdownOption } from "./Dropdown";
 export { FilterPill } from "./FilterPill";
 export type { FilterPillProps } from "./FilterPill";
 
+export { FloatingDesignSystemButton } from "./FloatingDesignSystemButton";
+
 export { IconBox } from "./IconBox";
 export type { IconBoxProps, IconBoxSize, IconBoxTone } from "./IconBox";
 

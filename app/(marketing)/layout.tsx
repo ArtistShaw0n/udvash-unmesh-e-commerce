@@ -1,3 +1,4 @@
+import { FloatingDesignSystemButton } from "@/components/atoms";
 import { Header, Footer } from "@/components/organisms";
 
 export default function MarketingLayout({
@@ -11,6 +12,7 @@ export default function MarketingLayout({
       <Header cartCount={99} />
       <main id="main-content" className="flex-1">{children}</main>
       <Footer />
+      <FloatingDesignSystemButton />
     </>
   );
 }
