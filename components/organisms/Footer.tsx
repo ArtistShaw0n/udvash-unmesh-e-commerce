@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Logo } from "@/components/atoms";
+import { PaymentMethodsRow } from "@/components/molecules";
 import {
   SITE_ADDRESS_BN,
   SITE_EMAIL,
@@ -35,7 +36,8 @@ export function Footer({ className }: FooterProps) {
         <div className="grid gap-8 lg:gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="brightness-0 invert">
+            {/* Logo keeps its original brand colors on dark footer — matches screenshots */}
+            <div className="inline-block rounded-md bg-white/95 px-3 py-2">
               <Logo size="md" href="/" />
             </div>
             <p className="text-body-sm text-white/80 leading-relaxed max-w-[260px]">
@@ -73,7 +75,12 @@ export function Footer({ className }: FooterProps) {
           </FooterColumn>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-body-sm text-white/70">
+        {/* Payment methods strip */}
+        <div className="mt-10">
+          <PaymentMethodsRow />
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-body-sm text-white/70">
           <p>© ২০২৬ উদ্ভাস-উন্মেষ — সর্বস্ব সংরক্ষিত</p>
           <p>ঢাকা, বাংলাদেশ</p>
         </div>

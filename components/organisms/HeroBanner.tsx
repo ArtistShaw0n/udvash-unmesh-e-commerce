@@ -1,4 +1,4 @@
-import { Button } from "@/components/atoms";
+import { Button, CarouselDots, HeroBookIllustration } from "@/components/atoms";
 import { clsx } from "@/lib/clsx";
 
 export interface HeroBannerProps {
@@ -31,13 +31,15 @@ export function HeroBanner({
             <h1 className="text-h1 font-bold leading-[1.1] tracking-tight">{title}</h1>
             <p className="text-body text-white/85 leading-relaxed max-w-xl">{description}</p>
             <div className="flex flex-wrap gap-3 pt-1">
-              <Button href={primaryCta.href} variant="white" size="md">{primaryCta.label}</Button>
+              <Button href={primaryCta.href} variant="primary" size="md"
+                      className="!bg-brand-600 hover:!bg-brand-500">
+                {primaryCta.label}
+              </Button>
               {secondaryCta && (
                 <Button
                   href={secondaryCta.href}
-                  variant="secondary"
+                  variant="white"
                   size="md"
-                  className="!bg-transparent !text-white !border-white/40 hover:!bg-white/10"
                 >
                   {secondaryCta.label}
                 </Button>
@@ -46,39 +48,15 @@ export function HeroBanner({
           </div>
 
           <div className="hidden lg:flex justify-center">
-            <BookStackIllustration />
+            <HeroBookIllustration />
           </div>
         </div>
 
-        {/* Carousel indicator dots (visual only for now) */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          <span className="w-2 h-2 rounded-full bg-white" />
-          <span className="w-2 h-2 rounded-full bg-white/40" />
-          <span className="w-2 h-2 rounded-full bg-white/40" />
+        {/* Carousel dots — active dot is wider */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+          <CarouselDots count={3} active={0} tone="onDark" />
         </div>
       </div>
     </section>
-  );
-}
-
-function BookStackIllustration() {
-  return (
-    <svg
-      viewBox="0 0 220 240"
-      className="w-full max-w-[260px] h-auto text-white/30"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="40" y="30" width="140" height="180" rx="6" />
-      <line x1="50" y1="60" x2="170" y2="60" />
-      <line x1="50" y1="90" x2="160" y2="90" />
-      <line x1="50" y1="120" x2="170" y2="120" />
-      <line x1="50" y1="150" x2="150" y2="150" />
-      <path d="M40 30 L40 220 L60 200 L60 50 Z" fill="currentColor" opacity="0.4" />
-    </svg>
   );
 }

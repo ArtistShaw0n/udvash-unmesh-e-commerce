@@ -45,7 +45,7 @@ export function PriceBlock({
         </span>
       )}
       {save > 0 && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-success-100 text-success-700 dark:bg-success-700/20 dark:text-success-400 text-caption font-bold">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-brand-100 text-brand-800 dark:bg-brand-700/30 dark:text-brand-300 text-caption font-bold">
           Save ৳{format(save, bengali)}
         </span>
       )}

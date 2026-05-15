@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
+import { CartIconButton } from "@/components/atoms/CartIconButton";
+import { StockOutOverlay } from "@/components/atoms/StockOutOverlay";
 import { PriceBlock } from "./PriceBlock";
 import { QuantityCounter } from "./QuantityCounter";
 import { clsx } from "@/lib/clsx";
@@ -21,6 +22,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
 
   const isStockOut = book.stock === "out-of-stock";
   const isPreorder = book.stock === "preorder";
+  const secondary = (book as unknown as { secondaryBadge?: BookBadge }).secondaryBadge;
 
   return (
     <div
@@ -29,41 +31,40 @@ export function ProductCard({ book, className }: ProductCardProps) {
         className,
       )}
     >
-      {/* Image area with badges */}
+      {/* Image area — square aspect, with corner badges */}
       <Link
         href={detailHref}
-        className="relative block aspect-[4/5] bg-[var(--bg-surface-muted)] overflow-hidden"
+        className="relative block aspect-square bg-[var(--bg-surface-muted)] overflow-hidden"
         aria-label={book.titleBn}
       >
         <BookCoverPlaceholder />
 
-        {/* Primary badge (corner-tl) */}
+        {/* Primary badge — top-left */}
         {book.badge && (
-          <Badge color={book.badge.type} variant="solid" placement="corner-tl"
-                 className="absolute top-0 left-0">
+          <Badge
+            color={book.badge.type}
+            variant="solid"
+            placement="corner-tl"
+            className="absolute top-0 left-0"
+          >
             {book.badge.label}
           </Badge>
         )}
-        {/* Secondary badge (corner-bl) */}
-        {(book as unknown as { secondaryBadge?: BookBadge }).secondaryBadge && (
+
+        {/* Secondary badge — TOP-RIGHT (matches screenshots) */}
+        {secondary && (
           <Badge
-            color={(book as unknown as { secondaryBadge: BookBadge }).secondaryBadge.type}
+            color={secondary.type}
             variant="solid"
-            placement="corner-bl"
-            className="absolute bottom-0 left-0"
+            placement="corner-tr"
+            className="absolute top-0 right-0"
           >
-            {(book as unknown as { secondaryBadge: BookBadge }).secondaryBadge.label}
+            {secondary.label}
           </Badge>
         )}
 
-        {/* Stock out overlay */}
-        {isStockOut && (
-          <div className="absolute inset-0 bg-neutral-400/40 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="-rotate-12 bg-neutral-700 text-white text-h4 font-black px-4 py-1 tracking-wider rounded-sm shadow-lg">
-              STOCK OUT
-            </span>
-          </div>
-        )}
+        {/* Stock out diagonal sticker */}
+        {isStockOut && <StockOutOverlay />}
       </Link>
 
       {/* Body */}
@@ -100,19 +101,35 @@ export function ProductCard({ book, className }: ProductCardProps) {
           </p>
         )}
 
+        {/* Bottom row — [counter] [Buy Now] [cart icon] (matches screenshots) */}
         <div className="mt-auto pt-3 flex items-center gap-2">
           {!isStockOut && (
             <QuantityCounter value={qty} onChange={setQty} />
           )}
           {isStockOut ? (
-            <Button variant="ghost" size="sm" fullWidth disabled
-                    className="!bg-[var(--bg-surface-muted)] !text-[var(--fg-muted)]">
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth
+              disabled
+              className="!bg-[var(--bg-surface-muted)] !text-[var(--fg-muted)]"
+            >
               Stock Out
             </Button>
           ) : isPreorder ? (
-            <Button variant="warning" size="sm" fullWidth>Pre Order</Button>
+            <>
+              <Button variant="warning" size="sm" fullWidth>
+                Pre Order
+              </Button>
+              <CartIconButton size="sm" />
+            </>
           ) : (
-            <Button variant="primary" size="sm" fullWidth>Buy Now</Button>
+            <>
+              <Button variant="primary" size="sm" fullWidth>
+                Buy Now
+              </Button>
+              <CartIconButton size="sm" />
+            </>
           )}
         </div>
       </div>
@@ -124,13 +141,13 @@ function BookCoverPlaceholder() {
   return (
     <div className="absolute inset-0 flex items-center justify-center p-6">
       <svg
-        viewBox="0 0 120 160"
+        viewBox="0 0 120 140"
         className="w-3/5 h-auto text-[var(--fg-muted)] opacity-40"
         fill="currentColor"
         aria-hidden="true"
       >
-        <rect x="20" y="10" width="80" height="140" rx="4" />
-        <rect x="20" y="10" width="6" height="140" fill="currentColor" opacity="0.6" />
+        <rect x="20" y="10" width="80" height="120" rx="4" />
+        <rect x="20" y="10" width="6" height="120" fill="currentColor" opacity="0.6" />
       </svg>
     </div>
   );

@@ -7,11 +7,20 @@ export type { CountdownTimerProps } from "./CountdownTimer";
 export { FormField } from "./FormField";
 export type { FormFieldProps } from "./FormField";
 
+export { BreadcrumbPill } from "./BreadcrumbPill";
+export type { BreadcrumbPillProps } from "./BreadcrumbPill";
+
 export { InfoChip } from "./InfoChip";
 export type { InfoChipProps } from "./InfoChip";
 
+export { LoadMoreButton } from "./LoadMoreButton";
+export type { LoadMoreButtonProps } from "./LoadMoreButton";
+
 export { OrderSummaryCard } from "./OrderSummaryCard";
 export type { OrderSummaryCardProps } from "./OrderSummaryCard";
+
+export { PaymentMethodsRow } from "./PaymentMethodsRow";
+export type { PaymentMethodsRowProps } from "./PaymentMethodsRow";
 
 export { PriceBlock } from "./PriceBlock";
 export type { PriceBlockProps } from "./PriceBlock";

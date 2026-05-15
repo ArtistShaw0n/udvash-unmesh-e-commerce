@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock } from "lucide-react";
-import { Badge, Button } from "@/components/atoms";
+import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
+  BreadcrumbPill,
   CountdownTimer,
   InfoChip,
   PriceBlock,
@@ -51,9 +52,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
 
         {/* Info panel */}
         <div className="space-y-5">
-          <Badge color="bestseller" variant="soft">
-            {book.categoryLabel} · HSC Parallel Text
-          </Badge>
+          <BreadcrumbPill category={book.categoryLabel} title="HSC Parallel Text" />
 
           <h1 className="text-h2 text-[var(--fg-primary)] tracking-tight">
             {book.title}
@@ -90,11 +89,13 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>
 
+          {/* Bottom row — counter + Buy Now + cart icon (matches screenshots) */}
           <div className="flex items-center gap-3 pt-2">
             <QuantityCounter value={qty} onChange={setQty} />
             <Button variant="primary" size="lg" fullWidth leftIcon={<ShoppingBag size={18} />}>
               Buy Now
             </Button>
+            <CartIconButton size="lg" />
           </div>
         </div>
       </div>
@@ -113,7 +114,6 @@ function BookCover() {
   );
 }
 
-/** Inline minimal countdown — just "HH:MM:SS" tick, used inside price box. */
 function CountdownTimerInline({ target }: { target: Date }) {
   return <CountdownTimer targetDate={target} tone="default" format="hms" className="!gap-0.5 [&>div]:bg-transparent [&>div]:p-0 [&>div]:min-w-0 [&_span:last-child]:hidden" />;
 }

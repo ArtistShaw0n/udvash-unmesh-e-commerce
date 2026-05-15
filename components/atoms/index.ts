@@ -7,8 +7,20 @@ export type { BadgeProps, BadgeColor, BadgeStyle, BadgePlacement } from "./Badge
 export { Button } from "./Button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./Button";
 
+export { CarouselDots } from "./CarouselDots";
+export type { CarouselDotsProps } from "./CarouselDots";
+
+export { CartIconButton } from "./CartIconButton";
+export type { CartIconButtonProps, CartIconButtonSize } from "./CartIconButton";
+
 export { Checkbox } from "./Checkbox";
 export type { CheckboxProps } from "./Checkbox";
+
+export { HeroBookIllustration } from "./HeroBookIllustration";
+export type { HeroBookIllustrationProps } from "./HeroBookIllustration";
+
+export { StockOutOverlay } from "./StockOutOverlay";
+export type { StockOutOverlayProps } from "./StockOutOverlay";
 
 export { Dropdown } from "./Dropdown";
 export type { DropdownProps, DropdownOption } from "./Dropdown";

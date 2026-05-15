@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "@/components/atoms";
 import { Dropdown } from "@/components/atoms/Dropdown";
-import { ProductCard } from "@/components/molecules";
+import { LoadMoreButton, ProductCard } from "@/components/molecules";
 import {
   CategoryFilterSection,
 } from "@/components/organisms";
@@ -85,9 +84,7 @@ export function ProductsBrowser({ books }: { books: Book[] }) {
 
           {hasMore && (
             <div className="text-center pt-4">
-              <Button variant="secondary" size="lg" onClick={() => setPage((p) => p + 1)}>
-                আরো দেখুন
-              </Button>
+              <LoadMoreButton onClick={() => setPage((p) => p + 1)} />
             </div>
           )}
 
