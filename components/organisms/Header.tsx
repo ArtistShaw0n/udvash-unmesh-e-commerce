@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchBar } from "@/components/molecules";
@@ -12,6 +14,15 @@ export interface HeaderProps {
 }
 
 export function Header({ cartCount = 0, className }: HeaderProps) {
+  const router = useRouter();
+  const [q, setQ] = useState("");
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const term = q.trim();
+    router.push(term ? `/search?q=${encodeURIComponent(term)}` : "/search");
+  }
+
   return (
     <header
       className={clsx(
@@ -22,9 +33,9 @@ export function Header({ cartCount = 0, className }: HeaderProps) {
       <div className="container-site flex items-center gap-3 sm:gap-6 h-16 sm:h-20">
         <Logo size="md" />
 
-        <div className="flex-1 max-w-2xl mx-2 hidden sm:block">
-          <SearchBar />
-        </div>
+        <form className="flex-1 max-w-2xl mx-2 hidden sm:block" onSubmit={submitSearch} role="search">
+          <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
+        </form>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <Link
@@ -45,9 +56,9 @@ export function Header({ cartCount = 0, className }: HeaderProps) {
         </div>
       </div>
 
-      <div className="container-site pb-3 sm:hidden">
-        <SearchBar />
-      </div>
+      <form className="container-site pb-3 sm:hidden" onSubmit={submitSearch} role="search">
+        <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
+      </form>
     </header>
   );
 }

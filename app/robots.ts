@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh.netlify.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh-e-commerce.netlify.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,7 +8,16 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/cart", "/api/"],
+        disallow: [
+          "/cart",
+          "/checkout",
+          "/account",
+          "/order/",
+          "/forgot-password",
+          "/reset-password",
+          "/verify-email",
+          "/api/",
+        ],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

@@ -1,5 +1,16 @@
+export { AccountSidebar } from "./AccountSidebar";
+
 export { AuthCard } from "./AuthCard";
 export type { AuthCardProps } from "./AuthCard";
+
+export { StaticPageHero } from "./StaticPageHero";
+export type { StaticPageHeroProps } from "./StaticPageHero";
+
+export { StaticPageLayout } from "./StaticPageLayout";
+export type { StaticPageLayoutProps } from "./StaticPageLayout";
+
+export { SuccessHero } from "./SuccessHero";
+export type { SuccessHeroProps } from "./SuccessHero";
 
 export { CategoryFilterSection } from "./CategoryFilterSection";
 export type { CategoryFilterSectionProps } from "./CategoryFilterSection";
