@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
@@ -13,6 +14,7 @@ import {
   ThumbnailButton,
 } from "@/components/molecules";
 import type { Book } from "@/lib/books";
+import { useCart } from "@/lib/cart-context";
 import { toBengaliNumber } from "@/lib/site";
 import { clsx } from "@/lib/clsx";
 
@@ -23,8 +25,20 @@ export interface ProductDetailHeroProps {
 }
 
 export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetailHeroProps) {
+  const router = useRouter();
+  const { addItem } = useCart();
   const [activeThumb, setActiveThumb] = useState(0);
-  const [qty, setQty] = useState(0);
+  // Local "how many to add" — applied to cart when Buy Now / cart icon is clicked.
+  const [qty, setQty] = useState(1);
+
+  function handleBuyNow() {
+    addItem(book.slug, Math.max(1, qty));
+    router.push("/cart");
+  }
+
+  function handleAddToCartIcon() {
+    addItem(book.slug, Math.max(1, qty));
+  }
 
   return (
     <section className={clsx("section-pad-sm", className)}>
@@ -91,11 +105,17 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
 
           {/* Bottom row — counter + Buy Now + cart icon (matches screenshots) */}
           <div className="flex items-center gap-3 pt-2">
-            <QuantityCounter value={qty} onChange={setQty} />
-            <Button variant="primary" size="lg" fullWidth leftIcon={<ShoppingBag size={18} />}>
+            <QuantityCounter value={qty} min={1} onChange={setQty} />
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              leftIcon={<ShoppingBag size={18} />}
+              onClick={handleBuyNow}
+            >
               Buy Now
             </Button>
-            <CartIconButton size="lg" />
+            <CartIconButton size="lg" onClick={handleAddToCartIcon} />
           </div>
         </div>
       </div>

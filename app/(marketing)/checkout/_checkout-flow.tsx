@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, MapPin, Plus, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,8 @@ import {
   type Address,
   type PaymentMethodId,
 } from "@/components/molecules";
+import { useCart } from "@/lib/cart-context";
+import { getBookBySlug } from "@/lib/books";
 import { toBengaliNumber } from "@/lib/site";
 
 const SAMPLE_ADDRESSES: Address[] = [
@@ -43,23 +45,60 @@ const STEPS = [
   { label: "রিভিউ" },
 ];
 
+const VAT_RATE = 0.05;
+const SHIPPING_FLAT = 50;
+
 export function CheckoutFlow() {
   const router = useRouter();
+  const { items, hydrated, clearSelected } = useCart();
   const [step, setStep] = useState(0);
   const [addressId, setAddressId] = useState(SAMPLE_ADDRESSES[0].id);
   const [adding, setAdding] = useState(false);
   const [payment, setPayment] = useState<PaymentMethodId>("bkash");
   const [promo, setPromo] = useState("");
 
-  const subtotal = 2250;
-  const vat = 250;
-  const shipping = 50;
+  // Resolve only the selected items.
+  const selectedItems = items
+    .filter((i) => i.selected)
+    .map((entry) => {
+      const book = getBookBySlug(entry.slug);
+      return book ? { entry, book } : null;
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+
+  const itemCount = selectedItems.reduce((s, r) => s + r.entry.quantity, 0);
+  const subtotal = selectedItems.reduce(
+    (sum, r) => sum + r.book.price * r.entry.quantity,
+    0,
+  );
+  const vat = subtotal > 0 ? Math.round(subtotal * VAT_RATE) : 0;
+  const shipping = subtotal > 0 ? SHIPPING_FLAT : 0;
   const total = subtotal + vat + shipping;
+
+  // Guard: if there's nothing selected after hydration, send the user back to /cart.
+  useEffect(() => {
+    if (hydrated && selectedItems.length === 0) {
+      router.replace("/cart");
+    }
+  }, [hydrated, selectedItems.length, router]);
 
   const handlePlaceOrder = () => {
     const orderId = "UU" + Date.now().toString().slice(-6);
+    // Remove the items we just checked out, then navigate to the success page.
+    clearSelected();
     router.push(`/order/${orderId}/success`);
   };
+
+  // Show a stable shell before hydration / during redirect.
+  if (!hydrated || selectedItems.length === 0) {
+    return (
+      <section className="section-pad-sm">
+        <div className="container-site">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section-pad-sm">
@@ -136,7 +175,7 @@ export function CheckoutFlow() {
             {step === 2 && (
               <>
                 <h2 className="text-h3 text-[var(--fg-primary)]">অর্ডার রিভিউ</h2>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <SectionMini title="ডেলিভারি ঠিকানা">
                     {SAMPLE_ADDRESSES.find((a) => a.id === addressId)?.line1}
                   </SectionMini>
@@ -146,6 +185,22 @@ export function CheckoutFlow() {
                     {payment === "card" && "Credit / Debit Card"}
                     {payment === "cod" && "Cash on Delivery"}
                   </SectionMini>
+                  <div>
+                    <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)] mb-2">আপনার অর্ডার</p>
+                    <ul className="divide-y divide-[var(--border-muted)] rounded-md border border-[var(--border-default)]">
+                      {selectedItems.map(({ entry, book }) => (
+                        <li key={book.slug} className="flex items-center gap-3 px-3 py-2.5">
+                          <span className="flex-1 text-body-sm text-[var(--fg-primary)] truncate">{book.titleBn}</span>
+                          <span className="text-caption text-[var(--fg-muted)] tabular-nums">
+                            ×{toBengaliNumber(entry.quantity)}
+                          </span>
+                          <span className="text-body-sm font-semibold text-[var(--fg-primary)] tabular-nums min-w-[5rem] text-right">
+                            {toBengaliNumber((book.price * entry.quantity).toLocaleString("en-US"))}৳
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                   <div>
                     <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)] mb-2">প্রোমো কোড</p>
                     <div className="flex gap-2">
@@ -186,7 +241,10 @@ export function CheckoutFlow() {
           <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
             <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
             <dl className="space-y-2">
-              <SummaryRow label="Subtotal (2 items)" value={subtotal} />
+              <SummaryRow
+                label={`Subtotal (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
+                value={subtotal}
+              />
               <SummaryRow label="Vat" value={vat} />
               <SummaryRow label="Shipping" value={shipping} />
             </dl>

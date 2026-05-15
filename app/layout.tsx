@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri, Inter } from "next/font/google";
 import Script from "next/script";
+import { CartProvider } from "@/lib/cart-context";
 import "./globals.css";
 
 const inter = Inter({
@@ -85,7 +86,7 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInitScript}
         </Script>
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

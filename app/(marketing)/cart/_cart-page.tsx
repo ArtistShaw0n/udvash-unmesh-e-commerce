@@ -1,44 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ShoppingBag } from "lucide-react";
-import { Checkbox } from "@/components/atoms";
-import { CartItemRow, OrderSummaryCard, type CartItem } from "@/components/molecules";
+import { Button, Checkbox } from "@/components/atoms";
+import {
+  CartItemRow,
+  EmptyState,
+  OrderSummaryCard,
+  type CartItem as RowItem,
+} from "@/components/molecules";
+import { useCart } from "@/lib/cart-context";
+import { getBookBySlug } from "@/lib/books";
 
-const INITIAL_ITEMS: (CartItem & { quantity: number; selected: boolean })[] = [
-  { id: "1", titleBn: "এইচএসসি রসায়ন ২য় পত্র", category: "Academic", price: 2250, unitPrice: 9890, quantity: 1, selected: true },
-  { id: "2", titleBn: "এইচএসসি রসায়ন ২য় পত্র", category: "Academic", price: 2250, unitPrice: 9890, quantity: 1, selected: false },
-  { id: "3", titleBn: "এইচএসসি রসায়ন ২য় পত্র", category: "Academic", price: 2250, unitPrice: 9890, quantity: 1, selected: false },
-  { id: "4", titleBn: "এইচএসসি রসায়ন ২য় পত্র", category: "Academic", price: 2250, unitPrice: 9890, quantity: 1, selected: false },
-];
+const VAT_RATE = 0.05;
+const SHIPPING_FLAT = 50;
 
 export function CartPage() {
-  const [items, setItems] = useState(INITIAL_ITEMS);
+  const router = useRouter();
+  const {
+    items,
+    hydrated,
+    selectedCount,
+    allSelected,
+    toggleSelected,
+    toggleSelectAll,
+    setQuantity,
+    removeItem,
+    clearCart,
+  } = useCart();
 
-  const selectedCount = items.filter((i) => i.selected).length;
-  const allSelected = items.length > 0 && selectedCount === items.length;
+  // Resolve each cart entry against the book catalog. Drop unknown slugs.
+  const resolved = items
+    .map((entry) => {
+      const book = getBookBySlug(entry.slug);
+      if (!book) return null;
+      return { entry, book };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
-  function toggleAll() {
-    setItems((prev) => prev.map((i) => ({ ...i, selected: !allSelected })));
-  }
-  function toggleItem(id: string) {
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, selected: !i.selected } : i));
-  }
-  function setQty(id: string, q: number) {
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity: q } : i));
-  }
-  function remove(id: string) {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-  }
-  function deleteAll() {
-    setItems([]);
+  // Selected-only totals.
+  const selectedResolved = resolved.filter((r) => r.entry.selected);
+  const subtotal = selectedResolved.reduce(
+    (sum, r) => sum + r.book.price * r.entry.quantity,
+    0,
+  );
+  const vat = selectedResolved.length > 0 ? Math.round(subtotal * VAT_RATE) : 0;
+  const shipping = selectedResolved.length > 0 ? SHIPPING_FLAT : 0;
+  const total = subtotal + vat + shipping;
+
+  // Pre-hydration: render an empty shell to keep SSR/CSR HTML aligned.
+  if (!hydrated) {
+    return (
+      <section className="section-pad-sm">
+        <div className="container-site">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
+        </div>
+      </section>
+    );
   }
 
-  const subtotal = items.filter((i) => i.selected).reduce((sum, i) => sum + i.price * Math.max(1, i.quantity), 0);
-  const vat = 250;
-  const shipping = 50;
-  const total = subtotal;
+  // Truly empty cart.
+  if (resolved.length === 0) {
+    return (
+      <section className="section-pad-sm">
+        <div className="container-site">
+          <EmptyState
+            icon={<ShoppingBag size={36} />}
+            title="আপনার কার্ট খালি"
+            description="বই যোগ করতে নিচের বাটন চাপুন।"
+            cta={
+              <Button href="/products" variant="primary">
+                বই দেখুন
+              </Button>
+            }
+          />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section-pad-sm">
@@ -60,50 +100,59 @@ export function CartPage() {
               </h1>
             </div>
 
-            {items.length > 0 ? (
-              <>
-                <div className="flex items-center justify-between py-4">
-                  <Checkbox label="Select All" id="select-all" checked={allSelected} onChange={toggleAll} />
-                  <button
-                    type="button"
-                    onClick={deleteAll}
-                    className="text-body-sm text-discount-600 hover:text-discount-700 font-semibold"
-                  >
-                    Delete All
-                  </button>
-                </div>
+            <div className="flex items-center justify-between py-4">
+              <Checkbox
+                label="Select All"
+                id="select-all"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+              />
+              <button
+                type="button"
+                onClick={clearCart}
+                className="text-body-sm text-discount-600 hover:text-discount-700 font-semibold"
+              >
+                Delete All
+              </button>
+            </div>
 
-                <div>
-                  {items.map((item) => (
-                    <CartItemRow
-                      key={item.id}
-                      item={item}
-                      quantity={item.quantity}
-                      selected={item.selected}
-                      onToggleSelect={() => toggleItem(item.id)}
-                      onQuantityChange={(q) => setQty(item.id, q)}
-                      onRemove={() => remove(item.id)}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="py-12 text-center">
-                <p className="text-body text-[var(--fg-muted)]">আপনার কার্ট খালি।</p>
-              </div>
-            )}
+            <div>
+              {resolved.map(({ entry, book }) => {
+                const rowItem: RowItem = {
+                  id: book.slug,
+                  titleBn: book.titleBn,
+                  category: book.categoryLabel,
+                  price: book.price * entry.quantity,
+                  unitPrice: book.price,
+                };
+                return (
+                  <CartItemRow
+                    key={book.slug}
+                    item={rowItem}
+                    quantity={entry.quantity}
+                    selected={entry.selected}
+                    onToggleSelect={() => toggleSelected(book.slug)}
+                    onQuantityChange={(q) => setQuantity(book.slug, q)}
+                    onRemove={() => removeItem(book.slug)}
+                  />
+                );
+              })}
+            </div>
           </div>
 
           {/* Order summary */}
-          {items.length > 0 && (
-            <OrderSummaryCard
-              itemCount={selectedCount}
-              subtotal={subtotal}
-              vat={vat}
-              shipping={shipping}
-              total={total}
-            />
-          )}
+          <OrderSummaryCard
+            itemCount={selectedCount}
+            subtotal={subtotal}
+            vat={vat}
+            shipping={shipping}
+            total={total}
+            onAddMore={() => router.push("/products")}
+            onCheckout={() => {
+              if (selectedCount === 0) return;
+              router.push("/checkout");
+            }}
+          />
         </div>
       </div>
     </section>

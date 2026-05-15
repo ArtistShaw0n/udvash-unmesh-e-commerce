@@ -4,7 +4,7 @@ import { Footer, Header } from "@/components/organisms";
 export default function NotFound() {
   return (
     <>
-      <Header cartCount={0} />
+      <Header />
       <main className="flex-1 flex items-center justify-center section-pad">
         <div className="container-site">
           <div className="max-w-xl mx-auto text-center space-y-6">

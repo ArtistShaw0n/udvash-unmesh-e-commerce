@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { CartIconButton } from "@/components/atoms/CartIconButton";
 import { StockOutOverlay } from "@/components/atoms/StockOutOverlay";
 import { PriceBlock } from "./PriceBlock";
 import { QuantityCounter } from "./QuantityCounter";
+import { useCart } from "@/lib/cart-context";
 import { clsx } from "@/lib/clsx";
 import type { Book, BookBadge } from "@/lib/books";
 
@@ -17,12 +18,23 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ book, className }: ProductCardProps) {
-  const [qty, setQty] = useState(0);
+  const router = useRouter();
+  const { getQuantity, setQuantity, addItem, hydrated } = useCart();
+  const qty = hydrated ? getQuantity(book.slug) : 0;
   const detailHref = `/products/${book.slug}`;
 
   const isStockOut = book.stock === "out-of-stock";
   const isPreorder = book.stock === "preorder";
   const secondary = (book as unknown as { secondaryBadge?: BookBadge }).secondaryBadge;
+
+  function handleBuyNow() {
+    if (qty === 0) addItem(book.slug, 1);
+    router.push("/cart");
+  }
+
+  function handleAddToCartIcon() {
+    addItem(book.slug, 1);
+  }
 
   return (
     <div
@@ -104,7 +116,10 @@ export function ProductCard({ book, className }: ProductCardProps) {
         {/* Bottom row — [counter] [Buy Now] [cart icon] (matches screenshots) */}
         <div className="mt-auto pt-3 flex items-center gap-2">
           {!isStockOut && (
-            <QuantityCounter value={qty} onChange={setQty} />
+            <QuantityCounter
+              value={qty}
+              onChange={(next) => setQuantity(book.slug, next)}
+            />
           )}
           {isStockOut ? (
             <Button
@@ -118,17 +133,17 @@ export function ProductCard({ book, className }: ProductCardProps) {
             </Button>
           ) : isPreorder ? (
             <>
-              <Button variant="warning" size="sm" fullWidth>
+              <Button variant="warning" size="sm" fullWidth onClick={handleBuyNow}>
                 Pre Order
               </Button>
-              <CartIconButton size="sm" />
+              <CartIconButton size="sm" onClick={handleAddToCartIcon} />
             </>
           ) : (
             <>
-              <Button variant="primary" size="sm" fullWidth>
+              <Button variant="primary" size="sm" fullWidth onClick={handleBuyNow}>
                 Buy Now
               </Button>
-              <CartIconButton size="sm" />
+              <CartIconButton size="sm" onClick={handleAddToCartIcon} />
             </>
           )}
         </div>
