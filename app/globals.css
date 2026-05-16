@@ -87,7 +87,7 @@
   /* ---------- Semantic — Badges ---------- */
   --color-badge-discount: var(--color-discount-600);
   --color-badge-preorder: var(--color-warning-500);
-  --color-badge-bestseller: var(--color-navy-800);
+  --color-badge-bestseller: #2563eb; /* bright blue from screenshots */
   --color-badge-stockout: var(--color-neutral-400);
 
   /* ---------- Typography ---------- */
@@ -325,7 +325,7 @@ body {
 
 /* Corner placement — only opposite corner rounded */
 .badge-corner-tl, .badge-corner-tr, .badge-corner-bl, .badge-corner-br {
-  font-size: 0.75rem; padding: 0.5rem 1rem; letter-spacing: 0.08em;
+  font-size: 0.8125rem; padding: 0.5rem 0.875rem; letter-spacing: 0.04em; font-weight: 700;
 }
 .badge-corner-tl { border-radius: 0 0 var(--radius-md) 0; }
 .badge-corner-tr { border-radius: 0 0 0 var(--radius-md); }

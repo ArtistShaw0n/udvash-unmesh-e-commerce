@@ -48,10 +48,15 @@ export function ProductCard({ book, className }: ProductCardProps) {
         className,
       )}
     >
-      {/* Image — square aspect */}
+      {/* Image area — warm cream gradient backdrop matching the reference */}
       <Link
         href={detailHref}
-        className="relative block aspect-square bg-[var(--bg-surface-muted)] overflow-hidden"
+        className={clsx(
+          "relative block aspect-square overflow-hidden",
+          isStockOut
+            ? "bg-[var(--bg-surface-muted)]"
+            : "bg-[linear-gradient(180deg,_#fffaf2_0%,_#fde7c4_60%,_#f3b97a_100%)] dark:bg-[linear-gradient(180deg,_#2a2520_0%,_#3a3022_55%,_#5a3818_100%)]",
+        )}
         aria-label={book.titleBn}
       >
         <BookCoverPlaceholder />
@@ -77,7 +82,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
       </Link>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-4">
+      <div className="flex flex-col flex-1 p-5">
         <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
           {book.categoryLabel}
         </p>
@@ -90,12 +95,11 @@ export function ProductCard({ book, className }: ProductCardProps) {
           {book.descriptionBn}
         </p>
 
-        {/* Divider between description and price (matches reference) */}
         <hr className="border-t border-[var(--border-muted)] my-3" />
 
         <PriceBlock price={book.price} oldPrice={book.oldPrice} size="sm" />
 
-        {/* Status row — one of: Free Delivery / Pre Order / Stock Out (mutually exclusive) */}
+        {/* Status row — exactly one of: Free Delivery / Pre Order / Stock Out */}
         <div className="mt-2 min-h-[1.25em]">
           {isStockOut ? (
             <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold inline-flex items-center gap-1">
@@ -113,7 +117,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
         </div>
 
         {/* Action row: counter + CTA + cart icon */}
-        <div className="mt-auto pt-3 flex items-center gap-2">
+        <div className="mt-auto pt-4 flex items-center gap-2">
           {!isStockOut && (
             <QuantityCounter
               value={qty}
@@ -151,17 +155,37 @@ export function ProductCard({ book, className }: ProductCardProps) {
   );
 }
 
+/**
+ * Richer book-cover placeholder modeled after the reference photo:
+ * teal hardcover with a small label band, "page edges" hint on the right,
+ * subtle shadow on the cream backdrop.
+ */
 function BookCoverPlaceholder() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-6">
+    <div className="absolute inset-0 flex items-end justify-center pb-6">
       <svg
-        viewBox="0 0 120 140"
-        className="w-3/5 h-auto text-[var(--fg-muted)] opacity-40"
-        fill="currentColor"
+        viewBox="0 0 140 160"
+        className="w-3/5 h-auto drop-shadow-[0_8px_12px_rgba(0,0,0,0.18)]"
         aria-hidden="true"
       >
-        <rect x="20" y="10" width="80" height="120" rx="4" />
-        <rect x="20" y="10" width="6" height="120" fill="currentColor" opacity="0.6" />
+        {/* Right page edges (off-white slab behind cover) */}
+        <rect x="100" y="14" width="14" height="138" rx="1.5" fill="#f4ecdc" />
+        <line x1="105" y1="22" x2="105" y2="146" stroke="#dccaa4" strokeWidth="0.5" />
+        <line x1="109" y1="22" x2="109" y2="146" stroke="#dccaa4" strokeWidth="0.5" />
+        {/* Cover */}
+        <rect x="22" y="10" width="84" height="142" rx="2" fill="#0F8E8B" />
+        {/* Spine highlight */}
+        <rect x="22" y="10" width="6" height="142" fill="#0a6b69" />
+        {/* Title band */}
+        <rect x="30" y="22" width="68" height="20" rx="2" fill="#f3f9f8" />
+        {/* Decorative star */}
+        <circle cx="64" cy="85" r="18" fill="#fffaf2" opacity="0.9" />
+        <circle cx="64" cy="85" r="14" fill="#0F8E8B" />
+        <text x="64" y="91" fontSize="9" fontWeight="700" textAnchor="middle" fill="#f3f9f8">
+          উদ্ভাস
+        </text>
+        {/* Bottom band */}
+        <rect x="30" y="135" width="68" height="10" rx="1.5" fill="#f3f9f8" />
       </svg>
     </div>
   );
