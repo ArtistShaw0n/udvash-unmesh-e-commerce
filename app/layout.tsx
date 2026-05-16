@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri, Inter } from "next/font/google";
 import Script from "next/script";
+import { AuthProvider } from "@/lib/auth-context";
 import { CartProvider } from "@/lib/cart-context";
+import { OrdersProvider } from "@/lib/orders-store";
+import { ToastProvider } from "@/lib/toast-context";
+import { WishlistProvider } from "@/lib/wishlist-context";
 import "./globals.css";
 
 const inter = Inter({
@@ -86,7 +90,15 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInitScript}
         </Script>
-        <CartProvider>{children}</CartProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <OrdersProvider>
+              <WishlistProvider>
+                <CartProvider>{children}</CartProvider>
+              </WishlistProvider>
+            </OrdersProvider>
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

@@ -1,5 +1,7 @@
 export { AccountSidebar } from "./AccountSidebar";
 
+export { AccountGuard } from "./AccountGuard";
+
 export { AuthCard } from "./AuthCard";
 export type { AuthCardProps } from "./AuthCard";
 

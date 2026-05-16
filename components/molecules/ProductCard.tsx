@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Heart } from "lucide-react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { CartIconButton } from "@/components/atoms/CartIconButton";
@@ -9,6 +10,8 @@ import { StockOutOverlay } from "@/components/atoms/StockOutOverlay";
 import { PriceBlock } from "./PriceBlock";
 import { QuantityCounter } from "./QuantityCounter";
 import { useCart } from "@/lib/cart-context";
+import { useToast } from "@/lib/toast-context";
+import { useWishlist } from "@/lib/wishlist-context";
 import { clsx } from "@/lib/clsx";
 import type { Book, BookBadge } from "@/lib/books";
 
@@ -20,7 +23,11 @@ export interface ProductCardProps {
 export function ProductCard({ book, className }: ProductCardProps) {
   const router = useRouter();
   const { getQuantity, setQuantity, addItem, hydrated } = useCart();
+  const wishlist = useWishlist();
+  const toast = useToast();
+
   const qty = hydrated ? getQuantity(book.slug) : 0;
+  const inWishlist = wishlist.hydrated ? wishlist.has(book.slug) : false;
   const detailHref = `/products/${book.slug}`;
 
   const isStockOut = book.stock === "out-of-stock";
@@ -34,6 +41,15 @@ export function ProductCard({ book, className }: ProductCardProps) {
 
   function handleAddToCartIcon() {
     addItem(book.slug, 1);
+    toast.success("কার্টে যোগ হয়েছে");
+  }
+
+  function handleWishlistToggle(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const added = wishlist.toggle(book.slug);
+    if (added) toast.success("উইশলিস্টে যোগ হয়েছে");
+    else toast.info("উইশলিস্ট থেকে সরানো হয়েছে");
   }
 
   return (
@@ -74,6 +90,22 @@ export function ProductCard({ book, className }: ProductCardProps) {
             {secondary.label}
           </Badge>
         )}
+
+        {/* Wishlist heart — bottom-right of image */}
+        <button
+          type="button"
+          onClick={handleWishlistToggle}
+          aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={inWishlist}
+          className={clsx(
+            "absolute bottom-2 right-2 w-9 h-9 inline-flex items-center justify-center rounded-full bg-[var(--bg-surface)] border shadow-card transition-colors",
+            inWishlist
+              ? "border-discount-300 text-discount-600 hover:bg-discount-50"
+              : "border-[var(--border-default)] text-[var(--fg-muted)] hover:text-discount-600 hover:border-discount-300",
+          )}
+        >
+          <Heart size={16} fill={inWishlist ? "currentColor" : "none"} />
+        </button>
 
         {/* Stock out diagonal sticker */}
         {isStockOut && <StockOutOverlay />}

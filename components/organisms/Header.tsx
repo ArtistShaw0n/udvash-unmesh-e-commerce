@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Heart } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchBar } from "@/components/molecules";
+import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
+import { useToast } from "@/lib/toast-context";
 import { clsx } from "@/lib/clsx";
 
 export interface HeaderProps {
@@ -16,7 +18,31 @@ export interface HeaderProps {
 export function Header({ className }: HeaderProps) {
   const router = useRouter();
   const [q, setQ] = useState("");
-  const { itemCount, hydrated } = useCart();
+  const { itemCount, hydrated: cartHydrated } = useCart();
+  const { user, hydrated: authHydrated, logout } = useAuth();
+  const toast = useToast();
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Close menu on outside-click / Escape
+  useEffect(() => {
+    function onPointer(e: MouseEvent) {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", onPointer);
+      document.addEventListener("keydown", onKey);
+    }
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -24,8 +50,15 @@ export function Header({ className }: HeaderProps) {
     router.push(term ? `/search?q=${encodeURIComponent(term)}` : "/search");
   }
 
-  // Only show the badge after hydration so SSR/CSR markup matches.
-  const showBadge = hydrated && itemCount > 0;
+  function handleLogout() {
+    logout();
+    setMenuOpen(false);
+    toast.info("লগআউট হয়েছে");
+    router.push("/");
+  }
+
+  const showBadge = cartHydrated && itemCount > 0;
+  const isLoggedIn = authHydrated && !!user;
 
   return (
     <header
@@ -54,9 +87,63 @@ export function Header({ className }: HeaderProps) {
               </span>
             )}
           </Link>
-          <Button href="/login" variant="primary" size="md">
-            Login/Register
-          </Button>
+
+          {!authHydrated ? (
+            // Stable placeholder so SSR and CSR widths match.
+            <div className="w-32 h-10 rounded-md bg-[var(--bg-surface-muted)] animate-pulse hidden sm:block" />
+          ) : isLoggedIn ? (
+            <div ref={menuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((o) => !o)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                className="inline-flex items-center gap-2 h-10 px-2 sm:px-3 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
+              >
+                <span className="inline-flex w-8 h-8 items-center justify-center rounded-full bg-brand-600 text-white text-body-sm font-bold">
+                  {user!.name.charAt(0).toUpperCase()}
+                </span>
+                <span className="hidden sm:block text-body-sm font-semibold text-[var(--fg-primary)] truncate max-w-[8rem]">
+                  {user!.name}
+                </span>
+                <ChevronDown size={14} className="hidden sm:block text-[var(--fg-muted)]" />
+              </button>
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-2 w-56 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-2 z-50"
+                >
+                  <div className="px-3 py-2 border-b border-[var(--border-muted)] mb-1">
+                    <p className="text-body-sm font-semibold text-[var(--fg-primary)] truncate">{user!.name}</p>
+                    <p className="text-caption text-[var(--fg-muted)] truncate">{user!.email}</p>
+                  </div>
+                  <MenuLink href="/account" icon={<UserIcon size={16} />} onClick={() => setMenuOpen(false)}>
+                    ড্যাশবোর্ড
+                  </MenuLink>
+                  <MenuLink href="/account/orders" icon={<Package size={16} />} onClick={() => setMenuOpen(false)}>
+                    আমার অর্ডার
+                  </MenuLink>
+                  <MenuLink href="/account/wishlist" icon={<Heart size={16} />} onClick={() => setMenuOpen(false)}>
+                    উইশলিস্ট
+                  </MenuLink>
+                  <div className="my-1 border-t border-[var(--border-muted)]" />
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-body-sm font-semibold text-discount-600 hover:bg-discount-50 dark:hover:bg-discount-900/20 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    লগআউট
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Button href="/login" variant="primary" size="md">
+              Login/Register
+            </Button>
+          )}
         </div>
       </div>
 
@@ -64,5 +151,29 @@ export function Header({ className }: HeaderProps) {
         <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
       </form>
     </header>
+  );
+}
+
+function MenuLink({
+  href,
+  icon,
+  children,
+  onClick,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      role="menuitem"
+      onClick={onClick}
+      className="flex items-center gap-2 px-3 py-2 rounded-md text-body-sm text-[var(--fg-secondary)] hover:bg-[var(--bg-surface-muted)] hover:text-[var(--fg-primary)] transition-colors"
+    >
+      {icon}
+      {children}
+    </Link>
   );
 }

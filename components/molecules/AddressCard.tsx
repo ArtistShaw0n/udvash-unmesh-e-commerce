@@ -1,4 +1,4 @@
-import { MapPin, Pencil, Trash2 } from "lucide-react";
+import { MapPin, Pencil, Trash2, Star } from "lucide-react";
 import { clsx } from "@/lib/clsx";
 
 export interface Address {
@@ -20,6 +20,7 @@ export interface AddressCardProps {
   onSelect?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onSetDefault?: () => void;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function AddressCard({
   onSelect,
   onEdit,
   onDelete,
+  onSetDefault,
   className,
 }: AddressCardProps) {
   const interactive = selectable && onSelect;
@@ -69,6 +71,15 @@ export function AddressCard({
             {address.line2 ? `, ${address.line2}` : ""}, {address.city}
             {address.zip ? ` - ${address.zip}` : ""}
           </p>
+          {onSetDefault && !address.isDefault && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onSetDefault(); }}
+              className="mt-2 inline-flex items-center gap-1 text-caption font-semibold text-brand-700 dark:text-brand-400 hover:underline"
+            >
+              <Star size={12} /> ডিফল্ট সেট করুন
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           {onEdit && (

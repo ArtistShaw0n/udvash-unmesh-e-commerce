@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { User, Package, MapPin, Heart, Shield, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { useToast } from "@/lib/toast-context";
 import { clsx } from "@/lib/clsx";
 
 const ITEMS = [
@@ -16,6 +18,16 @@ const ITEMS = [
 
 export function AccountSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+  const toast = useToast();
+
+  function handleLogout() {
+    logout();
+    toast.info("লগআউট হয়েছে");
+    router.push("/");
+  }
+
   return (
     <aside className={clsx("rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 sm:p-3 sticky top-24", className)}>
       <nav>
@@ -42,6 +54,7 @@ export function AccountSidebar({ className }: { className?: string }) {
           <li className="pt-2 mt-2 border-t border-[var(--border-muted)]">
             <button
               type="button"
+              onClick={handleLogout}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-body-sm font-semibold text-discount-600 hover:bg-discount-50 dark:hover:bg-discount-900/20 transition-colors"
             >
               <LogOut size={18} />
