@@ -39,6 +39,9 @@ export type { InputProps } from "./Input";
 export { Logo } from "./Logo";
 export type { LogoProps } from "./Logo";
 
+export { LogoWhite } from "./LogoWhite";
+export type { LogoWhiteProps } from "./LogoWhite";
+
 export { SectionLabel } from "./SectionLabel";
 export type { SectionLabelProps } from "./SectionLabel";
 

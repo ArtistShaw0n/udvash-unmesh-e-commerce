@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
-import { Logo } from "@/components/atoms";
+import { LogoWhite } from "@/components/atoms";
 import { PaymentMethodsRow } from "@/components/molecules";
 import {
   SITE_ADDRESS_BN,
@@ -36,10 +36,8 @@ export function Footer({ className }: FooterProps) {
         <div className="grid gap-8 lg:gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            {/* Logo keeps its original brand colors on dark footer — matches screenshots */}
-            <div className="inline-block rounded-md bg-white/95 px-3 py-2">
-              <Logo size="md" href="/" />
-            </div>
+            {/* White logo variant — designed for the dark brand-700 footer. */}
+            <LogoWhite size="md" href="/" />
             <p className="text-body-sm text-white/80 leading-relaxed max-w-[260px]">
               {SITE_TAGLINE_BN}
             </p>
