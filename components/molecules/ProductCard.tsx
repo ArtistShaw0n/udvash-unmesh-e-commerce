@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart } from "lucide-react";
+import { Heart, Clock } from "lucide-react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { CartIconButton } from "@/components/atoms/CartIconButton";
@@ -59,7 +59,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
         className,
       )}
     >
-      {/* Image area — square aspect, with corner badges */}
+      {/* Image area — square aspect */}
       <Link
         href={detailHref}
         className="relative block aspect-square bg-[var(--bg-surface-muted)] overflow-hidden"
@@ -67,44 +67,38 @@ export function ProductCard({ book, className }: ProductCardProps) {
       >
         <BookCoverPlaceholder />
 
-        {/* Primary badge — top-left */}
-        {book.badge && (
-          <Badge
-            color={book.badge.type}
-            variant="solid"
-            placement="corner-tl"
-            className="absolute top-0 left-0"
-          >
-            {book.badge.label}
-          </Badge>
+        {/* Top-left badge stack: primary first, secondary inline */}
+        {(book.badge || secondary) && (
+          <div className="absolute top-0 left-0 flex items-stretch">
+            {book.badge && (
+              <Badge color={book.badge.type} variant="solid" placement="corner-tl">
+                {book.badge.label}
+              </Badge>
+            )}
+            {secondary && (
+              <Badge color={secondary.type} variant="solid" placement="corner-tl">
+                {secondary.label}
+              </Badge>
+            )}
+          </div>
         )}
 
-        {/* Secondary badge — TOP-RIGHT (matches screenshots) */}
-        {secondary && (
-          <Badge
-            color={secondary.type}
-            variant="solid"
-            placement="corner-tr"
-            className="absolute top-0 right-0"
-          >
-            {secondary.label}
-          </Badge>
-        )}
-
-        {/* Wishlist heart — bottom-right of image */}
+        {/* Top-right wishlist heart — subtle, fades in on hover; stays visible
+            when the item is already in wishlist so users can find it again. */}
         <button
           type="button"
           onClick={handleWishlistToggle}
           aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={inWishlist}
           className={clsx(
-            "absolute bottom-2 right-2 w-9 h-9 inline-flex items-center justify-center rounded-full bg-[var(--bg-surface)] border shadow-card transition-colors",
+            "absolute top-2 right-2 w-8 h-8 inline-flex items-center justify-center rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-sm border shadow-card transition-all",
+            "focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
             inWishlist
-              ? "border-discount-300 text-discount-600 hover:bg-discount-50"
-              : "border-[var(--border-default)] text-[var(--fg-muted)] hover:text-discount-600 hover:border-discount-300",
+              ? "opacity-100 border-discount-300 text-discount-600 hover:bg-discount-50"
+              : "opacity-0 group-hover:opacity-100 border-[var(--border-default)] text-[var(--fg-muted)] hover:text-discount-600 hover:border-discount-300",
           )}
         >
-          <Heart size={16} fill={inWishlist ? "currentColor" : "none"} />
+          <Heart size={14} fill={inWishlist ? "currentColor" : "none"} />
         </button>
 
         {/* Stock out diagonal sticker */}
@@ -125,27 +119,30 @@ export function ProductCard({ book, className }: ProductCardProps) {
           {book.descriptionBn}
         </p>
 
+        {/* Divider above price (matches reference) */}
+        <hr className="border-t border-[var(--border-muted)] !mt-3" />
+
         <div className="pt-1">
           <PriceBlock price={book.price} oldPrice={book.oldPrice} size="sm" />
         </div>
 
-        {book.freeDelivery && !isStockOut && (
-          <p className="text-caption text-success-700 dark:text-success-400 font-semibold flex items-center gap-1">
-            ✓ Free Delivery
+        {book.freeDelivery && !isStockOut && !isPreorder && (
+          <p className="text-caption text-success-700 dark:text-success-400 font-semibold inline-flex items-center gap-1">
+            <CheckMark /> Free Delivery
           </p>
         )}
         {isStockOut && (
-          <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold flex items-center gap-1">
-            ✕ Stock Out
+          <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold inline-flex items-center gap-1">
+            <CrossMark /> Stock Out
           </p>
         )}
         {isPreorder && (
-          <p className="text-caption text-warning-700 dark:text-warning-400 font-semibold flex items-center gap-1">
-            🟠 Pre Order
+          <p className="text-caption text-warning-700 dark:text-warning-400 font-semibold inline-flex items-center gap-1.5">
+            <Clock size={12} /> Pre Order
           </p>
         )}
 
-        {/* Bottom row — [counter] [Buy Now] [cart icon] (matches screenshots) */}
+        {/* Bottom row — [counter] [Buy Now] [cart icon] (matches reference) */}
         <div className="mt-auto pt-3 flex items-center gap-2">
           {!isStockOut && (
             <QuantityCounter
@@ -181,6 +178,37 @@ export function ProductCard({ book, className }: ProductCardProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Small inline check/cross marks so we don't pull a full icon for one glyph. */
+function CheckMark() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="flex-shrink-0">
+      <path
+        d="M2 6.5L4.5 9L10 3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CrossMark() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="flex-shrink-0">
+      <path
+        d="M3 3L9 9M9 3L3 9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
