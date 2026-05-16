@@ -6,8 +6,11 @@ export interface StockOutOverlayProps {
 }
 
 /**
- * Stock-out "sticker" overlay applied across a ProductCard image.
- * Renders a rotated stamp-like graphic with notched ends.
+ * Stock-out sticker overlay applied across a ProductCard image — Figma spec:
+ *   • Rect21404 covers the entire image with rgba(0,0,0,0.2)
+ *   • Text sticker centred: 143×40, padding 6 19, bg rgba(0,0,0,0.5),
+ *     5px radius, rotate -12deg
+ *   • Label: Poppins 700, 16px, line-height 28px, letter-spacing 1.55px, uppercase
  */
 export function StockOutOverlay({
   className,
@@ -15,22 +18,19 @@ export function StockOutOverlay({
 }: StockOutOverlayProps) {
   return (
     <div
+      aria-label="Stock out"
       className={clsx(
-        "absolute inset-0 flex items-center justify-center bg-neutral-300/40 dark:bg-neutral-900/40 backdrop-blur-[1px]",
+        "absolute inset-0 flex items-center justify-center bg-black/20",
         className,
       )}
-      aria-label="Stock out"
     >
-      <div className="relative -rotate-12 select-none">
-        {/* Main label panel */}
-        <div className="bg-neutral-700 dark:bg-neutral-800 text-white px-6 py-2 shadow-card-hover">
-          <span className="text-h4 font-black tracking-[0.18em]">{label}</span>
-        </div>
-        {/* Top + bottom notches (ribbon look) */}
-        <span className="absolute -top-1 left-2 w-2 h-2 bg-neutral-700 dark:bg-neutral-800 rounded-full" />
-        <span className="absolute -top-1 right-2 w-2 h-2 bg-neutral-700 dark:bg-neutral-800 rounded-full" />
-        <span className="absolute -bottom-1 left-2 w-2 h-2 bg-neutral-700 dark:bg-neutral-800 rounded-full" />
-        <span className="absolute -bottom-1 right-2 w-2 h-2 bg-neutral-700 dark:bg-neutral-800 rounded-full" />
+      <div
+        className="-rotate-12 flex items-center justify-center rounded-[5px] bg-black/50 px-[19px] py-[6px] select-none"
+        style={{ minWidth: "143px", height: "40px" }}
+      >
+        <span className="font-poppins font-bold text-white text-[16px] leading-[28px] tracking-[0.097em] uppercase">
+          {label}
+        </span>
       </div>
     </div>
   );

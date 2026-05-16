@@ -85,9 +85,10 @@
   --color-neutral-900: #0f172a;
 
   /* ---------- Semantic — Badges ---------- */
-  --color-badge-discount: var(--color-discount-600);
-  --color-badge-preorder: var(--color-warning-500);
-  --color-badge-bestseller: #2563eb; /* bright blue from screenshots */
+  /* Tag/badge colors locked to Figma spec */
+  --color-badge-discount: #E02D15;   /* Tag 1 — discount red */
+  --color-badge-preorder: #F59E0B;   /* Tag 3 — preorder orange */
+  --color-badge-bestseller: #0284C7; /* Tag 4 — best-seller blue */
   --color-badge-stockout: var(--color-neutral-400);
 
   /* ---------- Typography ---------- */
@@ -95,6 +96,9 @@
     -apple-system, BlinkMacSystemFont, sans-serif;
   --font-bengali: var(--font-bengali), "Hind Siliguri", "Noto Sans Bengali",
     sans-serif;
+  /* Poppins is used by ProductCard + price block (Figma reference) */
+  --font-poppins: var(--font-poppins), "Hind Siliguri", "Noto Sans Bengali",
+    ui-sans-serif, system-ui, sans-serif;
 
   --text-xs:   0.75rem;
   --text-sm:   0.875rem;
@@ -323,11 +327,18 @@ body {
 .badge-outline-bestseller { background: transparent; color: var(--color-navy-800);     box-shadow: inset 0 0 0 1.5px var(--color-navy-800); }
 .badge-outline-stockout   { background: transparent; color: var(--color-neutral-600);  box-shadow: inset 0 0 0 1.5px var(--color-neutral-400); }
 
-/* Corner placement — only opposite corner rounded */
+/* Tag pill — Figma "Tag 1/3/4" spec:
+   24px tall, 0 10px padding, 50px radius, 11px Poppins 500,
+   0.2px letter-spacing, light drop-shadow. */
 .badge-corner-tl, .badge-corner-tr, .badge-corner-bl, .badge-corner-br {
-  font-size: 0.8125rem; padding: 0.5rem 0.875rem; letter-spacing: 0.04em; font-weight: 700;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 50px;
+  font-family: var(--font-poppins), "Hind Siliguri", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: none;
 }
-.badge-corner-tl { border-radius: 0 0 var(--radius-md) 0; }
-.badge-corner-tr { border-radius: 0 0 0 var(--radius-md); }
-.badge-corner-bl { border-radius: 0 var(--radius-md) 0 0; }
-.badge-corner-br { border-radius: var(--radius-md) 0 0 0; }

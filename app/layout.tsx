@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hind_Siliguri, Inter } from "next/font/google";
+import { Hind_Siliguri, Inter, Poppins } from "next/font/google";
 import Script from "next/script";
 import { AuthProvider } from "@/lib/auth-context";
 import { CartProvider } from "@/lib/cart-context";
@@ -18,6 +18,13 @@ const bengali = Hind_Siliguri({
   variable: "--font-bengali",
   subsets: ["bengali", "latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -83,7 +90,7 @@ export default function RootLayout({
   return (
     <html
       lang="bn"
-      className={`${inter.variable} ${bengali.variable} h-full antialiased`}
+      className={`${inter.variable} ${bengali.variable} ${poppins.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

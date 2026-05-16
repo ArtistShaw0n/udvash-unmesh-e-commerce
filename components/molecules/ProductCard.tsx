@@ -1,11 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { AlarmClock, Check, X } from "lucide-react";
+import { AlarmClock, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
-import { CartIconButton } from "@/components/atoms/CartIconButton";
 import { StockOutOverlay } from "@/components/atoms/StockOutOverlay";
 import { PriceBlock } from "./PriceBlock";
 import { QuantityCounter } from "./QuantityCounter";
@@ -19,8 +16,26 @@ export interface ProductCardProps {
   className?: string;
 }
 
+/**
+ * ProductCard — implemented strictly from the Figma export (`udvash-roadmap copy.docx`).
+ *
+ * Hard-coded sizes per Figma:
+ *   • Card        306 × 520, padding 10/10/12, radius 10
+ *   • Image area  286 × 256, bg #F7F9FB, radius 5
+ *   • Body        286 × 242, padding-top 12, gap 8
+ *   • Action row  286 × 34, justify-space-between
+ *     - Counter   90 × 34
+ *     - Add to Cart button 130 × 34
+ *     - Cart icon button 34 × 34
+ *
+ * Variants (driven by book.stock + book.badge + secondaryBadge):
+ *   • Discount → red pill
+ *   • Pre Order → orange pill + AlarmClock status + orange "Pre Order" button
+ *   • Best Seller (+ Discount) → blue pill (+ red pill), Save badge uses brand tone
+ *   • Stock Out → grey overlay + diagonal sticker, single full-width disabled
+ *     "Stock Out" button + disabled cart icon, no counter
+ */
 export function ProductCard({ book, className }: ProductCardProps) {
-  const router = useRouter();
   const { getQuantity, setQuantity, addItem, hydrated } = useCart();
   const toast = useToast();
 
@@ -30,13 +45,10 @@ export function ProductCard({ book, className }: ProductCardProps) {
   const isStockOut = book.stock === "out-of-stock";
   const isPreorder = book.stock === "preorder";
   const secondary = (book as unknown as { secondaryBadge?: BookBadge }).secondaryBadge;
+  const hasBestSeller =
+    book.badge?.type === "bestseller" || secondary?.type === "bestseller";
 
-  function handleBuyNow() {
-    if (qty === 0) addItem(book.slug, 1);
-    router.push("/cart");
-  }
-
-  function handleAddToCartIcon() {
+  function handleAddToCart() {
     addItem(book.slug, 1);
     toast.success("কার্টে যোগ হয়েছে");
   }
@@ -44,26 +56,22 @@ export function ProductCard({ book, className }: ProductCardProps) {
   return (
     <div
       className={clsx(
-        "group flex flex-col overflow-hidden rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card hover:shadow-card-hover transition-shadow",
+        // 306 max width card with 10/10/12 padding, 10px radius, white bg, soft shadow
+        "flex flex-col w-full max-w-[306px] mx-auto pt-[10px] px-[10px] pb-[12px] rounded-[10px] bg-white dark:bg-[var(--bg-surface)] shadow-card hover:shadow-card-hover transition-shadow",
         className,
       )}
     >
-      {/* Image area — warm cream gradient backdrop matching the reference */}
+      {/* Image area — aspect 286/256, #F7F9FB, badges sit absolutely at 10/10 */}
       <Link
         href={detailHref}
-        className={clsx(
-          "relative block aspect-square overflow-hidden",
-          isStockOut
-            ? "bg-[var(--bg-surface-muted)]"
-            : "bg-[linear-gradient(180deg,_#fffaf2_0%,_#fde7c4_60%,_#f3b97a_100%)] dark:bg-[linear-gradient(180deg,_#2a2520_0%,_#3a3022_55%,_#5a3818_100%)]",
-        )}
         aria-label={book.titleBn}
+        className="relative block w-full aspect-[286/256] rounded-[5px] overflow-hidden bg-[#F7F9FB] dark:bg-[var(--bg-surface-muted)]"
       >
         <BookCoverPlaceholder />
 
-        {/* Top-left badge row: primary + (optional) secondary, ribbon-style flush */}
+        {/* Tag pills at top-left */}
         {(book.badge || secondary) && (
-          <div className="absolute top-0 left-0 flex items-stretch">
+          <div className="absolute top-[10px] left-[10px] flex items-center gap-[12px]">
             {book.badge && (
               <Badge color={book.badge.type} variant="solid" placement="corner-tl">
                 {book.badge.label}
@@ -77,76 +85,90 @@ export function ProductCard({ book, className }: ProductCardProps) {
           </div>
         )}
 
-        {/* Stock-out diagonal sticker */}
         {isStockOut && <StockOutOverlay />}
       </Link>
 
-      {/* Body */}
-      <div className="flex flex-col flex-1 p-5">
-        <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
+      {/* Body — full width inside card padding, padding-top 12, gap 8 */}
+      <div className="flex flex-col w-full pt-3 gap-2 flex-1">
+        {/* Category label */}
+        <p className="font-poppins font-medium text-[10px] leading-[24px] tracking-[0.2px] uppercase text-[#676767]">
           {book.categoryLabel}
         </p>
-        <Link href={detailHref} className="block mt-2">
-          <h3 className="text-body font-bold text-[var(--fg-primary)] leading-snug line-clamp-2 hover:text-brand-700 dark:hover:text-brand-400 transition-colors min-h-[2.6em]">
-            {book.title}
-          </h3>
-        </Link>
-        <p className="text-caption text-[var(--fg-secondary)] line-clamp-2 min-h-[2em] mt-2">
-          {book.descriptionBn}
-        </p>
 
-        <hr className="border-t border-[var(--border-muted)] my-3" />
-
-        <PriceBlock price={book.price} oldPrice={book.oldPrice} size="sm" />
-
-        {/* Status row — exactly one of: Free Delivery / Pre Order / Stock Out */}
-        <div className="mt-2 min-h-[1.25em]">
-          {isStockOut ? (
-            <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold inline-flex items-center gap-1">
-              <X size={12} strokeWidth={3} /> Stock Out
-            </p>
-          ) : isPreorder ? (
-            <p className="text-caption text-warning-700 dark:text-warning-400 font-semibold inline-flex items-center gap-1.5">
-              <AlarmClock size={12} /> Pre Order
-            </p>
-          ) : book.freeDelivery ? (
-            <p className="text-caption text-success-700 dark:text-success-400 font-semibold inline-flex items-center gap-1">
-              <Check size={12} strokeWidth={3} /> Free Delivery
-            </p>
-          ) : null}
+        {/* Title + description — gap 4 */}
+        <div className="flex flex-col gap-1">
+          <Link href={detailHref}>
+            <h3 className="font-poppins font-bold text-[14px] leading-[22px] tracking-[0.1px] text-[#3D3D3D] dark:text-white line-clamp-2 min-h-[44px] hover:text-[#006D77] dark:hover:text-brand-400 transition-colors">
+              {book.title}
+            </h3>
+          </Link>
+          <p className="font-poppins font-normal text-[12px] leading-[16px] tracking-[0.2px] text-[#676767] dark:text-[var(--fg-secondary)] line-clamp-2 min-h-[32px]">
+            {book.descriptionBn}
+          </p>
         </div>
 
-        {/* Action row: counter + CTA + cart icon */}
-        <div className="mt-auto pt-4 flex items-center gap-2">
-          {!isStockOut && (
-            <QuantityCounter
-              value={qty}
-              onChange={(next) => setQuantity(book.slug, next)}
-            />
-          )}
+        {/* Divider — Vector 2 */}
+        <hr className="border-0 border-t border-[#E5F0F1] dark:border-[var(--border-muted)] w-full" />
+
+        {/* Price row */}
+        <PriceBlock
+          price={book.price}
+          oldPrice={book.oldPrice}
+          size="sm"
+          saveVariant={hasBestSeller ? "brand" : "discount"}
+        />
+
+        {/* Status indicator — exactly one of Free Delivery / Pre Order / Stock Out */}
+        <div className="flex items-center gap-1 min-h-[16px]">
+          {isStockOut ? <StockOutStatus /> : isPreorder ? <PreOrderStatus /> : book.freeDelivery ? <FreeDeliveryStatus /> : null}
+        </div>
+
+        {/* Action row — Figma "Frame 931" justify-space-between */}
+        <div className="mt-auto flex items-center justify-between gap-3 w-full pt-1">
           {isStockOut ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              fullWidth
-              disabled
-              className="!bg-[var(--bg-surface-muted)] !text-[var(--fg-muted)]"
-            >
-              Stock Out
-            </Button>
-          ) : isPreorder ? (
             <>
-              <Button variant="warning" size="sm" fullWidth onClick={handleBuyNow}>
-                Pre Order
-              </Button>
-              <CartIconButton size="sm" onClick={handleAddToCartIcon} />
+              <button
+                type="button"
+                disabled
+                className="flex-1 h-[34px] inline-flex items-center justify-center rounded-[5px] bg-[#DEDEDE] text-[#676767] font-poppins font-normal text-[14px] leading-[21px] cursor-not-allowed"
+              >
+                Stock Out
+              </button>
+              <button
+                type="button"
+                disabled
+                aria-label="Cart"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-[5px] bg-white border border-[#DEDEDE] cursor-not-allowed"
+              >
+                <ShoppingCart size={18} className="text-[#DEDEDE]" />
+              </button>
             </>
           ) : (
             <>
-              <Button variant="primary" size="sm" fullWidth onClick={handleBuyNow}>
-                Buy Now
-              </Button>
-              <CartIconButton size="sm" onClick={handleAddToCartIcon} />
+              <QuantityCounter
+                value={qty}
+                onChange={(next) => setQuantity(book.slug, next)}
+                size="card"
+              />
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className={clsx(
+                  // Figma target 130×34; allow shrink/grow on narrower cards.
+                  "flex-1 min-w-0 max-w-[130px] h-[34px] inline-flex items-center justify-center rounded-[5px] font-poppins font-normal text-[14px] leading-[21px] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500",
+                  isPreorder ? "bg-[#F59E0B]" : "bg-[#006D77]",
+                )}
+              >
+                {isPreorder ? "Pre Order" : "Add to Cart"}
+              </button>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                aria-label="Add to cart"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-[5px] bg-white border border-[#006D77] hover:bg-[#006D77]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
+              >
+                <ShoppingCart size={18} className="text-[#006D77]" strokeWidth={1.5} />
+              </button>
             </>
           )}
         </div>
@@ -155,32 +177,89 @@ export function ProductCard({ book, className }: ProductCardProps) {
   );
 }
 
-/**
- * Richer book-cover placeholder modeled after the reference photo:
- * teal hardcover with a small label band, "page edges" hint on the right,
- * subtle shadow on the cream backdrop.
- */
+/* ------------------------------------------------------------------ */
+/* Status indicators                                                  */
+/* ------------------------------------------------------------------ */
+
+function FreeDeliveryStatus() {
+  return (
+    <>
+      <CheckIcon />
+      <span className="font-poppins font-medium text-[12px] leading-4 text-[#006D77]">
+        Free Delivery
+      </span>
+    </>
+  );
+}
+
+function PreOrderStatus() {
+  return (
+    <>
+      <AlarmClock size={14} className="text-[#F59E0B]" strokeWidth={2} />
+      <span className="font-poppins font-medium text-[12px] leading-4 text-[#F59E0B]">
+        Pre Order
+      </span>
+    </>
+  );
+}
+
+function StockOutStatus() {
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-[2px] bg-[#E02D15]"
+      >
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+          <path d="M1.5 1.5L6.5 6.5M6.5 1.5L1.5 6.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </span>
+      <span className="font-poppins font-medium text-[12px] leading-4 text-[#E02D15]">
+        Stock Out
+      </span>
+    </>
+  );
+}
+
+/** Free-delivery check icon — outlined teal #006D77, ~14px box. */
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path
+        d="M2.33 7.5L5.5 10.67L11.67 4.5"
+        stroke="#006D77"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Book cover placeholder                                             */
+/* ------------------------------------------------------------------ */
+
 function BookCoverPlaceholder() {
   return (
-    <div className="absolute inset-0 flex items-end justify-center pb-6">
+    <div className="absolute inset-0 flex items-end justify-center pb-4">
       <svg
         viewBox="0 0 140 160"
-        className="w-3/5 h-auto drop-shadow-[0_8px_12px_rgba(0,0,0,0.18)]"
+        className="w-[180px] h-auto drop-shadow-[0_8px_14px_rgba(0,0,0,0.12)]"
         aria-hidden="true"
       >
-        {/* Right page edges (off-white slab behind cover) */}
+        {/* Page edges */}
         <rect x="100" y="14" width="14" height="138" rx="1.5" fill="#f4ecdc" />
         <line x1="105" y1="22" x2="105" y2="146" stroke="#dccaa4" strokeWidth="0.5" />
         <line x1="109" y1="22" x2="109" y2="146" stroke="#dccaa4" strokeWidth="0.5" />
         {/* Cover */}
-        <rect x="22" y="10" width="84" height="142" rx="2" fill="#0F8E8B" />
-        {/* Spine highlight */}
-        <rect x="22" y="10" width="6" height="142" fill="#0a6b69" />
+        <rect x="22" y="10" width="84" height="142" rx="2" fill="#006D77" />
+        <rect x="22" y="10" width="6" height="142" fill="#054f51" />
         {/* Title band */}
         <rect x="30" y="22" width="68" height="20" rx="2" fill="#f3f9f8" />
-        {/* Decorative star */}
-        <circle cx="64" cy="85" r="18" fill="#fffaf2" opacity="0.9" />
-        <circle cx="64" cy="85" r="14" fill="#0F8E8B" />
+        {/* Center mark */}
+        <circle cx="64" cy="85" r="18" fill="#fffaf2" opacity="0.95" />
+        <circle cx="64" cy="85" r="14" fill="#006D77" />
         <text x="64" y="91" fontSize="9" fontWeight="700" textAnchor="middle" fill="#f3f9f8">
           উদ্ভাস
         </text>
