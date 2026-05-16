@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Clock } from "lucide-react";
+import { AlarmClock, Check, X } from "lucide-react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { CartIconButton } from "@/components/atoms/CartIconButton";
@@ -11,7 +11,6 @@ import { PriceBlock } from "./PriceBlock";
 import { QuantityCounter } from "./QuantityCounter";
 import { useCart } from "@/lib/cart-context";
 import { useToast } from "@/lib/toast-context";
-import { useWishlist } from "@/lib/wishlist-context";
 import { clsx } from "@/lib/clsx";
 import type { Book, BookBadge } from "@/lib/books";
 
@@ -23,11 +22,9 @@ export interface ProductCardProps {
 export function ProductCard({ book, className }: ProductCardProps) {
   const router = useRouter();
   const { getQuantity, setQuantity, addItem, hydrated } = useCart();
-  const wishlist = useWishlist();
   const toast = useToast();
 
   const qty = hydrated ? getQuantity(book.slug) : 0;
-  const inWishlist = wishlist.hydrated ? wishlist.has(book.slug) : false;
   const detailHref = `/products/${book.slug}`;
 
   const isStockOut = book.stock === "out-of-stock";
@@ -44,14 +41,6 @@ export function ProductCard({ book, className }: ProductCardProps) {
     toast.success("কার্টে যোগ হয়েছে");
   }
 
-  function handleWishlistToggle(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    const added = wishlist.toggle(book.slug);
-    if (added) toast.success("উইশলিস্টে যোগ হয়েছে");
-    else toast.info("উইশলিস্ট থেকে সরানো হয়েছে");
-  }
-
   return (
     <div
       className={clsx(
@@ -59,7 +48,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
         className,
       )}
     >
-      {/* Image area — square aspect */}
+      {/* Image — square aspect */}
       <Link
         href={detailHref}
         className="relative block aspect-square bg-[var(--bg-surface-muted)] overflow-hidden"
@@ -67,7 +56,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
       >
         <BookCoverPlaceholder />
 
-        {/* Top-left badge stack: primary first, secondary inline */}
+        {/* Top-left badge row: primary + (optional) secondary, ribbon-style flush */}
         {(book.badge || secondary) && (
           <div className="absolute top-0 left-0 flex items-stretch">
             {book.badge && (
@@ -83,66 +72,47 @@ export function ProductCard({ book, className }: ProductCardProps) {
           </div>
         )}
 
-        {/* Top-right wishlist heart — subtle, fades in on hover; stays visible
-            when the item is already in wishlist so users can find it again. */}
-        <button
-          type="button"
-          onClick={handleWishlistToggle}
-          aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-          aria-pressed={inWishlist}
-          className={clsx(
-            "absolute top-2 right-2 w-8 h-8 inline-flex items-center justify-center rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-sm border shadow-card transition-all",
-            "focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
-            inWishlist
-              ? "opacity-100 border-discount-300 text-discount-600 hover:bg-discount-50"
-              : "opacity-0 group-hover:opacity-100 border-[var(--border-default)] text-[var(--fg-muted)] hover:text-discount-600 hover:border-discount-300",
-          )}
-        >
-          <Heart size={14} fill={inWishlist ? "currentColor" : "none"} />
-        </button>
-
-        {/* Stock out diagonal sticker */}
+        {/* Stock-out diagonal sticker */}
         {isStockOut && <StockOutOverlay />}
       </Link>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-4 space-y-2">
+      <div className="flex flex-col flex-1 p-4">
         <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
           {book.categoryLabel}
         </p>
-        <Link href={detailHref} className="block">
+        <Link href={detailHref} className="block mt-2">
           <h3 className="text-body font-bold text-[var(--fg-primary)] leading-snug line-clamp-2 hover:text-brand-700 dark:hover:text-brand-400 transition-colors min-h-[2.6em]">
             {book.title}
           </h3>
         </Link>
-        <p className="text-caption text-[var(--fg-secondary)] line-clamp-2 min-h-[2em]">
+        <p className="text-caption text-[var(--fg-secondary)] line-clamp-2 min-h-[2em] mt-2">
           {book.descriptionBn}
         </p>
 
-        {/* Divider above price (matches reference) */}
-        <hr className="border-t border-[var(--border-muted)] !mt-3" />
+        {/* Divider between description and price (matches reference) */}
+        <hr className="border-t border-[var(--border-muted)] my-3" />
 
-        <div className="pt-1">
-          <PriceBlock price={book.price} oldPrice={book.oldPrice} size="sm" />
+        <PriceBlock price={book.price} oldPrice={book.oldPrice} size="sm" />
+
+        {/* Status row — one of: Free Delivery / Pre Order / Stock Out (mutually exclusive) */}
+        <div className="mt-2 min-h-[1.25em]">
+          {isStockOut ? (
+            <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold inline-flex items-center gap-1">
+              <X size={12} strokeWidth={3} /> Stock Out
+            </p>
+          ) : isPreorder ? (
+            <p className="text-caption text-warning-700 dark:text-warning-400 font-semibold inline-flex items-center gap-1.5">
+              <AlarmClock size={12} /> Pre Order
+            </p>
+          ) : book.freeDelivery ? (
+            <p className="text-caption text-success-700 dark:text-success-400 font-semibold inline-flex items-center gap-1">
+              <Check size={12} strokeWidth={3} /> Free Delivery
+            </p>
+          ) : null}
         </div>
 
-        {book.freeDelivery && !isStockOut && !isPreorder && (
-          <p className="text-caption text-success-700 dark:text-success-400 font-semibold inline-flex items-center gap-1">
-            <CheckMark /> Free Delivery
-          </p>
-        )}
-        {isStockOut && (
-          <p className="text-caption text-discount-700 dark:text-discount-400 font-semibold inline-flex items-center gap-1">
-            <CrossMark /> Stock Out
-          </p>
-        )}
-        {isPreorder && (
-          <p className="text-caption text-warning-700 dark:text-warning-400 font-semibold inline-flex items-center gap-1.5">
-            <Clock size={12} /> Pre Order
-          </p>
-        )}
-
-        {/* Bottom row — [counter] [Buy Now] [cart icon] (matches reference) */}
+        {/* Action row: counter + CTA + cart icon */}
         <div className="mt-auto pt-3 flex items-center gap-2">
           {!isStockOut && (
             <QuantityCounter
@@ -178,37 +148,6 @@ export function ProductCard({ book, className }: ProductCardProps) {
         </div>
       </div>
     </div>
-  );
-}
-
-/** Small inline check/cross marks so we don't pull a full icon for one glyph. */
-function CheckMark() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="flex-shrink-0">
-      <path
-        d="M2 6.5L4.5 9L10 3.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CrossMark() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="flex-shrink-0">
-      <path
-        d="M3 3L9 9M9 3L3 9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 

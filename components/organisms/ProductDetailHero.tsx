@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock } from "lucide-react";
+import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock, Heart } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
   BreadcrumbPill,
@@ -15,6 +15,8 @@ import {
 } from "@/components/molecules";
 import type { Book } from "@/lib/books";
 import { useCart } from "@/lib/cart-context";
+import { useWishlist } from "@/lib/wishlist-context";
+import { useToast } from "@/lib/toast-context";
 import { toBengaliNumber } from "@/lib/site";
 import { clsx } from "@/lib/clsx";
 
@@ -27,9 +29,13 @@ export interface ProductDetailHeroProps {
 export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetailHeroProps) {
   const router = useRouter();
   const { addItem } = useCart();
+  const wishlist = useWishlist();
+  const toast = useToast();
   const [activeThumb, setActiveThumb] = useState(0);
   // Local "how many to add" — applied to cart when Buy Now / cart icon is clicked.
   const [qty, setQty] = useState(1);
+
+  const inWishlist = wishlist.hydrated ? wishlist.has(book.slug) : false;
 
   function handleBuyNow() {
     addItem(book.slug, Math.max(1, qty));
@@ -38,6 +44,12 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
 
   function handleAddToCartIcon() {
     addItem(book.slug, Math.max(1, qty));
+  }
+
+  function handleWishlistToggle() {
+    const added = wishlist.toggle(book.slug);
+    if (added) toast.success("উইশলিস্টে যোগ হয়েছে");
+    else toast.info("উইশলিস্ট থেকে সরানো হয়েছে");
   }
 
   return (
@@ -103,7 +115,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>
 
-          {/* Bottom row — counter + Buy Now + cart icon (matches screenshots) */}
+          {/* Bottom row — counter + Buy Now + cart icon + wishlist */}
           <div className="flex items-center gap-3 pt-2">
             <QuantityCounter value={qty} min={1} onChange={setQty} />
             <Button
@@ -116,6 +128,20 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
               Buy Now
             </Button>
             <CartIconButton size="lg" onClick={handleAddToCartIcon} />
+            <button
+              type="button"
+              onClick={handleWishlistToggle}
+              aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              aria-pressed={inWishlist}
+              className={clsx(
+                "inline-flex items-center justify-center w-12 h-12 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                inWishlist
+                  ? "border-discount-300 bg-discount-50 text-discount-600 dark:bg-discount-900/20 dark:border-discount-700/40"
+                  : "border-[var(--border-default)] text-[var(--fg-muted)] hover:border-discount-300 hover:text-discount-600",
+              )}
+            >
+              <Heart size={20} fill={inWishlist ? "currentColor" : "none"} />
+            </button>
           </div>
         </div>
       </div>
