@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
+import { ShoppingCart, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
@@ -74,8 +74,10 @@ export function Header({ className }: HeaderProps) {
             aria-label={`Cart (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
             className="relative inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
           >
-            <ShoppingBag size={20} className="text-[var(--fg-primary)] sm:hidden" />
-            <ShoppingBag size={22} className="text-[var(--fg-primary)] hidden sm:block" />
+            {/* Figma spec — 18×18 ShoppingCart (matches the cart icon used inside
+                ProductCard action rows). One size across breakpoints; the button
+                tap-target around it scales with the header chrome. */}
+            <ShoppingCart size={18} className="text-[var(--fg-primary)]" />
             {showBadge && (
               <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 rounded-full bg-discount-600 text-white text-caption font-bold inline-flex items-center justify-center">
                 {itemCount > 99 ? "99+" : itemCount}

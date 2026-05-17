@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, ShoppingBag, User, Package } from "lucide-react";
+import { Home, Search, ShoppingCart, User, Package } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/lib/auth-context";
 import { clsx } from "@/lib/clsx";
@@ -28,7 +28,7 @@ export function MobileBottomNav() {
     { label: "হোম", href: "/", icon: Home },
     { label: "সার্চ", href: "/search", icon: Search },
     { label: "অর্ডার", href: isLoggedIn ? "/account/orders" : "/orders/track", icon: Package },
-    { label: "কার্ট", href: "/cart", icon: ShoppingBag, badge: itemCount },
+    { label: "কার্ট", href: "/cart", icon: ShoppingCart, badge: itemCount },
     {
       label: "একাউন্ট",
       href: isLoggedIn ? "/account" : "/login",
