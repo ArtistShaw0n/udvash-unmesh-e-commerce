@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { badRequest, conflict, ok } from "@/lib/server/response";
 import { createSession, hashPassword } from "@/lib/server/auth";
 import { store } from "@/lib/server/store";
+import { notify } from "@/lib/server/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,9 @@ export async function POST(req: NextRequest) {
   });
 
   await createSession(user);
+
+  // Fire the welcome email (in dev this just logs to stdout)
+  void notify.onWelcome(user, verifyCode);
 
   // In production, dispatch an email with verifyCode here (Resend/SendGrid).
   // For demo we return it so the user can paste it. Remove `devCode` for prod.

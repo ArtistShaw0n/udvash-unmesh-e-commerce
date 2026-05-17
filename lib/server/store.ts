@@ -14,6 +14,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import { getAllBooks } from "../books";
+import { DEFAULT_COUPONS, type Coupon } from "../coupons";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const DATA_FILE = path.join(DATA_DIR, "store.json");
@@ -99,6 +100,7 @@ interface DbShape {
   orders: Record<string, ServerOrder>;
   reviews: Record<string, ServerReview>;
   inventory: ServerInventory;
+  coupons: Coupon[];
 }
 
 const INITIAL_UNITS = 25;
@@ -117,6 +119,7 @@ function emptyDb(): DbShape {
     orders: {},
     reviews: {},
     inventory,
+    coupons: [...DEFAULT_COUPONS],
   };
 }
 
@@ -304,6 +307,34 @@ export const store = {
   },
   dumpAllReviews(): ServerReview[] {
     return Object.values(load().reviews);
+  },
+  // ---- Coupons ---------------------------------------------------------
+  dumpCoupons(): Coupon[] {
+    const db = load();
+    // Migration: ensure pre-existing store.json (without coupons) gets seeded
+    if (!db.coupons) {
+      db.coupons = [...DEFAULT_COUPONS];
+      persist();
+    }
+    return db.coupons;
+  },
+  upsertCoupon(coupon: Coupon): Coupon {
+    const db = load();
+    if (!db.coupons) db.coupons = [];
+    const idx = db.coupons.findIndex((c) => c.code === coupon.code);
+    if (idx >= 0) db.coupons[idx] = coupon;
+    else db.coupons.push(coupon);
+    persist();
+    return coupon;
+  },
+  deleteCoupon(code: string): boolean {
+    const db = load();
+    if (!db.coupons) db.coupons = [];
+    const before = db.coupons.length;
+    db.coupons = db.coupons.filter((c) => c.code !== code);
+    if (db.coupons.length === before) return false;
+    persist();
+    return true;
   },
   setInventory(slug: string, units: number): number {
     const db = load();

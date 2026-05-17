@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/server/auth";
 import { store, type ServerOrder } from "@/lib/server/store";
 import { applyCoupon } from "@/lib/coupons";
 import { getBookBySlug } from "@/lib/books";
+import { notify } from "@/lib/server/notifications";
+import { initiatePayment } from "@/lib/server/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +70,11 @@ export async function POST(req: NextRequest) {
   let appliedCoupon: string | undefined;
 
   if (couponCode) {
-    const result = applyCoupon(couponCode, { subtotal, shipping: baseShipping });
+    const result = applyCoupon(
+      couponCode,
+      { subtotal, shipping: baseShipping },
+      store.dumpCoupons(),
+    );
     if (!result.ok) return badRequest(result.error);
     couponDiscount = result.coupon.kind === "free-shipping" ? 0 : result.discount;
     shipping = result.shippingAfter;
@@ -86,10 +92,8 @@ export async function POST(req: NextRequest) {
     return conflict(`কিছু আইটেমের স্টক নেই: ${inventoryResult.lacking.join(", ")}`);
   }
 
-  const paymentStatus: ServerOrder["payment"]["status"] =
-    paymentMethod === "cod" ? "cod" : paymentMethod === "card" ? "paid" : "pending";
-
-  const order: ServerOrder = {
+  // Run the payment provider (stub today, real gateway swap later)
+  const draftOrder: ServerOrder = {
     id: newOrderId(),
     userId: user.id,
     placedAt: Date.now(),
@@ -109,7 +113,7 @@ export async function POST(req: NextRequest) {
       city: address.city,
       zip: address.zip,
     },
-    payment: { method: paymentMethod, status: paymentStatus },
+    payment: { method: paymentMethod, status: "pending" },
     subtotal,
     vat,
     shipping,
@@ -118,8 +122,25 @@ export async function POST(req: NextRequest) {
     returnStatus: "none",
   };
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
+  const paymentResult = await initiatePayment({
+    order: draftOrder,
+    successUrl: `${siteUrl}/order/${draftOrder.id}/success`,
+    cancelUrl: `${siteUrl}/cart`,
+    webhookUrl: `${siteUrl}/api/payments/webhook`,
+  });
+
+  const order: ServerOrder = {
+    ...draftOrder,
+    payment: { method: paymentMethod, status: paymentResult.status },
+  };
+
   store.createOrder(order);
   store.clearCart(user.id, { onlySelected: true });
 
-  return ok({ order });
+  // Fire-and-forget notification
+  void notify.onOrderConfirmed(user, order);
+
+  return ok({ order, redirectUrl: paymentResult.redirectUrl });
 }

@@ -10,6 +10,7 @@ import {
   Users,
   RotateCcw,
   Star,
+  Tag,
   LogOut,
   Menu,
   X,
@@ -25,6 +26,7 @@ const NAV = [
   { label: "কাস্টমার", href: "/admin/customers", icon: Users },
   { label: "রিটার্ন", href: "/admin/returns", icon: RotateCcw },
   { label: "রিভিউ", href: "/admin/reviews", icon: Star },
+  { label: "কুপন", href: "/admin/coupons", icon: Tag },
 ];
 
 export function AdminSidebar() {

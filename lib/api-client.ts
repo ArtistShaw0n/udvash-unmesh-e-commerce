@@ -226,4 +226,16 @@ export const api = {
   },
   adminReturns: () => call<{ returns: unknown[] }>("/api/admin/returns"),
   adminReviews: () => call<{ reviews: unknown[] }>("/api/admin/reviews"),
+
+  // Admin coupons
+  adminCoupons: () => call<{ coupons: unknown[] }>("/api/admin/coupons"),
+  adminCreateCoupon: (input: Record<string, unknown>) =>
+    call<{ coupon: unknown }>("/api/admin/coupons", { method: "POST", body: input }),
+  adminUpdateCoupon: (code: string, patch: Record<string, unknown>) =>
+    call<{ coupon: unknown }>(`/api/admin/coupons/${code}`, {
+      method: "PATCH",
+      body: patch,
+    }),
+  adminDeleteCoupon: (code: string) =>
+    call<{ deleted: true }>(`/api/admin/coupons/${code}`, { method: "DELETE" }),
 };

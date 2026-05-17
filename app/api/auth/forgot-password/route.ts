@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { badRequest, ok } from "@/lib/server/response";
 import { store } from "@/lib/server/store";
+import { notify } from "@/lib/server/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,7 @@ export async function POST(req: NextRequest) {
   if (user) {
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     store.updateUser(user.id, { resetCode });
-    // Real impl: dispatch a password-reset email with a tokenized link.
-    // For demo we return the code so the user can paste it.
+    void notify.onPasswordReset(user, resetCode);
     return ok({ sent: true, devResetCode: resetCode });
   }
 

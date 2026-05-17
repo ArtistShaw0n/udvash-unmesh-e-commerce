@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { badRequest, forbidden, notFound, ok, unauthorized } from "@/lib/server/response";
 import { getCurrentUser } from "@/lib/server/auth";
 import { store } from "@/lib/server/store";
+import { notify } from "@/lib/server/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       order.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
     );
     const updated = store.updateOrder(id, { status: "cancelled", cancelReason: reason });
+    if (updated) void notify.onOrderCancelled(user, updated, false);
     return ok({ order: updated });
   }
 
@@ -52,6 +54,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       returnStatus: "requested",
       returnReason: reason.trim(),
     });
+    if (updated) void notify.onReturnRequested(user, updated);
     return ok({ order: updated });
   }
 

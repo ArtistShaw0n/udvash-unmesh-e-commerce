@@ -21,7 +21,11 @@ export interface Coupon {
   successLabel: string;
 }
 
-export const COUPONS: Coupon[] = [
+/**
+ * Default seed of coupons. The admin can override / extend at runtime;
+ * the admin store reads from this seed on first boot.
+ */
+export const DEFAULT_COUPONS: Coupon[] = [
   {
     code: "NEW10",
     kind: "percent",
@@ -76,9 +80,12 @@ export interface CouponApplyError {
   error: string;
 }
 
-export function findCoupon(code: string): Coupon | undefined {
+export function findCoupon(
+  code: string,
+  catalog: Coupon[] = DEFAULT_COUPONS,
+): Coupon | undefined {
   const cleaned = code.trim().toUpperCase();
-  return COUPONS.find((c) => c.code === cleaned);
+  return catalog.find((c) => c.code === cleaned);
 }
 
 /**
@@ -88,8 +95,9 @@ export function findCoupon(code: string): Coupon | undefined {
 export function applyCoupon(
   code: string,
   input: CouponApplyInput,
+  catalog: Coupon[] = DEFAULT_COUPONS,
 ): CouponApplyResult | CouponApplyError {
-  const coupon = findCoupon(code);
+  const coupon = findCoupon(code, catalog);
   if (!coupon) return { ok: false, error: "অবৈধ কোড" };
 
   if (coupon.expiresAt && coupon.expiresAt < Date.now()) {

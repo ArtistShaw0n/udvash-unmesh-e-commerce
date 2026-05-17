@@ -8,6 +8,7 @@ import {
 } from "@/lib/server/response";
 import { requireAdmin } from "@/lib/server/auth";
 import { store, type ServerOrder } from "@/lib/server/store";
+import { notify } from "@/lib/server/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -98,5 +99,17 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   if (Object.keys(patch).length === 0) return badRequest("Nothing to update");
 
   const updated = store.updateOrder(id, patch);
+
+  // Fire notifications based on the transition
+  if (updated) {
+    const customer = store.findUserById(updated.userId);
+    if (customer) {
+      if (patch.status === "shipped") void notify.onOrderShipped(customer, updated);
+      if (patch.status === "delivered") void notify.onOrderDelivered(customer, updated);
+      if (patch.status === "cancelled") void notify.onOrderCancelled(customer, updated, true);
+      if (patch.returnStatus === "refunded") void notify.onReturnRefunded(customer, updated);
+    }
+  }
+
   return ok({ order: updated });
 }
