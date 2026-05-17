@@ -1,70 +1,44 @@
+import Image from "next/image";
 import { clsx } from "@/lib/clsx";
 
 /**
- * Long row of supported payment-method chips. Renders as small monochrome
- * text-chips since we don't have brand-logo SVG assets yet — swap to real
- * brand logos when available.
+ * Payment methods strip rendered from a single high-quality PNG that
+ * carries the real brand logos (VISA, Mastercard, JCB, bKash, Nagad,
+ * Rocket, the local banks, etc.) plus the SSLCommerz "Verified by"
+ * badge at the right end.
+ *
+ * The asset is `public/footer/payments.png` (1240×39). On desktop it
+ * renders at native intrinsic width; on narrower viewports the
+ * containing div scrolls horizontally so nothing gets squashed.
+ *
+ * Previously this was a row of text chips ("VISA", "MC", "AmEx", ...)
+ * because we didn't have brand-logo assets. Once the real strip arrived,
+ * the chip approach was replaced.
  */
 export interface PaymentMethodsRowProps {
   className?: string;
 }
 
-const METHODS = [
-  "VISA",
-  "MC",
-  "AmEx",
-  "JCB",
-  "Diners",
-  "DBBL",
-  "bKash",
-  "Nagad",
-  "Rocket",
-  "Upay",
-  "TapnPay",
-  "BBL",
-  "SureCash",
-  "MTB",
-  "EBL",
-  "IFIC",
-  "City",
-  "SCB",
-  "HSBC",
-  "Brac",
-  "Eastern",
-  "Prime",
-  "Pubali",
-  "Sonali",
-  "Janata",
-  "Agrani",
-  "NRB",
-  "Mercantile",
-  "UCB",
-  "Mutual",
-];
-
 export function PaymentMethodsRow({ className }: PaymentMethodsRowProps) {
   return (
     <div
       className={clsx(
-        "rounded-md bg-white/95 px-3 py-2 overflow-x-auto",
+        "rounded-md bg-white/95 px-3 py-3 overflow-x-auto",
         className,
       )}
     >
-      <div className="flex items-center gap-1.5 min-w-max">
-        <span className="inline-flex items-center px-2 py-1 rounded-sm bg-neutral-100 text-neutral-700 text-[10px] font-bold whitespace-nowrap h-6">
-          Pay With
-        </span>
-        {METHODS.map((m) => (
-          <span
-            key={m}
-            className="inline-flex items-center justify-center px-2 py-1 rounded-sm bg-white text-neutral-700 text-[10px] font-bold whitespace-nowrap min-w-[42px] h-6 border border-neutral-200"
-          >
-            {m}
-          </span>
-        ))}
-        <span className="ml-2 inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-brand-50 text-brand-800 text-[10px] font-bold whitespace-nowrap h-6 border border-brand-200">
-          Verified by <span className="font-black">SSLcommerz</span>
-        </span>
+      <div className="min-w-max flex items-center">
+        <Image
+          src="/footer/payments.png"
+          alt="Supported payment methods — VISA, Mastercard, bKash, Nagad, Rocket, and more. Verified by SSLCommerz."
+          width={1240}
+          height={39}
+          // Below-the-fold (footer) → defer to lazy load.
+          loading="lazy"
+          // Cap at the asset's native width; scale down responsively on
+          // narrower viewports without distorting the aspect ratio.
+          className="h-auto max-w-full w-[1240px]"
+        />
       </div>
     </div>
   );
