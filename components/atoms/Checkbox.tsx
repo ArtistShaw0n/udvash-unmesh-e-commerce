@@ -5,7 +5,7 @@ import { Check, Minus } from "lucide-react";
 import { clsx } from "@/lib/clsx";
 
 export interface CheckboxProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size"> {
   label?: React.ReactNode;
   /**
    * Tri-state: when true, renders the indeterminate (mixed) glyph regardless
@@ -13,6 +13,12 @@ export interface CheckboxProps
    * are checked. Sets `aria-checked="mixed"` for screen readers.
    */
   indeterminate?: boolean;
+  /**
+   * Visual size. `md` (default) = 20×20 — used in dense surfaces like the
+   * cart Select-All and per-row checkboxes. `sm` = 16×16 — used in dense
+   * filter sidebars (the standard "settings checkbox" size).
+   */
+  size?: "sm" | "md";
 }
 
 /**
@@ -37,6 +43,7 @@ export function Checkbox({
   label,
   checked,
   indeterminate = false,
+  size = "md",
   className,
   id,
   disabled,
@@ -50,17 +57,24 @@ export function Checkbox({
   }, [indeterminate]);
 
   const showAsFilled = indeterminate || !!checked;
+  const isSm = size === "sm";
 
   return (
     <label
       htmlFor={id}
       className={clsx(
-        "inline-flex items-center gap-2.5 select-none",
+        "inline-flex items-center select-none",
+        isSm ? "gap-2" : "gap-2.5",
         disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
         className,
       )}
     >
-      <span className="relative inline-flex w-5 h-5 shrink-0">
+      <span
+        className={clsx(
+          "relative inline-flex shrink-0",
+          isSm ? "w-4 h-4" : "w-5 h-5",
+        )}
+      >
         <input
           ref={inputRef}
           id={id}
@@ -96,16 +110,18 @@ export function Checkbox({
               : undefined,
           )}
         >
-          {/* Indeterminate takes priority over checked when both true */}
+          {/* Indeterminate takes priority over checked when both true.
+              Glyph sizes scale with the box: 11px for sm (16 box),
+              14px for md (20 box) — keeps the same inner-padding ratio. */}
           {indeterminate ? (
             <Minus
-              size={14}
+              size={isSm ? 11 : 14}
               strokeWidth={3.5}
               className="text-white pointer-events-none"
             />
           ) : (
             <Check
-              size={14}
+              size={isSm ? 11 : 14}
               strokeWidth={3}
               className={clsx(
                 "text-white pointer-events-none transition-opacity duration-150",

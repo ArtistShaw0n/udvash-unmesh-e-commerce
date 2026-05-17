@@ -152,17 +152,20 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
   // controls, separate inputs. Prefix IDs so labels resolve to the right
   // input (duplicate IDs are an a11y violation and break `htmlFor`).
   const renderFilterPanel = (scope: "desktop" | "mobile") => (
-    <div className="space-y-5">
+    // Compact filter sidebar — small checkboxes (16×16, the conventional
+    // "settings panel" size) + tight row spacing so the section reads as
+    // a dense, scannable rail not a tall column.
+    <div className="space-y-4">
       <Section title="দাম">
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {PRICE_BRACKETS.map((b, i) => (
-            <label key={b.label} className="flex items-center gap-2 cursor-pointer">
+            <label key={b.label} className="flex items-center gap-2 cursor-pointer py-0.5">
               <input
                 type="radio"
                 name={`price-${scope}`}
                 checked={filters.priceIdx === i}
                 onChange={() => updateFilter("priceIdx", i)}
-                className="accent-brand-600"
+                className="accent-brand-600 w-4 h-4"
               />
               <span className="text-body-sm text-[var(--fg-secondary)]">{b.label}</span>
             </label>
@@ -170,21 +173,24 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
         </div>
       </Section>
       <Section title="অপশন">
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Checkbox
             id={`${scope}-ff-free`}
+            size="sm"
             label="ফ্রি ডেলিভারি"
             checked={filters.freeDelivery}
             onChange={(e) => updateFilter("freeDelivery", e.target.checked)}
           />
           <Checkbox
             id={`${scope}-ff-stock`}
+            size="sm"
             label="স্টকে আছে"
             checked={filters.inStockOnly}
             onChange={(e) => updateFilter("inStockOnly", e.target.checked)}
           />
           <Checkbox
             id={`${scope}-ff-disc`}
+            size="sm"
             label="ডিসকাউন্ট চলছে"
             checked={filters.discountOnly}
             onChange={(e) => updateFilter("discountOnly", e.target.checked)}
@@ -211,13 +217,13 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
 
       <section className="section-pad-sm">
         <div className="container-site space-y-6">
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <h2 className="text-h2 text-[var(--fg-primary)]">সকল বই</h2>
-              <p className="text-body-sm text-[var(--fg-secondary)] mt-1">
-                {toBengaliNumber(filtered.length)} টি বই পাওয়া গেছে
-              </p>
-            </div>
+          {/* Toolbar — filter trigger (mobile) + result count + sort. The h1
+              "সকল বই" was removed per user request; the section title from
+              CategoryFilterSection above is enough to anchor the page. */}
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-body-sm text-[var(--fg-secondary)]">
+              {toBengaliNumber(filtered.length)} টি বই পাওয়া গেছে
+            </p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
