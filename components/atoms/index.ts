@@ -56,6 +56,9 @@ export { WhatsAppButton } from "./WhatsAppButton";
 
 export { InstallPrompt } from "./InstallPrompt";
 
+export { Skeleton, ProductCardSkeleton, TableRowSkeleton } from "./Skeleton";
+export type { SkeletonProps } from "./Skeleton";
+
 export { SectionLabel } from "./SectionLabel";
 export type { SectionLabelProps } from "./SectionLabel";
 

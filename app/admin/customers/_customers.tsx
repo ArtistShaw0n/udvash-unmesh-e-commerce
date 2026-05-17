@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Search, ShieldCheck, ShieldAlert } from "lucide-react";
-import { Input } from "@/components/atoms";
+import { Input, TableRowSkeleton } from "@/components/atoms";
 import { api } from "@/lib/api-client";
 import { formatBnDate } from "@/lib/orders-store";
 import { toBengaliNumber } from "@/lib/site";
@@ -53,8 +53,14 @@ export function AdminCustomersList() {
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
-          লোড হচ্ছে...
+        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
+          <table className="w-full text-body-sm">
+            <tbody className="divide-y divide-[var(--border-muted)]">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TableRowSkeleton key={i} cols={6} />
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : (
         <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
