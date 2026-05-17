@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
 
   const normalized = email.trim().toLowerCase();
-  if (store.findUserByEmail(normalized)) {
+  if (await store.findUserByEmail(normalized)) {
     return conflict("এই ইমেইলে ইতিমধ্যে একাউন্ট আছে");
   }
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const id = `u_${Math.random().toString(36).slice(2, 12)}`;
   const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-  const user = store.createUser({
+  const user = await store.createUser({
     id,
     email: normalized,
     passwordHash,

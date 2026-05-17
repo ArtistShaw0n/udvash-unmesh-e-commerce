@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (!code) return badRequest("Code required");
   if (!Number.isFinite(subtotal) || subtotal < 0) return badRequest("Invalid subtotal");
 
-  const result = applyCoupon(code, { subtotal, shipping }, store.dumpCoupons());
+  const result = applyCoupon(code, { subtotal, shipping }, await store.dumpCoupons());
   if (!result.ok) return badRequest(result.error);
 
   return ok({

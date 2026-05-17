@@ -11,6 +11,6 @@ export async function GET() {
   } catch (e) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
-  const reviews = store.dumpAllReviews().sort((a, b) => b.createdAt - a.createdAt);
+  const reviews = (await store.dumpAllReviews()).sort((a, b) => b.createdAt - a.createdAt);
   return ok({ reviews });
 }

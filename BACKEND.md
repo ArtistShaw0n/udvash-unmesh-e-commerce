@@ -1,4 +1,8 @@
-# Backend — current state + migration plan
+# Backend — current state
+
+> **Status (May 2026):** Prisma + Postgres migration shipped. The
+> file-backed JSON store is gone. The runtime queries Neon Postgres
+> via a singleton Prisma client.
 
 ## What's live today
 

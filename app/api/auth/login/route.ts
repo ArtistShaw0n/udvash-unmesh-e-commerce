@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
   if (!password) return badRequest("পাসওয়ার্ড দিন");
 
-  const user = store.findUserByEmail(email);
+  const user = await store.findUserByEmail(email);
   if (!user) return unauthorized("ইমেইল বা পাসওয়ার্ড ভুল");
   const passOk = await verifyPassword(password, user.passwordHash);
   if (!passOk) return unauthorized("ইমেইল বা পাসওয়ার্ড ভুল");

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (!valid) return badRequest("বর্তমান পাসওয়ার্ড ভুল");
 
   const passwordHash = await hashPassword(next);
-  store.updateUser(user.id, { passwordHash });
+  await store.updateUser(user.id, { passwordHash });
 
   return ok({ changed: true });
 }

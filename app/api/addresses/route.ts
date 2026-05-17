@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
-  return ok({ addresses: store.addressesFor(user.id) });
+  return ok({ addresses: await store.addressesFor(user.id) });
 }
 
 /** POST /api/addresses — create a new address */
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return badRequest("সব ঘর পূরণ করুন");
   }
 
-  const existing = store.addressesFor(user.id);
+  const existing = await store.addressesFor(user.id);
   const shouldBeDefault = isDefault === true || existing.length === 0;
 
   const id = `a_${Math.random().toString(36).slice(2, 10)}`;
@@ -41,6 +41,6 @@ export async function POST(req: NextRequest) {
     zip,
     isDefault: shouldBeDefault,
   };
-  store.upsertAddress(address);
+  await store.upsertAddress(address);
   return ok({ address });
 }

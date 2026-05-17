@@ -1,0 +1,162 @@
+// Udvash-Unmesh — Postgres schema
+//
+// Naming convention: model names are PascalCase singular ("User",
+// "CartItem"). Field names are camelCase. Snake-cased SQL identifiers
+// come from `@map`/`@@map` where it helps readability of the raw SQL.
+//
+// Soft-delete is not used — orders go through a `status` lifecycle,
+// reviews and coupons get hard-deleted. Cascade deletes are wired so
+// removing a User auto-removes their addresses / cart / orders /
+// reviews; book slugs are typed as `String` (not FK) because the
+// catalog lives in `data/books.json`, not in the DB.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------
+// Users + auth
+// ---------------------------------------------------------------------
+
+model User {
+  id              String    @id
+  email           String    @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  emailVerified   Boolean   @default(false)
+  emailVerifyCode String?
+  resetCode       String?
+  createdAt       DateTime  @default(now())
+
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  cart      CartItem[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------
+// Addresses
+// ---------------------------------------------------------------------
+
+model Address {
+  id            String  @id
+  userId        String
+  label         String
+  recipientName String
+  phone         String
+  line1         String
+  line2         String?
+  city          String
+  zip           String?
+  isDefault     Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+// ---------------------------------------------------------------------
+// Cart — composite PK (user + slug) so adding twice merges quantity
+// ---------------------------------------------------------------------
+
+model CartItem {
+  userId    String
+  slug      String
+  quantity  Int      @default(1)
+  selected  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, slug])
+  @@index([userId])
+  @@map("cart_items")
+}
+
+// ---------------------------------------------------------------------
+// Orders — items snapshot is JSON, address is a JSON snapshot too
+// ---------------------------------------------------------------------
+
+model Order {
+  id            String    @id
+  userId        String
+  placedAt      DateTime  @default(now())
+  status        String    // placed | confirmed | shipped | delivered | cancelled
+  items         Json      // [{ slug, quantity, price, titleBn }, ...]
+  address       Json      // snapshot of ServerAddress (recipientName, phone, line1, line2, city, zip)
+  paymentMethod String
+  paymentStatus String    // paid | pending | cod
+  subtotal      Int
+  vat           Int
+  shipping      Int
+  total         Int
+  couponCode    String?
+  returnStatus  String    @default("none")
+  cancelReason  String?
+  returnReason  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([placedAt])
+  @@map("orders")
+}
+
+// ---------------------------------------------------------------------
+// Reviews — one per (book, user) to prevent dupes
+// ---------------------------------------------------------------------
+
+model Review {
+  id                String   @id
+  slug              String
+  userId            String
+  authorName        String
+  rating            Int
+  title             String
+  body              String
+  createdAt         DateTime @default(now())
+  verifiedPurchase  Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([slug, userId])
+  @@index([slug])
+  @@map("reviews")
+}
+
+// ---------------------------------------------------------------------
+// Inventory — book slug → unit count
+// ---------------------------------------------------------------------
+
+model Inventory {
+  slug  String @id
+  units Int    @default(25)
+
+  @@map("inventory")
+}
+
+// ---------------------------------------------------------------------
+// Coupons — admin-editable
+// ---------------------------------------------------------------------
+
+model Coupon {
+  code         String   @id  // uppercase A-Z, 0-9, -, _
+  kind         String          // percent | fixed | free-shipping
+  value        Int
+  minSubtotal  Int?
+  maxDiscount  Int?
+  description  String
+  successLabel String
+  createdAt    DateTime @default(now())
+
+  @@map("coupons")
+}

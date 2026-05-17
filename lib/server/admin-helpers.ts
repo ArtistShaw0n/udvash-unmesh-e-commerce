@@ -36,7 +36,7 @@ function daysAgo(n: number): number {
   return d.getTime();
 }
 
-export function getDashboardStats(): DashboardStats {
+export async function getDashboardStats(): Promise<DashboardStats> {
   // Pull lists by scanning all users / orders. Fine for the file-backed
   // store; with Prisma+Postgres these become aggregate SQL queries.
   const allUsers: ServerUser[] = [];
@@ -45,10 +45,10 @@ export function getDashboardStats(): DashboardStats {
   // we approximate by deduping orders.email
   // Pragmatic shim: peek at the store's private map.
   // (When migrating to Prisma, replace with `prisma.user.count()` etc.)
-  const orderList = listAllOrders();
+  const orderList = await listAllOrders();
   const uniqueEmails = new Set(orderList.map((o) => o.userId));
   for (const id of uniqueEmails) {
-    const u = store.findUserById(id);
+    const u = await store.findUserById(id);
     if (u) allUsers.push(u);
   }
 
@@ -81,7 +81,7 @@ export function getDashboardStats(): DashboardStats {
   let lowStockCount = 0;
   for (const b of getAllBooks()) {
     if (b.stock === "out-of-stock" || b.stock === "preorder") continue;
-    const units = store.getInventory(b.slug);
+    const units = await store.getInventory(b.slug);
     if (units <= 5) lowStockCount += 1;
   }
 
@@ -102,7 +102,7 @@ export function getDashboardStats(): DashboardStats {
 // List helpers — scan the store
 // ------------------------------------------------------------------
 
-export function listAllOrders(): ServerOrder[] {
+export async function listAllOrders(): Promise<ServerOrder[]> {
   // No public list-all method on store; reach in via ordersFor(undefined)
   // is unsupported — instead we rebuild from each user we've seen.
   // For the file-backed store we just iterate every order id by scanning.
@@ -110,18 +110,18 @@ export function listAllOrders(): ServerOrder[] {
   const out: ServerOrder[] = [];
   // The store doesn't expose its internals; expose via a helper there
   // → see store.ts where we expose `listOrders` for admin use only.
-  for (const o of getAllOrdersFromStore()) out.push(o);
+  for (const o of await getAllOrdersFromStore()) out.push(o);
   return out.sort((a, b) => b.placedAt - a.placedAt);
 }
 
-function getAllOrdersFromStore(): ServerOrder[] {
+async function getAllOrdersFromStore(): Promise<ServerOrder[]> {
   // Recreate behaviour: iterate by reading the store's internal map.
   // The store exposes ordersFor(userId); we use a private trick — read
   // the data file directly through the load() side effect by trying a
   // sentinel. Simpler: add a "_dumpAllOrders" to store. Done below.
-  return store.dumpAllOrders();
+  return await store.dumpAllOrders();
 }
 
-export function listAllCustomers(): ServerUser[] {
-  return store.dumpAllUsers();
+export async function listAllCustomers(): Promise<ServerUser[]> {
+  return await store.dumpAllUsers();
 }

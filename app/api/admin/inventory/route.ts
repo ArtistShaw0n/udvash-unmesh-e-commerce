@@ -13,14 +13,16 @@ export async function GET() {
   } catch (e) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
-  const rows = getAllBooks().map((b) => ({
-    slug: b.slug,
-    title: b.title,
-    titleBn: b.titleBn,
-    category: b.categoryLabel,
-    catalogStock: b.stock,
-    units: store.getInventory(b.slug),
-  }));
+  const rows = await Promise.all(
+    getAllBooks().map(async (b) => ({
+      slug: b.slug,
+      title: b.title,
+      titleBn: b.titleBn,
+      category: b.categoryLabel,
+      catalogStock: b.stock,
+      units: await store.getInventory(b.slug),
+    })),
+  );
   return ok({ inventory: rows });
 }
 
@@ -35,6 +37,6 @@ export async function PATCH(req: NextRequest) {
   if (!body?.slug || typeof body.units !== "number") {
     return badRequest("slug + numeric units required");
   }
-  const next = store.setInventory(body.slug, body.units);
+  const next = await store.setInventory(body.slug, body.units);
   return ok({ slug: body.slug, units: next });
 }

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
-  const addresses = store.addressesFor(user.id);
+  const addresses = await store.addressesFor(user.id);
   return ok({
     user: {
       id: user.id,

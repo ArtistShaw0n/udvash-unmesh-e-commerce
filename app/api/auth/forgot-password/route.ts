@@ -14,10 +14,10 @@ export async function POST(req: NextRequest) {
   }
 
   // Never leak whether the email exists. Always 200 with the same shape.
-  const user = store.findUserByEmail(email);
+  const user = await store.findUserByEmail(email);
   if (user) {
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-    store.updateUser(user.id, { resetCode });
+    await store.updateUser(user.id, { resetCode });
     void notify.onPasswordReset(user, resetCode);
     return ok({ sent: true, devResetCode: resetCode });
   }

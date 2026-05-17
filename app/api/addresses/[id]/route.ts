@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
   const { id } = await params;
-  const list = store.addressesFor(user.id);
+  const list = await store.addressesFor(user.id);
   const existing = list.find((a) => a.id === id);
   if (!existing) return notFound();
   if (existing.userId !== user.id) return forbidden();
@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     userId: existing.userId,
   };
   // If setDefault toggle came in, also clear other defaults
-  store.upsertAddress(next);
+  await store.upsertAddress(next);
   return ok({ address: next });
 }
 
@@ -38,17 +38,17 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
   const { id } = await params;
-  const list = store.addressesFor(user.id);
+  const list = await store.addressesFor(user.id);
   const existing = list.find((a) => a.id === id);
   if (!existing) return notFound();
   if (existing.userId !== user.id) return forbidden();
-  store.deleteAddress(id);
+  await store.deleteAddress(id);
 
   // Promote a new default if the removed one was default
   if (existing.isDefault) {
-    const remaining = store.addressesFor(user.id);
+    const remaining = await store.addressesFor(user.id);
     if (remaining.length > 0) {
-      store.upsertAddress({ ...remaining[0], isDefault: true });
+      await store.upsertAddress({ ...remaining[0], isDefault: true });
     }
   }
   return ok({ deleted: true });

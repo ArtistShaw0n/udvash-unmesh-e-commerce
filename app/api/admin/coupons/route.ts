@@ -19,7 +19,7 @@ export async function GET() {
   } catch (e) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
-  return ok({ coupons: store.dumpCoupons() });
+  return ok({ coupons: await store.dumpCoupons() });
 }
 
 const KIND_VALUES: CouponKind[] = ["percent", "fixed", "free-shipping"];
@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
   const result = validateCoupon(body);
   if (typeof result === "string") return badRequest(result);
 
-  const existing = store.dumpCoupons().find((c) => c.code === result.code);
+  const existing = (await store.dumpCoupons()).find((c) => c.code === result.code);
   if (existing) return conflict("এই কোড ইতিমধ্যে আছে");
 
-  return ok({ coupon: store.upsertCoupon(result) });
+  return ok({ coupon: await store.upsertCoupon(result) });
 }

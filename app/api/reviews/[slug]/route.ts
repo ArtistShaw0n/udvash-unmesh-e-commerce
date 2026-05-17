@@ -13,7 +13,7 @@ interface Ctx {
 /** GET /api/reviews/[slug] — list reviews + aggregate summary */
 export async function GET(_req: NextRequest, { params }: Ctx) {
   const { slug } = await params;
-  const reviews = store.reviewsFor(slug);
+  const reviews = await store.reviewsFor(slug);
   const count = reviews.length;
   const distribution: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   let sum = 0;
@@ -35,14 +35,14 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   if (!getBookBySlug(slug)) return badRequest("Unknown product");
 
   // Already reviewed?
-  if (store.hasReviewed(user.id, slug)) {
+  if (await store.hasReviewed(user.id, slug)) {
     return conflict("আপনি ইতিমধ্যে এই বইয়ের জন্য রিভিউ দিয়েছেন");
   }
 
   // Verified-purchase check
-  const verifiedPurchase = store
-    .ordersFor(user.id)
-    .some((o) => o.items.some((it) => it.slug === slug));
+  const verifiedPurchase = (await store.ordersFor(user.id)).some((o) =>
+    o.items.some((it) => it.slug === slug),
+  );
   if (!verifiedPurchase) {
     return badRequest("রিভিউ লিখতে এই বইটি আপনার অর্ডারে থাকতে হবে");
   }
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   if (!reviewBody) return badRequest("মন্তব্য লিখুন");
 
   const id = `rv_${Math.random().toString(36).slice(2, 12)}`;
-  const review = store.createReview({
+  const review = await store.createReview({
     id,
     slug,
     userId: user.id,

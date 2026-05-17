@@ -10,5 +10,5 @@ export async function GET() {
   } catch (e) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
-  return ok({ stats: getDashboardStats() });
+  return ok({ stats: await getDashboardStats() });
 }

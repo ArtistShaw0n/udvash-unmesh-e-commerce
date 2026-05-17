@@ -92,7 +92,7 @@ export async function requireSession(): Promise<SessionClaims> {
 export async function getCurrentUser(): Promise<ServerUser | null> {
   const s = await getSession();
   if (!s?.sub) return null;
-  return store.findUserById(s.sub) ?? null;
+  return (await store.findUserById(s.sub)) ?? null;
 }
 
 // --------------------------------------------------------------------

@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   const book = getBookBySlug(slug);
   if (!book) return notFound("Product not found");
 
-  const reviews = store.reviewsFor(slug);
+  const reviews = await store.reviewsFor(slug);
   const ratingCount = reviews.length;
   const ratingAverage =
     ratingCount > 0
@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   return ok({
     book: {
       ...book,
-      inventoryUnits: store.getInventory(slug),
+      inventoryUnits: await store.getInventory(slug),
       ratingCount,
       ratingAverage,
     },

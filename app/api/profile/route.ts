@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest) {
 
   if (name !== undefined && !name) return badRequest("নাম খালি রাখা যাবে না");
 
-  const updated = store.updateUser(user.id, {
+  const updated = await store.updateUser(user.id, {
     ...(name !== undefined && { name }),
     ...(phone !== undefined && { phone: phone || undefined }),
   });

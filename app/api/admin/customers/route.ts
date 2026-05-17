@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.toLowerCase();
 
-  let list = listAllCustomers();
+  let list = await listAllCustomers();
   if (q) {
     list = list.filter(
       (u) =>
@@ -26,21 +26,23 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const rows = list.slice(0, 200).map((u) => {
-    const orders = store.ordersFor(u.id);
-    return {
-      id: u.id,
-      email: u.email,
-      name: u.name,
-      phone: u.phone,
-      emailVerified: u.emailVerified,
-      createdAt: u.createdAt,
-      orderCount: orders.length,
-      revenue: orders
-        .filter((o) => o.status !== "cancelled")
-        .reduce((s, o) => s + o.total, 0),
-    };
-  });
+  const rows = await Promise.all(
+    list.slice(0, 200).map(async (u) => {
+      const orders = await store.ordersFor(u.id);
+      return {
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        phone: u.phone,
+        emailVerified: u.emailVerified,
+        createdAt: u.createdAt,
+        orderCount: orders.length,
+        revenue: orders
+          .filter((o) => o.status !== "cancelled")
+          .reduce((s, o) => s + o.total, 0),
+      };
+    }),
+  );
 
   return ok({ customers: rows, total: list.length });
 }

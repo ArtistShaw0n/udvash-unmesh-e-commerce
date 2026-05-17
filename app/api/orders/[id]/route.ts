@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
   const { id } = await params;
-  const order = store.getOrder(id);
+  const order = await store.getOrder(id);
   if (!order) return notFound();
   if (order.userId !== user.id) return forbidden();
   return ok({ order });
@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
   const { id } = await params;
-  const order = store.getOrder(id);
+  const order = await store.getOrder(id);
   if (!order) return notFound();
   if (order.userId !== user.id) return forbidden();
 
@@ -37,10 +37,10 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     if (order.status !== "placed" && order.status !== "confirmed") {
       return badRequest("এই অর্ডার বাতিল করা যাবে না");
     }
-    store.incrementInventory(
+    await store.incrementInventory(
       order.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
     );
-    const updated = store.updateOrder(id, { status: "cancelled", cancelReason: reason });
+    const updated = await store.updateOrder(id, { status: "cancelled", cancelReason: reason });
     if (updated) void notify.onOrderCancelled(user, updated, false);
     return ok({ order: updated });
   }
@@ -50,7 +50,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       return badRequest("শুধু ডেলিভার্ড অর্ডার রিটার্ন করা যায়");
     }
     if (!reason?.trim()) return badRequest("রিটার্নের কারণ লিখুন");
-    const updated = store.updateOrder(id, {
+    const updated = await store.updateOrder(id, {
       returnStatus: "requested",
       returnReason: reason.trim(),
     });

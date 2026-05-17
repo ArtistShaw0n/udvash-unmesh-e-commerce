@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
   const { code } = await params;
-  const existing = store.dumpCoupons().find((c) => c.code === code.toUpperCase());
+  const existing = (await store.dumpCoupons()).find((c) => c.code === code.toUpperCase());
   if (!existing) return notFound();
 
   const body = await req.json().catch(() => null);
@@ -34,7 +34,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     ...body,
     code: existing.code, // immutable
   };
-  return ok({ coupon: store.upsertCoupon(next) });
+  return ok({ coupon: await store.upsertCoupon(next) });
 }
 
 /** DELETE /api/admin/coupons/[code] */
@@ -45,7 +45,7 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
   const { code } = await params;
-  const ok2 = store.deleteCoupon(code.toUpperCase());
+  const ok2 = await store.deleteCoupon(code.toUpperCase());
   if (!ok2) return notFound();
   return ok({ deleted: true });
 }

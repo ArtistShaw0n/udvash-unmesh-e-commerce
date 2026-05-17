@@ -20,7 +20,7 @@ function newOrderId(): string {
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
-  return ok({ orders: store.ordersFor(user.id) });
+  return ok({ orders: await store.ordersFor(user.id) });
 }
 
 /**
@@ -46,10 +46,10 @@ export async function POST(req: NextRequest) {
   if (!addressId) return badRequest("ঠিকানা সিলেক্ট করুন");
   if (!paymentMethod) return badRequest("পেমেন্ট মেথড সিলেক্ট করুন");
 
-  const address = store.addressesFor(user.id).find((a) => a.id === addressId);
+  const address = (await store.addressesFor(user.id)).find((a) => a.id === addressId);
   if (!address) return badRequest("ঠিকানা পাওয়া যায়নি");
 
-  const cartItems = store.cartFor(user.id).filter((c) => c.selected);
+  const cartItems = (await store.cartFor(user.id)).filter((c) => c.selected);
   if (cartItems.length === 0) return badRequest("কোন আইটেম সিলেক্ট নেই");
 
   // Resolve catalog + compute totals
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const result = applyCoupon(
       couponCode,
       { subtotal, shipping: baseShipping },
-      store.dumpCoupons(),
+      await store.dumpCoupons(),
     );
     if (!result.ok) return badRequest(result.error);
     couponDiscount = result.coupon.kind === "free-shipping" ? 0 : result.discount;
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   const total = Math.max(0, subtotal - couponDiscount + vat + shipping);
 
   // Atomic stock decrement
-  const inventoryResult = store.decrementInventory(
+  const inventoryResult = await store.decrementInventory(
     resolved.map(({ c }) => ({ slug: c.slug, quantity: c.quantity })),
   );
   if (!inventoryResult.ok) {
@@ -136,8 +136,8 @@ export async function POST(req: NextRequest) {
     payment: { method: paymentMethod, status: paymentResult.status },
   };
 
-  store.createOrder(order);
-  store.clearCart(user.id, { onlySelected: true });
+  await store.createOrder(order);
+  await store.clearCart(user.id, { onlySelected: true });
 
   // Fire-and-forget notification
   void notify.onOrderConfirmed(user, order);

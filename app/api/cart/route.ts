@@ -11,7 +11,7 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return unauthorized();
 
-  const entries = store.cartFor(user.id);
+  const entries = await store.cartFor(user.id);
   const resolved = entries
     .map((e) => {
       const book = getBookBySlug(e.slug);
@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
   if (!slug || quantity <= 0) return badRequest("slug + positive quantity required");
   if (!getBookBySlug(slug)) return badRequest("Unknown product");
 
-  const existing = store.cartFor(user.id).find((c) => c.slug === slug);
+  const existing = (await store.cartFor(user.id)).find((c) => c.slug === slug);
   const newQty = Math.min(99, (existing?.quantity ?? 0) + quantity);
-  store.upsertCart({
+  await store.upsertCart({
     userId: user.id,
     slug,
     quantity: newQty,
@@ -55,7 +55,7 @@ export async function PATCH(req: NextRequest) {
   const slug = body?.slug as string | undefined;
   if (!slug) return badRequest("slug required");
 
-  const existing = store.cartFor(user.id).find((c) => c.slug === slug);
+  const existing = (await store.cartFor(user.id)).find((c) => c.slug === slug);
   if (!existing) return badRequest("Item not in cart");
 
   const quantity =
@@ -64,11 +64,11 @@ export async function PATCH(req: NextRequest) {
       : existing.quantity;
 
   if (quantity === 0) {
-    store.removeCart(user.id, slug);
+    await store.removeCart(user.id, slug);
     return ok({ removed: true });
   }
 
-  store.upsertCart({
+  await store.upsertCart({
     ...existing,
     quantity,
     selected: typeof body.selected === "boolean" ? body.selected : existing.selected,
@@ -87,15 +87,15 @@ export async function DELETE(req: NextRequest) {
   const clear = searchParams.get("clear");
 
   if (slug) {
-    store.removeCart(user.id, slug);
+    await store.removeCart(user.id, slug);
     return ok({ removed: true });
   }
   if (clear === "selected") {
-    store.clearCart(user.id, { onlySelected: true });
+    await store.clearCart(user.id, { onlySelected: true });
     return ok({ cleared: "selected" });
   }
   if (clear === "all") {
-    store.clearCart(user.id);
+    await store.clearCart(user.id);
     return ok({ cleared: "all" });
   }
   return badRequest("Specify ?slug= or ?clear=selected|all");

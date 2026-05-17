@@ -26,10 +26,12 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const products = books.map((b) => ({
-    ...b,
-    inventoryUnits: store.getInventory(b.slug),
-  }));
+  const products = await Promise.all(
+    books.map(async (b) => ({
+      ...b,
+      inventoryUnits: await store.getInventory(b.slug),
+    })),
+  );
 
   return ok({ products, total: products.length });
 }

@@ -32,9 +32,9 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
   const { id } = await params;
-  const order = store.getOrder(id);
+  const order = await store.getOrder(id);
   if (!order) return notFound();
-  const customer = store.findUserById(order.userId);
+  const customer = await store.findUserById(order.userId);
   return ok({
     order,
     customer: customer
@@ -56,7 +56,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
   const { id } = await params;
-  const order = store.getOrder(id);
+  const order = await store.getOrder(id);
   if (!order) return notFound();
 
   const body = await req.json().catch(() => null);
@@ -77,7 +77,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     patch.status = nextStatus;
     // Cancelled by admin: restock items
     if (nextStatus === "cancelled") {
-      store.incrementInventory(
+      await store.incrementInventory(
         order.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
       );
     }
@@ -90,7 +90,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     patch.returnStatus = returnStatus;
     // Refunded: restock items
     if (returnStatus === "refunded") {
-      store.incrementInventory(
+      await store.incrementInventory(
         order.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
       );
     }
@@ -98,11 +98,11 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
 
   if (Object.keys(patch).length === 0) return badRequest("Nothing to update");
 
-  const updated = store.updateOrder(id, patch);
+  const updated = await store.updateOrder(id, patch);
 
   // Fire notifications based on the transition
   if (updated) {
-    const customer = store.findUserById(updated.userId);
+    const customer = await store.findUserById(updated.userId);
     if (customer) {
       if (patch.status === "shipped") void notify.onOrderShipped(customer, updated);
       if (patch.status === "delivered") void notify.onOrderDelivered(customer, updated);

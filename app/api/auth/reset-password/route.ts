@@ -14,13 +14,13 @@ export async function POST(req: NextRequest) {
   if (!email || !code || !password) return badRequest("সব ঘর পূরণ করুন");
   if (password.length < 6) return badRequest("পাসওয়ার্ড অন্তত ৬ অক্ষর");
 
-  const user = store.findUserByEmail(email);
+  const user = await store.findUserByEmail(email);
   if (!user || !user.resetCode || user.resetCode !== code) {
     return badRequest("ভুল কোড");
   }
 
   const passwordHash = await hashPassword(password);
-  store.updateUser(user.id, { passwordHash, resetCode: undefined });
+  await store.updateUser(user.id, { passwordHash, resetCode: undefined });
 
   return ok({ reset: true });
 }

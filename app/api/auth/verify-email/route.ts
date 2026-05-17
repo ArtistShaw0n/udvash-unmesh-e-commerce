@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return badRequest("ভুল কোড");
   }
 
-  const updated = store.updateUser(user.id, {
+  const updated = await store.updateUser(user.id, {
     emailVerified: true,
     emailVerifyCode: undefined,
   });

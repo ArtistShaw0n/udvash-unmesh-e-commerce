@@ -12,15 +12,18 @@ export async function GET() {
   } catch (e) {
     return (e as Error).message === "UNAUTHORIZED" ? unauthorized() : forbidden();
   }
-  const rows = listAllOrders()
-    .filter((o) => o.returnStatus !== "none")
-    .map((o) => {
-      const u = store.findUserById(o.userId);
-      return {
-        ...o,
-        customerName: u?.name ?? "—",
-        customerEmail: u?.email ?? "—",
-      };
-    });
+  const allOrders = await listAllOrders();
+  const rows = await Promise.all(
+    allOrders
+      .filter((o) => o.returnStatus !== "none")
+      .map(async (o) => {
+        const u = await store.findUserById(o.userId);
+        return {
+          ...o,
+          customerName: u?.name ?? "—",
+          customerEmail: u?.email ?? "—",
+        };
+      }),
+  );
   return ok({ returns: rows });
 }
