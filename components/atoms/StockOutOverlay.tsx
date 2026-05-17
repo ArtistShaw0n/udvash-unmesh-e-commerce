@@ -25,7 +25,7 @@ export function StockOutOverlay({
       )}
     >
       <div
-        className="-rotate-12 flex items-center justify-center rounded-[5px] bg-black/50 px-[19px] py-[6px] select-none"
+        className="-rotate-12 flex items-center justify-center rounded-xs bg-black/50 px-[19px] py-[6px] select-none"
         style={{ minWidth: "143px", height: "40px" }}
       >
         <span className="font-poppins font-bold text-white text-[16px] leading-[28px] tracking-[0.097em] uppercase">

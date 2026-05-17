@@ -50,7 +50,7 @@ export function PaymentMethodPicker({
             aria-checked={selected}
             onClick={() => onChange(m.id)}
             className={clsx(
-              "flex items-center gap-3 rounded-lg border p-4 text-left transition-all",
+              "flex items-center gap-3 rounded-md border p-4 text-left transition-all",
               selected
                 ? "border-brand-600 ring-2 ring-brand-600/15 bg-brand-50 dark:bg-brand-700/15"
                 : "border-[var(--border-default)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]",

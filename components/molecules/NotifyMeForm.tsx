@@ -65,7 +65,7 @@ export function NotifyMeForm({ slug }: NotifyMeFormProps) {
 
   if (subscribed) {
     return (
-      <div className="rounded-lg border border-success-200 dark:border-success-700/40 bg-success-50 dark:bg-success-700/15 p-4 flex items-start gap-3">
+      <div className="rounded-md border border-success-200 dark:border-success-700/40 bg-success-50 dark:bg-success-700/15 p-4 flex items-start gap-3">
         <span className="inline-flex w-9 h-9 items-center justify-center rounded-full bg-success-100 dark:bg-success-700/30 text-success-700 dark:text-success-300 flex-shrink-0">
           <BellRing size={18} />
         </span>
@@ -84,7 +84,7 @@ export function NotifyMeForm({ slug }: NotifyMeFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-muted)] p-4 space-y-3"
+      className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface-muted)] p-4 space-y-3"
     >
       <div className="flex items-center gap-2">
         <Bell size={18} className="text-brand-700 dark:text-brand-400" />

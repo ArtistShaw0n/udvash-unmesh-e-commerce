@@ -138,7 +138,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
       {/* Return status banner */}
       {order.returnStatus !== "none" && (
-        <div className="rounded-lg bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/30 p-4">
+        <div className="rounded-md bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/30 p-4">
           <p className="text-caption font-bold uppercase tracking-wider text-warning-800 dark:text-warning-300">
             রিটার্ন স্ট্যাটাস
           </p>
@@ -155,7 +155,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
       {/* Cancel reason banner */}
       {order.status === "cancelled" && order.cancelReason && (
-        <div className="rounded-lg bg-discount-50 dark:bg-discount-900/20 border border-discount-200 dark:border-discount-700/40 p-4">
+        <div className="rounded-md bg-discount-50 dark:bg-discount-900/20 border border-discount-200 dark:border-discount-700/40 p-4">
           <p className="text-caption font-bold uppercase tracking-wider text-discount-800 dark:text-discount-300">
             ক্যান্সেলের কারণ
           </p>
@@ -168,13 +168,13 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
         <div className="space-y-6">
           {/* Status timeline */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডার স্ট্যাটাস</h2>
             <OrderStatusTimeline status={order.status} />
           </div>
 
           {/* Items */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডারকৃত বইসমূহ</h2>
             <ul className="divide-y divide-[var(--border-muted)]">
               {order.items.map((it) => (
@@ -200,7 +200,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
           </div>
 
           {/* Address */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-2">ডেলিভারি ঠিকানা</h2>
             <p className="text-body text-[var(--fg-secondary)] leading-relaxed">
               {order.address.recipientName} · {order.address.phone}
@@ -213,7 +213,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
         </div>
 
         {/* Summary */}
-        <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
+        <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
           <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
           <dl className="space-y-2">
             <Row label={`Subtotal (${toBengaliNumber(itemCount)} items)`} value={order.subtotal} />
@@ -325,7 +325,7 @@ function Modal({
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
+        className="w-full max-w-md rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
       >
         <div className="flex items-center justify-between">
           <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>

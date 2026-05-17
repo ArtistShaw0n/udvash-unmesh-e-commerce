@@ -17,7 +17,7 @@ const STAGES: Array<{ id: Exclude<OrderStatus, "cancelled">; label: string; icon
 export function OrderStatusTimeline({ status, className }: OrderStatusTimelineProps) {
   if (status === "cancelled") {
     return (
-      <div className={clsx("flex items-center gap-3 p-4 rounded-lg bg-discount-50 dark:bg-discount-900/20 border border-discount-200 dark:border-discount-700/30", className)}>
+      <div className={clsx("flex items-center gap-3 p-4 rounded-md bg-discount-50 dark:bg-discount-900/20 border border-discount-200 dark:border-discount-700/30", className)}>
         <span className="inline-flex w-9 h-9 items-center justify-center rounded-full bg-discount-600 text-white">
           <X size={18} />
         </span>

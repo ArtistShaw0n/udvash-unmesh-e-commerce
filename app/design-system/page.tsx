@@ -55,7 +55,7 @@ export default function DesignSystemPage() {
       </header>
 
       {/* Breakpoint indicator */}
-      <section className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-muted)] p-4 flex items-center gap-3 flex-wrap">
+      <section className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface-muted)] p-4 flex items-center gap-3 flex-wrap">
         <span className="text-caption font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
           Current breakpoint
         </span>
@@ -120,7 +120,7 @@ export default function DesignSystemPage() {
       {/* Typography */}
       <section className="space-y-4">
         <h2 className="text-h2 text-[var(--fg-primary)]">Typography (responsive)</h2>
-        <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
+        <div className="space-y-3 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
           <Row cls="text-display" specs="36 / 48 / 60" />
           <Row cls="text-h1" specs="30 / 36 / 48" />
           <Row cls="text-h2" specs="24 / 30 / 36" />
@@ -263,13 +263,13 @@ export default function DesignSystemPage() {
 
       <Block title="Molecules — CountdownTimer">
         <div className="flex flex-wrap gap-6">
-          <div className="p-5 rounded-lg bg-brand-700"><CountdownTimer targetDate={DEMO_END} tone="onBrand" format="hms" /></div>
+          <div className="p-5 rounded-md bg-brand-700"><CountdownTimer targetDate={DEMO_END} tone="onBrand" format="hms" /></div>
           <CountdownTimer targetDate={DEMO_END} tone="default" format="dhm" />
         </div>
       </Block>
 
       <Block title="Molecules — SpecificationRow · InfoChip">
-        <dl className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] divide-y divide-[var(--border-muted)] px-5">
+        <dl className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] divide-y divide-[var(--border-muted)] px-5">
           <SpecificationRow label="লেখক:" value="উদ্ভাস-উন্মেষ টিম" />
           <SpecificationRow label="পৃষ্ঠা সংখ্যা:" value="২৮০" />
           <SpecificationRow label="ভার্সন:" value="বাংলা" />
@@ -333,7 +333,7 @@ function Row({ cls, specs }: { cls: string; specs: string }) {
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
+    <section className="space-y-4 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-6">
       <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>
       <div className="pt-2">{children}</div>
     </section>

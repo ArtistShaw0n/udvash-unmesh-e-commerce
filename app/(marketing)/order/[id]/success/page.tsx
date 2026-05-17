@@ -18,7 +18,7 @@ export default async function OrderSuccessPage({ params }: PageProps) {
       title="অর্ডার সফলভাবে নেওয়া হয়েছে 🎉"
       description="ধন্যবাদ! আপনার অর্ডার আমাদের কাছে পৌঁছেছে। ২৪ ঘণ্টার মধ্যে আমাদের প্রতিনিধি যোগাযোগ করবেন। ডেলিভারি ৩-৫ কর্মদিবসের মধ্যে।"
       meta={
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 inline-block">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 inline-block">
           <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">Order Number</p>
           <p className="text-h3 font-bold text-brand-700 dark:text-brand-400 tabular-nums">#{id}</p>
         </div>

@@ -21,7 +21,7 @@ export default function PaymentPage() {
 
       <h2 className="text-h3 text-[var(--fg-primary)] pt-4">আমরা যেসব পদ্ধতি সাপোর্ট করি</h2>
       <div className="not-prose mt-3">
-        <div className="bg-neutral-100 rounded-lg p-3">
+        <div className="bg-neutral-100 rounded-md p-3">
           <PaymentMethodsRow />
         </div>
       </div>

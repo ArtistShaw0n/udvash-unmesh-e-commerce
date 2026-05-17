@@ -63,7 +63,7 @@ export function QuantityCounter({
   return (
     <div
       className={clsx(
-        "inline-flex items-center justify-center rounded-[5px] border border-[#E5F0F1] bg-white",
+        "inline-flex items-center justify-center rounded-xs border border-[#E5F0F1] bg-white",
         dims.outer,
         disabled && "opacity-50 pointer-events-none",
         className,

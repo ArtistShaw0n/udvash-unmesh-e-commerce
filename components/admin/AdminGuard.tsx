@@ -25,7 +25,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   if (!hydrated || !isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="w-full max-w-md rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-8 shadow-card min-h-[200px]" />
+        <div className="w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-8 shadow-card min-h-[200px]" />
       </div>
     );
   }
@@ -33,7 +33,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   if (!user?.isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="w-full max-w-md rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-8 shadow-card text-center space-y-4">
+        <div className="w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-8 shadow-card text-center space-y-4">
           <div className="inline-flex w-16 h-16 items-center justify-center rounded-full bg-discount-50 dark:bg-discount-900/30 text-discount-700 dark:text-discount-300">
             <ShieldOff size={28} />
           </div>

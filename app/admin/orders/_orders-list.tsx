@@ -61,7 +61,7 @@ export function AdminOrdersList() {
         </p>
       </div>
 
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card flex flex-col sm:flex-row gap-3">
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <Input
             placeholder="অর্ডার আইডি / ইমেইল / নাম / ফোন দিয়ে খুঁজুন"
@@ -84,7 +84,7 @@ export function AdminOrdersList() {
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden shadow-card">
           <table className="w-full text-body-sm">
             <tbody className="divide-y divide-[var(--border-muted)]">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -94,11 +94,11 @@ export function AdminOrdersList() {
           </table>
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           কোন অর্ডার পাওয়া যায়নি
         </div>
       ) : (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden shadow-card">
           <table className="w-full text-body-sm">
             <thead className="bg-[var(--bg-surface-muted)] text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
               <tr>

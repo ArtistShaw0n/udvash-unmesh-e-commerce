@@ -20,7 +20,7 @@ export function Skeleton({
       : rounded === "sm"
       ? "rounded-sm"
       : rounded === "lg"
-      ? "rounded-lg"
+      ? "rounded-md"
       : "rounded-md";
   return (
     <div
@@ -40,7 +40,7 @@ export function Skeleton({
 /** Skeleton row for a product card grid. */
 export function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col gap-3 p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)]">
+    <div className="flex flex-col gap-3 p-2.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)]">
       <Skeleton className="aspect-[286/256] w-full" rounded="md" />
       <Skeleton className="h-3 w-16" />
       <Skeleton className="h-4 w-3/4" />

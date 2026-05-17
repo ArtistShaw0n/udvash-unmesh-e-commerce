@@ -50,11 +50,11 @@ export function AdminReturnsList() {
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           লোড হচ্ছে...
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           কোন রিটার্ন রিকোয়েস্ট নেই
         </div>
       ) : (
@@ -63,7 +63,7 @@ export function AdminReturnsList() {
             <Link
               key={r.id}
               href={`/admin/orders/${r.id}`}
-              className="block rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card hover:shadow-card-hover transition-shadow"
+              className="block rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card hover:shadow-card-hover transition-shadow"
             >
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="flex-1 min-w-0">

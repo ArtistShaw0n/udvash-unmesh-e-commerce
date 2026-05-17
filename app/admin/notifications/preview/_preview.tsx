@@ -91,7 +91,7 @@ export function NotificationsPreview({ entries }: Props) {
       {/* Main — preview */}
       <section className="min-w-0">
         {active && (
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden">
             {/* Header */}
             <div className="border-b border-[var(--border-muted)] p-4 flex flex-wrap gap-3 items-center justify-between">
               <div className="min-w-0 flex-1">

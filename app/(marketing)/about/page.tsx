@@ -64,7 +64,7 @@ export default function AboutPage() {
         {VALUES.map((v) => (
           <div
             key={v.title}
-            className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5"
+            className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5"
           >
             <span className="inline-flex w-10 h-10 items-center justify-center rounded-md bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300">
               {v.icon}

@@ -38,11 +38,11 @@ export function HeroBanner({
 }: HeroBannerProps) {
   return (
     <section className={clsx("section-pad-sm container-site", className)}>
-      <div className="relative overflow-hidden rounded-[20px] bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-10 lg:min-h-[400px] flex items-center">
+      <div className="relative overflow-hidden rounded-lg bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-10 lg:min-h-[400px] flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10 items-center w-full min-w-0 [&>*]:min-w-0">
           <div className="space-y-5 lg:space-y-10">
             {badge && (
-              <span className="inline-flex items-center px-4 py-0.5 rounded-[50px] bg-[#469097] text-white font-poppins font-normal text-[12px] leading-6">
+              <span className="inline-flex items-center px-4 py-0.5 rounded-pill bg-[#469097] text-white font-poppins font-normal text-[12px] leading-6">
                 + {badge}
               </span>
             )}
@@ -59,7 +59,7 @@ export function HeroBanner({
               <Button
                 href={primaryCta.href}
                 size={{ base: "md", md: "lg" }}
-                className="!bg-white !text-[#006D77] hover:!bg-white/90 !px-[30px] !py-3 !rounded-[8px] !font-poppins !font-normal !text-[16px] !leading-6 !min-h-0"
+                className="!bg-white !text-[#006D77] hover:!bg-white/90 !px-[30px] !py-3 !rounded-sm !font-poppins !font-normal !text-[16px] !leading-6 !min-h-0"
               >
                 {primaryCta.label}
               </Button>
@@ -68,7 +68,7 @@ export function HeroBanner({
                   href={secondaryCta.href}
                   variant="ghost"
                   size={{ base: "md", md: "lg" }}
-                  className="!border !border-white !text-white hover:!bg-white/10 !px-[30px] !py-3 !rounded-[8px] !font-poppins !font-normal !text-[16px] !leading-6 !min-h-0"
+                  className="!border !border-white !text-white hover:!bg-white/10 !px-[30px] !py-3 !rounded-sm !font-poppins !font-normal !text-[16px] !leading-6 !min-h-0"
                 >
                   {secondaryCta.label}
                 </Button>

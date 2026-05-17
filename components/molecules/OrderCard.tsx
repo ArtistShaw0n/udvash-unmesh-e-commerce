@@ -41,7 +41,7 @@ export function OrderCard({ order, href, className }: OrderCardProps) {
     <Link
       href={linkHref}
       className={clsx(
-        "group flex items-center gap-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow",
+        "group flex items-center gap-4 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow",
         className,
       )}
     >

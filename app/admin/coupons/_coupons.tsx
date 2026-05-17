@@ -138,15 +138,15 @@ export function AdminCouponsManager() {
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           লোড হচ্ছে...
         </div>
       ) : coupons.length === 0 ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           এখনও কোন কুপন নেই
         </div>
       ) : (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
           <table className="w-full text-body-sm">
             <thead className="bg-[var(--bg-surface-muted)] text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
               <tr>
@@ -330,7 +330,7 @@ function Modal({
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
       >
         <div className="flex items-center justify-between">
           <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>

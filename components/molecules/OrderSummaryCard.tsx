@@ -31,7 +31,7 @@ export function OrderSummaryCard({
   return (
     <aside
       className={clsx(
-        "rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-5",
+        "rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-5",
         className,
       )}
     >

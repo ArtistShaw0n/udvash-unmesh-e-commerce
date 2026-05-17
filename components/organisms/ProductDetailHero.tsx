@@ -66,7 +66,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
       <div className="container-site grid grid-cols-1 gap-8 lg:gap-12 lg:grid-cols-2 lg:items-start">
         {/* Gallery — min-w-0 lets the grid item shrink under the content's intrinsic width */}
         <div className="space-y-4 min-w-0">
-          <div className="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-[var(--bg-surface-muted)] border border-[var(--border-default)]">
+          <div className="relative aspect-[4/5] w-full rounded-md overflow-hidden bg-[var(--bg-surface-muted)] border border-[var(--border-default)]">
             <BookCover />
             {book.badge && book.badge.type === "bestseller" && (
               <Badge color="bestseller" variant="solid" placement="corner-tl"
@@ -96,7 +96,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             {book.description}
           </p>
 
-          <div className="rounded-lg bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30 p-4 sm:p-5 space-y-3">
+          <div className="rounded-md bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30 p-4 sm:p-5 space-y-3">
             <PriceBlock price={book.price} oldPrice={book.oldPrice} size="lg" />
             {offerEndsAt && (
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-body-sm text-[var(--fg-secondary)]">

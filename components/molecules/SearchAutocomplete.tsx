@@ -156,7 +156,7 @@ export function SearchAutocomplete({
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 right-0 top-full mt-2 z-50 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover max-h-[60vh] overflow-y-auto"
+          className="absolute left-0 right-0 top-full mt-2 z-50 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover max-h-[60vh] overflow-y-auto"
         >
           {matches.length > 0 ? (
             <Section title="Top matches">

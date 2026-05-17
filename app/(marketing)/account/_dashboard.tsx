@@ -32,7 +32,7 @@ export function AccountDashboard() {
   return (
     <div className="space-y-6">
       {/* Greeting */}
-      <div className="rounded-lg bg-brand-700 text-white p-6 sm:p-8">
+      <div className="rounded-md bg-brand-700 text-white p-6 sm:p-8">
         <p className="text-body-sm text-white/80">স্বাগতম 👋</p>
         <h1 className="text-h2 mt-1">{user.name}</h1>
         <p className="text-body-sm text-white/85 mt-2 flex items-center gap-2">
@@ -42,7 +42,7 @@ export function AccountDashboard() {
 
       {/* Verify email banner */}
       {!user.emailVerified && (
-        <div className="rounded-lg bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/30 p-4 flex items-start gap-3">
+        <div className="rounded-md bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/30 p-4 flex items-start gap-3">
           <MailWarning size={22} className="text-warning-700 dark:text-warning-300 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-body font-semibold text-warning-800 dark:text-warning-200">
@@ -58,7 +58,7 @@ export function AccountDashboard() {
         </div>
       )}
       {user.emailVerified && (
-        <div className="rounded-lg bg-success-50 dark:bg-success-700/15 border border-success-200 dark:border-success-700/30 p-3 flex items-center gap-2">
+        <div className="rounded-md bg-success-50 dark:bg-success-700/15 border border-success-200 dark:border-success-700/30 p-3 flex items-center gap-2">
           <MailCheck size={18} className="text-success-700 dark:text-success-400" />
           <p className="text-body-sm text-success-800 dark:text-success-200">
             ইমেইল ভেরিফাইড
@@ -72,7 +72,7 @@ export function AccountDashboard() {
           <Link
             key={href}
             href={href}
-            className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 hover:border-brand-300 hover:shadow-card-hover transition-all"
+            className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 hover:border-brand-300 hover:shadow-card-hover transition-all"
           >
             <div className="flex items-center gap-3">
               <span className="inline-flex w-11 h-11 items-center justify-center rounded-md bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300">
@@ -90,7 +90,7 @@ export function AccountDashboard() {
       </div>
 
       {/* Recent orders */}
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
         <div className="flex items-end justify-between mb-4">
           <h2 className="text-h3 text-[var(--fg-primary)]">সাম্প্রতিক অর্ডার</h2>
           {recentOrders.length > 0 && (

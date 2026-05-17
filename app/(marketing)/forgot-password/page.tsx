@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
   return (
     <section className="section-pad-sm">
       <div className="container-site flex justify-center">
-        <div className="w-full max-w-md rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6">
+        <div className="w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6">
           <Link href="/login" className="inline-flex items-center gap-1 text-body-sm text-[var(--fg-secondary)] hover:text-brand-700">
             <ChevronLeft size={16} /> লগইনে ফিরে যান
           </Link>

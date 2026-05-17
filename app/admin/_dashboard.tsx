@@ -91,7 +91,7 @@ export function AdminDashboard() {
 
       {/* Status breakdown */}
       {stats && (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
           <h2 className="text-h3 text-[var(--fg-primary)]">অর্ডার স্ট্যাটাস ব্রেকডাউন</h2>
           <div className="grid gap-3 sm:grid-cols-5 mt-4">
             {(["placed", "confirmed", "shipped", "delivered", "cancelled"] as const).map(
@@ -131,7 +131,7 @@ export function AdminDashboard() {
 
       {/* Low stock alert */}
       {stats && stats.lowStockCount > 0 && (
-        <div className="rounded-lg bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/40 p-4 flex items-start gap-3">
+        <div className="rounded-md bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/40 p-4 flex items-start gap-3">
           <AlertTriangle
             size={20}
             className="text-warning-700 dark:text-warning-300 flex-shrink-0 mt-0.5"
@@ -173,7 +173,7 @@ function KpiCard({
       "bg-discount-50 text-discount-700 dark:bg-discount-700/20 dark:text-discount-300",
   };
   return (
-    <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
+    <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
       <div className="flex items-start justify-between">
         <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
           {label}

@@ -36,13 +36,13 @@ export default async function OrderDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
           <div className="space-y-6">
             {/* Status timeline */}
-            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+            <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
               <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডার স্ট্যাটাস</h2>
               <OrderStatusTimeline status="confirmed" />
             </div>
 
             {/* Items */}
-            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+            <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
               <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডারকৃত বইসমূহ</h2>
               <ul className="divide-y divide-[var(--border-muted)]">
                 {sampleItems.map((book) => (
@@ -61,7 +61,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
             </div>
 
             {/* Address */}
-            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+            <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
               <h2 className="text-h3 text-[var(--fg-primary)] mb-2">ডেলিভারি ঠিকানা</h2>
               <p className="text-body text-[var(--fg-secondary)]">
                 Shawon Ahmed · 01798214677<br />
@@ -71,7 +71,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
           </div>
 
           {/* Summary */}
-          <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
+          <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
             <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
             <dl className="space-y-2">
               <Row label={`Subtotal (${sampleItems.length} items)`} value={subtotal} />

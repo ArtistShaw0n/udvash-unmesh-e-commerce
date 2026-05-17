@@ -131,7 +131,7 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
 
         {/* Summary + distribution */}
         {summary.count > 0 && (
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card grid gap-6 md:grid-cols-[auto_1fr] md:items-center">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card grid gap-6 md:grid-cols-[auto_1fr] md:items-center">
             <div className="text-center md:border-r md:border-[var(--border-muted)] md:pr-6">
               <p className="text-h1 font-bold text-[var(--fg-primary)] tabular-nums">
                 {toBengaliNumber(summary.average)}
@@ -173,7 +173,7 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
         {composing && (
           <form
             onSubmit={handleSubmit}
-            className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card space-y-4"
+            className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card space-y-4"
           >
             <h3 className="text-h3 text-[var(--fg-primary)]">আপনার রিভিউ</h3>
             <div>
@@ -223,7 +223,7 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
             {visibleList.map((r) => (
               <li
                 key={r.id}
-                className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card"
+                className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card"
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>

@@ -13,7 +13,7 @@ export default function ReturnRefundPage() {
       description="৭ দিনের সহজ রিটার্ন পলিসি — কোন প্রশ্ন ছাড়াই।"
       breadcrumb={[{ label: "হোম", href: "/" }, { label: "রিটার্ন ও রিফান্ড" }]}
     >
-      <div className="rounded-lg bg-success-50 dark:bg-success-700/15 border border-success-200 dark:border-success-700/40 p-5 not-prose">
+      <div className="rounded-md bg-success-50 dark:bg-success-700/15 border border-success-200 dark:border-success-700/40 p-5 not-prose">
         <p className="text-body font-semibold text-success-800 dark:text-success-200">
           ৭ দিনের ১০০% মূল্য ফেরত গ্যারান্টি
         </p>
@@ -52,7 +52,7 @@ export default function ReturnRefundPage() {
       </ol>
 
       <h2 className="text-h3 text-[var(--fg-primary)] pt-6">রিফান্ড প্রসেসিং সময়সীমা</h2>
-      <div className="not-prose rounded-lg border border-[var(--border-default)] overflow-hidden">
+      <div className="not-prose rounded-md border border-[var(--border-default)] overflow-hidden">
         <table className="w-full text-body-sm">
           <thead className="bg-[var(--bg-surface-muted)]">
             <tr>

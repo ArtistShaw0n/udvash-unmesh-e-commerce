@@ -52,8 +52,10 @@ type AsLink = CommonProps &
 
 export type ButtonProps = AsButton | AsLink;
 
+// Button radius = 8px per Figma spec (Menu Item / Hero CTA frames).
+// Maps to `rounded-sm` in the canonical scale defined in globals.css.
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 disabled:opacity-50 disabled:pointer-events-none select-none whitespace-nowrap";
+  "inline-flex items-center justify-center gap-2 font-semibold rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 disabled:opacity-50 disabled:pointer-events-none select-none whitespace-nowrap";
 
 /**
  * Static class table. Tailwind's JIT scanner sees the full literal strings,

@@ -112,7 +112,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
         >
           <ChevronLeft size={16} /> অর্ডার লিস্টে ফিরে যান
         </Link>
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
           অর্ডার পাওয়া যায়নি
         </div>
       </div>
@@ -121,7 +121,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
 
   if (!order) {
     return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-12 text-center text-body-sm text-[var(--fg-muted)]">
         লোড হচ্ছে...
       </div>
     );
@@ -164,7 +164,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
 
       {/* Return workflow buttons */}
       {order.returnStatus !== "none" && (
-        <div className="rounded-lg bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/40 p-4 space-y-3">
+        <div className="rounded-md bg-warning-50 dark:bg-warning-700/15 border border-warning-200 dark:border-warning-700/40 p-4 space-y-3">
           <div>
             <p className="text-caption font-bold uppercase tracking-wider text-warning-800 dark:text-warning-300">
               রিটার্ন রিকোয়েস্ট ({order.returnStatus})
@@ -203,7 +203,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           {/* Items */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডারকৃত বইসমূহ</h2>
             <table className="w-full text-body-sm">
               <thead className="text-caption uppercase tracking-wider text-[var(--fg-muted)]">
@@ -234,7 +234,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
           </div>
 
           {/* Address */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-3">শিপিং ঠিকানা</h2>
             <p className="text-body-sm text-[var(--fg-secondary)] leading-relaxed">
               <span className="font-semibold text-[var(--fg-primary)]">{order.address.recipientName}</span> · {order.address.phone}
@@ -249,7 +249,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
         {/* Summary */}
         <aside className="space-y-4">
           {customer && (
-            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
+            <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
               <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
                 কাস্টমার
               </p>
@@ -267,7 +267,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
             </div>
           )}
 
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card space-y-3">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card space-y-3">
             <h3 className="text-h3 text-[var(--fg-primary)]">সারাংশ</h3>
             <dl className="space-y-1.5 text-body-sm">
               <Row label="সাবটোটাল" value={`${toBengaliNumber(order.subtotal.toLocaleString("en-US"))}৳`} />

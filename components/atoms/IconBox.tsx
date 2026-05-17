@@ -12,7 +12,7 @@ export interface IconBoxProps extends React.HTMLAttributes<HTMLDivElement> {
 const sizeClass: Record<IconBoxSize, string> = {
   sm: "w-9 h-9 rounded-md",
   md: "w-11 h-11 rounded-md",
-  lg: "w-14 h-14 rounded-lg",
+  lg: "w-14 h-14 rounded-md",
 };
 
 const toneClass: Record<IconBoxTone, string> = {

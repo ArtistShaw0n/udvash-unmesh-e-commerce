@@ -57,7 +57,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
     <div
       className={clsx(
         // 306 max width card with 10/10/12 padding, 10px radius, white bg, soft shadow
-        "flex flex-col w-full max-w-[306px] mx-auto pt-[10px] px-[10px] pb-[12px] rounded-[10px] bg-white dark:bg-[var(--bg-surface)] shadow-card hover:shadow-card-hover transition-shadow",
+        "flex flex-col w-full max-w-[306px] mx-auto pt-[10px] px-[10px] pb-[12px] rounded-md bg-white dark:bg-[var(--bg-surface)] shadow-card hover:shadow-card-hover transition-shadow",
         className,
       )}
     >
@@ -65,7 +65,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
       <Link
         href={detailHref}
         aria-label={book.titleBn}
-        className="relative block w-full aspect-[286/256] rounded-[5px] overflow-hidden bg-[#F7F9FB] dark:bg-[var(--bg-surface-muted)]"
+        className="relative block w-full aspect-[286/256] rounded-xs overflow-hidden bg-[#F7F9FB] dark:bg-[var(--bg-surface-muted)]"
       >
         <BookCoverPlaceholder />
 
@@ -130,7 +130,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
               <button
                 type="button"
                 disabled
-                className="flex-1 h-[34px] inline-flex items-center justify-center rounded-[5px] bg-[#DEDEDE] text-[#676767] font-poppins font-normal text-[14px] leading-[21px] cursor-not-allowed"
+                className="flex-1 h-[34px] inline-flex items-center justify-center rounded-xs bg-[#DEDEDE] text-[#676767] font-poppins font-normal text-[14px] leading-[21px] cursor-not-allowed"
               >
                 Stock Out
               </button>
@@ -138,7 +138,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 type="button"
                 disabled
                 aria-label="Cart"
-                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-[5px] bg-white border border-[#DEDEDE] cursor-not-allowed"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[#DEDEDE] cursor-not-allowed"
               >
                 <ShoppingCart size={18} className="text-[#DEDEDE]" />
               </button>
@@ -155,7 +155,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 onClick={handleAddToCart}
                 className={clsx(
                   // Figma target 130×34; allow shrink/grow on narrower cards.
-                  "flex-1 min-w-0 max-w-[130px] h-[34px] inline-flex items-center justify-center rounded-[5px] font-poppins font-normal text-[14px] leading-[21px] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500",
+                  "flex-1 min-w-0 max-w-[130px] h-[34px] inline-flex items-center justify-center rounded-xs font-poppins font-normal text-[14px] leading-[21px] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500",
                   isPreorder ? "bg-[#F59E0B]" : "bg-[#006D77]",
                 )}
               >
@@ -165,7 +165,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 type="button"
                 onClick={handleAddToCart}
                 aria-label="Add to cart"
-                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-[5px] bg-white border border-[#006D77] hover:bg-[#006D77]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[#006D77] hover:bg-[#006D77]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
               >
                 <ShoppingCart size={18} className="text-[#006D77]" strokeWidth={1.5} />
               </button>

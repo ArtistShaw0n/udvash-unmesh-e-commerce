@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
   return (
     <section className="section-pad-sm">
       <div className="container-site flex justify-center">
-        <div className="w-full max-w-md rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6">
+        <div className="w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6">
           {!done ? (
             <>
               <div className="text-center space-y-2">

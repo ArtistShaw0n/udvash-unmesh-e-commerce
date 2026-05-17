@@ -23,7 +23,7 @@ export function CookieConsentBanner() {
       className="fixed bottom-0 inset-x-0 z-[55] p-3 sm:p-4 pointer-events-none"
     >
       <div className="container-site pointer-events-auto">
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <span className="flex-shrink-0 inline-flex w-10 h-10 items-center justify-center rounded-full bg-warning-50 dark:bg-warning-700/20 text-warning-700 dark:text-warning-300">
             <Cookie size={20} />
           </span>

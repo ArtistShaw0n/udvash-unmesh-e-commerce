@@ -22,7 +22,7 @@ export function AccountGuard({ children }: { children: React.ReactNode }) {
 
   if (!hydrated || !isLoggedIn) {
     return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
     );
   }
 

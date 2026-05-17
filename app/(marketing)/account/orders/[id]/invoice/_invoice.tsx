@@ -77,7 +77,7 @@ export function OrderInvoice({ orderId }: OrderInvoiceProps) {
 
       {/* Invoice paper */}
       <div className="container-site py-8">
-        <div className="max-w-3xl mx-auto bg-white text-[#1a1a1a] shadow-card rounded-lg p-8 sm:p-10 print:p-0 print:shadow-none print:rounded-none print:max-w-none">
+        <div className="max-w-3xl mx-auto bg-white text-[#1a1a1a] shadow-card rounded-md p-8 sm:p-10 print:p-0 print:shadow-none print:rounded-none print:max-w-none">
           {/* Letterhead */}
           <header className="flex items-start justify-between gap-4 pb-6 border-b-2 border-[#1a1a1a]">
             <div>

@@ -42,7 +42,7 @@ export function AddressCard({
       onClick={interactive ? onSelect : undefined}
       onKeyDown={interactive ? (e) => (e.key === "Enter" || e.key === " ") && onSelect?.() : undefined}
       className={clsx(
-        "rounded-lg border bg-[var(--bg-surface)] p-4 sm:p-5 transition-all",
+        "rounded-md border bg-[var(--bg-surface)] p-4 sm:p-5 transition-all",
         selected ? "border-brand-600 ring-2 ring-brand-600/15" : "border-[var(--border-default)]",
         interactive && "cursor-pointer hover:border-[var(--border-strong)]",
         className,

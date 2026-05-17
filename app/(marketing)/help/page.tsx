@@ -182,7 +182,7 @@ export default function HelpPage() {
           </section>
         ))}
 
-        <div className="not-prose mt-8 p-5 rounded-lg bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30">
+        <div className="not-prose mt-8 p-5 rounded-md bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30">
           <p className="text-body font-semibold text-[var(--fg-primary)]">
             উত্তর পেলেন না?
           </p>

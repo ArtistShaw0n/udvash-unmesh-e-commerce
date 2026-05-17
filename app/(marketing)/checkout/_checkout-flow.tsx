@@ -148,7 +148,7 @@ export function CheckoutFlow() {
     return (
       <section className="section-pad-sm">
         <div className="container-site">
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
         </div>
       </section>
     );
@@ -219,7 +219,7 @@ export function CheckoutFlow() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card space-y-5">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card space-y-5">
             {step === 0 && (
               <>
                 <h2 className="text-h3 text-[var(--fg-primary)] flex items-center gap-2">
@@ -444,7 +444,7 @@ export function CheckoutFlow() {
           </div>
 
           {/* Summary */}
-          <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
+          <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
             <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
             <dl className="space-y-2">
               <SummaryRow

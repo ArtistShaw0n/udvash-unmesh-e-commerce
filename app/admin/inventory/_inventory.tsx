@@ -96,7 +96,7 @@ export function AdminInventoryEditor() {
         </p>
       </div>
 
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card">
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card">
         <Input
           placeholder="বই বা ক্যাটাগরি দিয়ে খুঁজুন"
           value={q}
@@ -106,7 +106,7 @@ export function AdminInventoryEditor() {
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
           <table className="w-full text-body-sm">
             <tbody className="divide-y divide-[var(--border-muted)]">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -116,7 +116,7 @@ export function AdminInventoryEditor() {
           </table>
         </div>
       ) : (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
+        <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-card">
           <table className="w-full text-body-sm">
             <thead className="bg-[var(--bg-surface-muted)] text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
               <tr>

@@ -41,7 +41,7 @@ export function WhatsAppButton() {
           <div
             role="dialog"
             aria-label="Chat presets"
-            className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-3 w-72 max-w-[calc(100vw-2rem)]"
+            className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-3 w-72 max-w-[calc(100vw-2rem)]"
           >
             <div className="flex items-center justify-between mb-2 px-1">
               <p className="text-body-sm font-semibold text-[var(--fg-primary)]">

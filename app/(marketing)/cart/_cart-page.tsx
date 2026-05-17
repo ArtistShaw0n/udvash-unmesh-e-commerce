@@ -59,7 +59,7 @@ export function CartPage() {
     return (
       <section className="section-pad-sm">
         <div className="container-site">
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card min-h-[40vh]" />
         </div>
       </section>
     );
@@ -97,7 +97,7 @@ export function CartPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
           {/* Cart list */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <div className="flex items-center gap-3 pb-4 border-b border-[var(--border-default)]">
               <ShoppingBag size={22} className="text-brand-700" />
               <h1 className="text-h3 text-[var(--fg-primary)]">

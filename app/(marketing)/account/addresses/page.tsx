@@ -208,7 +208,7 @@ function Modal({
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
       >
         <div className="flex items-center justify-between">
           <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>

@@ -27,7 +27,7 @@ function AuthCardSkeleton() {
   return (
     <section className="section-pad-sm">
       <div className="container-site flex justify-center">
-        <div className="w-full max-w-md rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 min-h-[480px]" />
+        <div className="w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 min-h-[480px]" />
       </div>
     </section>
   );
@@ -108,7 +108,7 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
       <div className="container-site flex justify-center">
         <div
           className={clsx(
-            "w-full max-w-md rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6",
+            "w-full max-w-md rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card p-6 sm:p-8 space-y-6",
             className,
           )}
         >

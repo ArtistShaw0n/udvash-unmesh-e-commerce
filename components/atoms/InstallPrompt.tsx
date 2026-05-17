@@ -61,7 +61,7 @@ export function InstallPrompt() {
     <div
       role="dialog"
       aria-label="Install app"
-      className="fixed bottom-20 sm:bottom-24 left-3 right-3 sm:left-auto sm:right-6 sm:w-[360px] z-[58] rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-4 flex items-start gap-3"
+      className="fixed bottom-20 sm:bottom-24 left-3 right-3 sm:left-auto sm:right-6 sm:w-[360px] z-[58] rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-4 flex items-start gap-3"
     >
       <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300 flex-shrink-0">
         <Download size={18} />

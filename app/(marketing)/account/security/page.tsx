@@ -38,7 +38,7 @@ export default function SecurityPage() {
       </div>
 
       <form
-        className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-8 shadow-card space-y-5 max-w-xl"
+        className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-8 shadow-card space-y-5 max-w-xl"
         onSubmit={submit}
       >
         {error && (

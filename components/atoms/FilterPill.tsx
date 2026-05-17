@@ -44,7 +44,7 @@ export function FilterPill({
       aria-pressed={active}
       className={clsx(
         // Shared
-        "inline-flex items-center justify-center rounded-[10px] border transition-colors whitespace-nowrap",
+        "inline-flex items-center justify-center rounded-md border transition-colors whitespace-nowrap",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
         // Size
         size === "default"

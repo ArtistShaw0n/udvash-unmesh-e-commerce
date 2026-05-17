@@ -92,7 +92,7 @@ export function TrackOrderPage() {
           ) : (
             <>
               <form
-                className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-8 shadow-card space-y-4"
+                className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-8 shadow-card space-y-4"
                 onSubmit={handleSubmit}
                 noValidate
               >
@@ -140,7 +140,7 @@ export function TrackOrderPage() {
               {result.kind === "not-found" && (
                 <div
                   role="alert"
-                  className="rounded-lg border border-discount-200 dark:border-discount-700/40 bg-discount-50 dark:bg-discount-900/20 p-5 flex items-start gap-3"
+                  className="rounded-md border border-discount-200 dark:border-discount-700/40 bg-discount-50 dark:bg-discount-900/20 p-5 flex items-start gap-3"
                 >
                   <AlertCircle
                     size={22}
@@ -191,7 +191,7 @@ function OrderDetail({
       </button>
 
       {/* Header card */}
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+      <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
@@ -229,14 +229,14 @@ function OrderDetail({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
         <div className="space-y-6">
           {/* Status timeline */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডার স্ট্যাটাস</h2>
             <OrderStatusTimeline status={order.status} />
           </div>
 
           {/* Courier tracking */}
           {order.courier && order.status !== "cancelled" && (
-            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+            <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
               <h2 className="text-h3 text-[var(--fg-primary)] mb-4 flex items-center gap-2">
                 <Truck size={20} /> কুরিয়ার ট্র্যাকিং
               </h2>
@@ -250,7 +250,7 @@ function OrderDetail({
           )}
 
           {/* Items */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-4">অর্ডারকৃত বইসমূহ</h2>
             <ul className="divide-y divide-[var(--border-muted)]">
               {order.items.map((it) => (
@@ -276,7 +276,7 @@ function OrderDetail({
           </div>
 
           {/* Shipping address */}
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <h2 className="text-h3 text-[var(--fg-primary)] mb-3 flex items-center gap-2">
               <MapPin size={20} /> ডেলিভারি ঠিকানা
             </h2>
@@ -296,7 +296,7 @@ function OrderDetail({
         </div>
 
         {/* Summary sidebar */}
-        <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
+        <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
           <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
           <dl className="space-y-2">
             <Row label={`Subtotal (${toBengaliNumber(itemCount)} ${itemCount === 1 ? "item" : "items"})`} value={order.subtotal} />

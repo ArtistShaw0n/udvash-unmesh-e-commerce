@@ -240,7 +240,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[240px_1fr] min-w-0 [&>*]:min-w-0">
-            <aside className="hidden lg:block sticky top-24 self-start rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
+            <aside className="hidden lg:block sticky top-24 self-start rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
               {renderFilterPanel("desktop")}
             </aside>
 
@@ -252,7 +252,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
                   ))}
                 </div>
               ) : (
-                <div className="py-20 text-center text-body text-[var(--fg-muted)] rounded-lg border border-dashed border-[var(--border-default)]">
+                <div className="py-20 text-center text-body text-[var(--fg-muted)] rounded-md border border-dashed border-[var(--border-default)]">
                   কোনো বই এই ফিল্টারে পাওয়া যায়নি।
                   <div className="mt-3">
                     <Button variant="secondary" size="sm" onClick={reset}>
