@@ -32,6 +32,13 @@ const TONE: Record<string, string> = {
   preorder: "bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300",
 };
 
+const STATUS_LABEL: Record<string, string> = {
+  "in-stock": "স্টকে আছে",
+  "low-stock": "কম স্টক",
+  "out-of-stock": "স্টক-আউট",
+  preorder: "প্রি-অর্ডার",
+};
+
 export function AdminInventoryEditor() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +98,7 @@ export function AdminInventoryEditor() {
 
       <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card">
         <Input
-          placeholder="বই বা ক্যাটেগরি দিয়ে সার্চ"
+          placeholder="বই বা ক্যাটাগরি দিয়ে খুঁজুন"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           leftIcon={<Search size={16} />}
@@ -117,7 +124,7 @@ export function AdminInventoryEditor() {
                 <th className="text-left px-4 py-3 hidden md:table-cell">ক্যাটেগরি</th>
                 <th className="text-center px-4 py-3">স্ট্যাটাস</th>
                 <th className="text-center px-4 py-3">ইউনিট</th>
-                <th className="text-center px-4 py-3">Set</th>
+                <th className="text-center px-4 py-3">নতুন মান</th>
                 <th className="px-2 py-3" />
               </tr>
             </thead>
@@ -142,11 +149,11 @@ export function AdminInventoryEditor() {
                     <td className="px-4 py-3 text-center">
                       <span
                         className={clsx(
-                          "inline-flex items-center px-2 py-0.5 rounded-sm text-caption font-bold",
+                          "inline-flex items-center px-2 py-0.5 rounded-sm text-caption font-bold whitespace-nowrap",
                           TONE[status],
                         )}
                       >
-                        {status}
+                        {STATUS_LABEL[status]}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center font-bold text-[var(--fg-primary)] tabular-nums">
@@ -171,7 +178,7 @@ export function AdminInventoryEditor() {
                         onClick={() => save(r.slug)}
                         disabled={!pending || saving}
                       >
-                        {saving ? "..." : "Save"}
+                        {saving ? "..." : "সংরক্ষণ"}
                       </Button>
                     </td>
                   </tr>

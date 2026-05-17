@@ -11,9 +11,9 @@ import type { Coupon, CouponKind } from "@/lib/coupons";
 import { clsx } from "@/lib/clsx";
 
 const KIND_LABEL: Record<CouponKind, string> = {
-  percent: "% off",
-  fixed: "Fixed ৳ off",
-  "free-shipping": "Free shipping",
+  percent: "% ছাড়",
+  fixed: "নির্দিষ্ট ৳ ছাড়",
+  "free-shipping": "ফ্রি শিপিং",
 };
 
 const KIND_TONE: Record<CouponKind, string> = {
@@ -150,12 +150,12 @@ export function AdminCouponsManager() {
           <table className="w-full text-body-sm">
             <thead className="bg-[var(--bg-surface-muted)] text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
               <tr>
-                <th className="text-left px-4 py-3">Code</th>
-                <th className="text-left px-4 py-3">Kind</th>
-                <th className="text-right px-4 py-3">Value</th>
-                <th className="text-right px-4 py-3 hidden sm:table-cell">Min</th>
-                <th className="text-right px-4 py-3 hidden sm:table-cell">Cap</th>
-                <th className="text-left px-4 py-3 hidden lg:table-cell">Description</th>
+                <th className="text-left px-4 py-3">কোড</th>
+                <th className="text-left px-4 py-3">ধরন</th>
+                <th className="text-right px-4 py-3">পরিমাণ</th>
+                <th className="text-right px-4 py-3 hidden sm:table-cell">নূন্যতম</th>
+                <th className="text-right px-4 py-3 hidden sm:table-cell">সর্বোচ্চ</th>
+                <th className="text-left px-4 py-3 hidden lg:table-cell">বিবরণ</th>
                 <th className="px-2 py-3" />
               </tr>
             </thead>
@@ -198,12 +198,12 @@ export function AdminCouponsManager() {
                         onClick={() => openEdit(c)}
                         className="px-2 py-1 rounded-md text-caption font-semibold text-[var(--fg-secondary)] hover:bg-[var(--bg-surface-muted)]"
                       >
-                        Edit
+                        সম্পাদনা
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDelete(c)}
-                        aria-label="Delete coupon"
+                        aria-label="কুপন মুছুন"
                         className="w-8 h-8 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:bg-discount-50 hover:text-discount-600 dark:hover:bg-discount-900/30"
                       >
                         <Trash2 size={14} />
@@ -219,10 +219,10 @@ export function AdminCouponsManager() {
 
       {/* Create / Edit modal */}
       {creating && (
-        <Modal title={editing ? `Edit ${editing.code}` : "নতুন কুপন"} onClose={closeForm}>
+        <Modal title={editing ? `${editing.code} সম্পাদনা` : "নতুন কুপন"} onClose={closeForm}>
           <FormField
             id="cp-code"
-            label="Code (uppercase A-Z, 0-9, -, _)"
+            label="কুপন কোড (বড় হাতের A-Z, 0-9, -, _)"
             placeholder="NEW10"
             value={form.code}
             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
@@ -230,28 +230,28 @@ export function AdminCouponsManager() {
           />
           <div className="space-y-1.5">
             <label className="block text-body-sm font-semibold text-[var(--fg-primary)]">
-              Kind
+              ধরন
             </label>
             <select
               value={form.kind}
               onChange={(e) => setForm({ ...form, kind: e.target.value as CouponKind })}
               className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2.5 text-body"
             >
-              <option value="percent">% off</option>
-              <option value="fixed">Fixed ৳ off</option>
-              <option value="free-shipping">Free shipping</option>
+              <option value="percent">% ছাড়</option>
+              <option value="fixed">নির্দিষ্ট ৳ ছাড়</option>
+              <option value="free-shipping">ফ্রি শিপিং</option>
             </select>
           </div>
           <FormField
             id="cp-value"
-            label={form.kind === "percent" ? "Percent (e.g. 10)" : form.kind === "fixed" ? "Amount in ৳" : "Value (set 0)"}
+            label={form.kind === "percent" ? "শতাংশ (যেমন ১০)" : form.kind === "fixed" ? "পরিমাণ (৳)" : "মান (০ দিন)"}
             value={form.value}
             onChange={(e) => setForm({ ...form, value: e.target.value })}
             type="number"
           />
           <FormField
             id="cp-min"
-            label="Minimum subtotal (৳) — optional"
+            label="নূন্যতম সাবটোটাল (৳) — ঐচ্ছিক"
             value={form.minSubtotal}
             onChange={(e) => setForm({ ...form, minSubtotal: e.target.value })}
             type="number"
@@ -259,7 +259,7 @@ export function AdminCouponsManager() {
           {form.kind === "percent" && (
             <FormField
               id="cp-cap"
-              label="Maximum discount cap (৳) — optional"
+              label="সর্বোচ্চ ছাড় (৳) — ঐচ্ছিক"
               value={form.maxDiscount}
               onChange={(e) => setForm({ ...form, maxDiscount: e.target.value })}
               type="number"
@@ -267,14 +267,14 @@ export function AdminCouponsManager() {
           )}
           <FormField
             id="cp-desc"
-            label="Description (shown to customers)"
+            label="বিবরণ (গ্রাহক যা দেখবেন)"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="১০% ছাড়, মিনিমাম ৫০০৳"
           />
           <FormField
             id="cp-success"
-            label="Success label (toast)"
+            label="সফলতার বার্তা (টোস্ট)"
             value={form.successLabel}
             onChange={(e) => setForm({ ...form, successLabel: e.target.value })}
             placeholder="১০% ছাড় প্রযোজ্য হয়েছে"
@@ -291,7 +291,7 @@ export function AdminCouponsManager() {
       )}
 
       {confirmDelete && (
-        <Modal title={`Delete ${confirmDelete.code}?`} onClose={() => setConfirmDelete(null)}>
+        <Modal title={`${confirmDelete.code} মুছবেন?`} onClose={() => setConfirmDelete(null)}>
           <p className="text-body-sm text-[var(--fg-secondary)]">
             <span className="font-mono font-semibold text-[var(--fg-primary)]">
               {confirmDelete.code}

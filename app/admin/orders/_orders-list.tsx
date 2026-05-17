@@ -20,11 +20,11 @@ interface AdminOrderRow {
 
 const STATUSES: { value: OrderStatus | ""; label: string }[] = [
   { value: "", label: "সব" },
-  { value: "placed", label: "Placed" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "shipped", label: "Shipped" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
+  { value: "placed", label: "অর্ডার করা" },
+  { value: "confirmed", label: "নিশ্চিত" },
+  { value: "shipped", label: "প্রেরিত" },
+  { value: "delivered", label: "ডেলিভার্ড" },
+  { value: "cancelled", label: "বাতিল" },
 ];
 
 const STATUS_TONE: Record<OrderStatus, string> = {
@@ -64,7 +64,7 @@ export function AdminOrdersList() {
       <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 shadow-card flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <Input
-            placeholder="Order ID / ইমেইল / নাম / ফোন দিয়ে সার্চ"
+            placeholder="অর্ডার আইডি / ইমেইল / নাম / ফোন দিয়ে খুঁজুন"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             leftIcon={<Search size={16} />}

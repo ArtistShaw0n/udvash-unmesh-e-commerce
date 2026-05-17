@@ -42,15 +42,15 @@ interface AdminCustomer {
 
 const NEXT_STATUS: Record<OrderStatus, { value: OrderStatus; label: string; icon: React.ReactNode }[]> = {
   placed: [
-    { value: "confirmed", label: "Confirm", icon: <Check size={14} /> },
-    { value: "cancelled", label: "Cancel", icon: <X size={14} /> },
+    { value: "confirmed", label: "নিশ্চিত করুন", icon: <Check size={14} /> },
+    { value: "cancelled", label: "বাতিল করুন", icon: <X size={14} /> },
   ],
   confirmed: [
-    { value: "shipped", label: "Mark Shipped", icon: <Truck size={14} /> },
-    { value: "cancelled", label: "Cancel", icon: <X size={14} /> },
+    { value: "shipped", label: "প্রেরিত হিসেবে চিহ্নিত", icon: <Truck size={14} /> },
+    { value: "cancelled", label: "বাতিল করুন", icon: <X size={14} /> },
   ],
   shipped: [
-    { value: "delivered", label: "Mark Delivered", icon: <Check size={14} /> },
+    { value: "delivered", label: "ডেলিভার্ড হিসেবে চিহ্নিত", icon: <Check size={14} /> },
   ],
   delivered: [],
   cancelled: [],
@@ -268,17 +268,17 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
           )}
 
           <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card space-y-3">
-            <h3 className="text-h3 text-[var(--fg-primary)]">Summary</h3>
+            <h3 className="text-h3 text-[var(--fg-primary)]">সারাংশ</h3>
             <dl className="space-y-1.5 text-body-sm">
-              <Row label="Subtotal" value={`${toBengaliNumber(order.subtotal.toLocaleString("en-US"))}৳`} />
+              <Row label="সাবটোটাল" value={`${toBengaliNumber(order.subtotal.toLocaleString("en-US"))}৳`} />
               {order.couponCode && (
-                <Row label={`Coupon (${order.couponCode})`} value="-" muted />
+                <Row label={`কুপন (${order.couponCode})`} value="-" muted />
               )}
-              <Row label="Vat" value={`${toBengaliNumber(order.vat.toLocaleString("en-US"))}৳`} />
-              <Row label="Shipping" value={`${toBengaliNumber(order.shipping.toLocaleString("en-US"))}৳`} />
+              <Row label="ভ্যাট" value={`${toBengaliNumber(order.vat.toLocaleString("en-US"))}৳`} />
+              <Row label="ডেলিভারি" value={`${toBengaliNumber(order.shipping.toLocaleString("en-US"))}৳`} />
             </dl>
             <div className="pt-3 border-t border-[var(--border-default)] flex items-center justify-between">
-              <span className="text-body-lg font-bold text-[var(--fg-primary)]">Total</span>
+              <span className="text-body-lg font-bold text-[var(--fg-primary)]">মোট</span>
               <span className="text-h3 font-bold text-[var(--fg-primary)] tabular-nums">
                 {toBengaliNumber(order.total.toLocaleString("en-US"))}৳
               </span>

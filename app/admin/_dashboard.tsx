@@ -97,11 +97,11 @@ export function AdminDashboard() {
             {(["placed", "confirmed", "shipped", "delivered", "cancelled"] as const).map(
               (status) => {
                 const labels = {
-                  placed: "Placed",
-                  confirmed: "Confirmed",
-                  shipped: "Shipped",
-                  delivered: "Delivered",
-                  cancelled: "Cancelled",
+                  placed: "অর্ডার করা",
+                  confirmed: "নিশ্চিত",
+                  shipped: "প্রেরিত",
+                  delivered: "ডেলিভার্ড",
+                  cancelled: "বাতিল",
                 };
                 const tones: Record<string, string> = {
                   placed: "bg-neutral-100 text-neutral-700",
