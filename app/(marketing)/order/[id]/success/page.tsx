@@ -25,8 +25,8 @@ export default async function OrderSuccessPage({ params }: PageProps) {
       }
       actions={
         <>
-          <Button href={`/account/orders/${id}`} variant="primary" size="lg">অর্ডার ট্র্যাক করুন</Button>
-          <Button href="/products" variant="secondary" size="lg">কেনাকাটা চালিয়ে যান</Button>
+          <Button href={`/account/orders/${id}`} variant="primary" size={{ base: "md", md: "lg" }}>অর্ডার ট্র্যাক করুন</Button>
+          <Button href="/products" variant="secondary" size={{ base: "md", md: "lg" }}>কেনাকাটা চালিয়ে যান</Button>
         </>
       }
     />

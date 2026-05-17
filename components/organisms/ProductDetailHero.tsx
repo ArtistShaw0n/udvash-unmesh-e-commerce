@@ -115,32 +115,47 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>
 
-          {/* Bottom row — counter + Buy Now + cart icon + wishlist */}
-          <div className="flex items-center gap-3 pt-2">
-            <QuantityCounter value={qty} min={1} onChange={setQty} />
+          {/* Bottom row — responsive: tighter on mobile, full on desktop */}
+          <div className="flex items-center gap-2 sm:gap-3 pt-2">
+            <QuantityCounter
+              value={qty}
+              min={1}
+              onChange={setQty}
+              size="detail"
+              className="hidden sm:inline-flex"
+            />
+            <QuantityCounter
+              value={qty}
+              min={1}
+              onChange={setQty}
+              size="card"
+              className="sm:hidden"
+            />
             <Button
               variant="primary"
-              size="lg"
+              size={{ base: "md", md: "lg" }}
               fullWidth
               leftIcon={<ShoppingBag size={18} />}
               onClick={handleBuyNow}
             >
               Buy Now
             </Button>
-            <CartIconButton size="lg" onClick={handleAddToCartIcon} />
+            <CartIconButton size="md" className="sm:hidden" onClick={handleAddToCartIcon} />
+            <CartIconButton size="lg" className="hidden sm:inline-flex" onClick={handleAddToCartIcon} />
             <button
               type="button"
               onClick={handleWishlistToggle}
               aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
               aria-pressed={inWishlist}
               className={clsx(
-                "inline-flex items-center justify-center w-12 h-12 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                "inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
                 inWishlist
                   ? "border-discount-300 bg-discount-50 text-discount-600 dark:bg-discount-900/20 dark:border-discount-700/40"
                   : "border-[var(--border-default)] text-[var(--fg-muted)] hover:border-discount-300 hover:text-discount-600",
               )}
             >
-              <Heart size={20} fill={inWishlist ? "currentColor" : "none"} />
+              <Heart size={18} fill={inWishlist ? "currentColor" : "none"} className="sm:hidden" />
+              <Heart size={20} fill={inWishlist ? "currentColor" : "none"} className="hidden sm:block" />
             </button>
           </div>
         </div>

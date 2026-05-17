@@ -182,7 +182,7 @@ function Inner() {
           <Button
             type="submit"
             variant="primary"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             fullWidth
             disabled={digits.some((d) => !d)}
           >

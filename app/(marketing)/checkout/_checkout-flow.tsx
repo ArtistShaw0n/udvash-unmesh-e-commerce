@@ -386,7 +386,7 @@ export function CheckoutFlow() {
               ) : (
                 <Button
                   variant="primary"
-                  size="lg"
+                  size={{ base: "md", md: "lg" }}
                   onClick={handlePlaceOrder}
                   disabled={placing}
                 >

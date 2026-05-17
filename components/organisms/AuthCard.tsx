@@ -205,7 +205,7 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
               </div>
             )}
 
-            <Button type="submit" variant="primary" size="lg" fullWidth disabled={pending}>
+            <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth disabled={pending}>
               {pending ? "অপেক্ষা করুন..." : submitLabel}
             </Button>
           </form>

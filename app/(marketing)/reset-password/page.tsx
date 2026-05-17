@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
                   required
                   error={confirm.length > 0 && password !== confirm ? "পাসওয়ার্ড মিলছে না" : undefined}
                 />
-                <Button type="submit" variant="primary" size="lg" fullWidth disabled={!matches}>
+                <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth disabled={!matches}>
                   পাসওয়ার্ড সেট করুন
                 </Button>
               </form>
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
               <p className="text-body text-[var(--fg-secondary)]">
                 এখন নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারবেন।
               </p>
-              <Button href="/login" variant="primary" size="lg" fullWidth>লগইন করুন</Button>
+              <Button href="/login" variant="primary" size={{ base: "md", md: "lg" }} fullWidth>লগইন করুন</Button>
               <Link href="/" className="block text-body-sm text-[var(--fg-muted)] hover:text-brand-700">
                 হোমে ফিরে যান
               </Link>

@@ -67,20 +67,22 @@ export function Header({ className }: HeaderProps) {
         className,
       )}
     >
-      <div className="container-site flex items-center gap-3 sm:gap-6 h-16 sm:h-20">
-        <Logo size="md" />
+      <div className="container-site flex items-center gap-3 sm:gap-6 h-14 sm:h-16 md:h-20">
+        {/* Logo shrinks on mobile so the right-side CTA fits */}
+        <Logo size="md" className="!h-7 sm:!h-8 md:!h-9" />
 
         <form className="flex-1 max-w-2xl mx-2 hidden sm:block" onSubmit={submitSearch} role="search">
           <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
         </form>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
           <Link
             href="/cart"
             aria-label={`Cart (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
+            className="relative inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
           >
-            <ShoppingBag size={22} className="text-[var(--fg-primary)]" />
+            <ShoppingBag size={20} className="text-[var(--fg-primary)] sm:hidden" />
+            <ShoppingBag size={22} className="text-[var(--fg-primary)] hidden sm:block" />
             {showBadge && (
               <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 rounded-full bg-discount-600 text-white text-caption font-bold inline-flex items-center justify-center">
                 {itemCount > 99 ? "99+" : itemCount}
@@ -89,8 +91,8 @@ export function Header({ className }: HeaderProps) {
           </Link>
 
           {!authHydrated ? (
-            // Stable placeholder so SSR and CSR widths match.
-            <div className="w-32 h-10 rounded-md bg-[var(--bg-surface-muted)] animate-pulse hidden sm:block" />
+            // Stable placeholder so SSR and CSR widths match (responsive width).
+            <div className="w-24 sm:w-32 h-9 sm:h-10 rounded-md bg-[var(--bg-surface-muted)] animate-pulse" />
           ) : isLoggedIn ? (
             <div ref={menuRef} className="relative">
               <button
@@ -98,15 +100,15 @@ export function Header({ className }: HeaderProps) {
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="inline-flex items-center gap-2 h-10 px-2 sm:px-3 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
+                className="inline-flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-1.5 sm:px-3 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
               >
-                <span className="inline-flex w-8 h-8 items-center justify-center rounded-full bg-brand-600 text-white text-body-sm font-bold">
+                <span className="inline-flex w-7 h-7 sm:w-8 sm:h-8 items-center justify-center rounded-full bg-brand-600 text-white text-caption sm:text-body-sm font-bold">
                   {user!.name.charAt(0).toUpperCase()}
                 </span>
-                <span className="hidden sm:block text-body-sm font-semibold text-[var(--fg-primary)] truncate max-w-[8rem]">
+                <span className="hidden md:block text-body-sm font-semibold text-[var(--fg-primary)] truncate max-w-[8rem]">
                   {user!.name}
                 </span>
-                <ChevronDown size={14} className="hidden sm:block text-[var(--fg-muted)]" />
+                <ChevronDown size={14} className="hidden md:block text-[var(--fg-muted)]" />
               </button>
 
               {menuOpen && (
@@ -140,8 +142,14 @@ export function Header({ className }: HeaderProps) {
               )}
             </div>
           ) : (
-            <Button href="/login" variant="primary" size="md">
-              Login/Register
+            // Responsive CTA: sm on mobile (compact 36px), md on tablet+ (44px)
+            <Button
+              href="/login"
+              variant="primary"
+              size={{ base: "sm", md: "md" }}
+            >
+              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">Login/Register</span>
             </Button>
           )}
         </div>

@@ -119,7 +119,7 @@ export function TrackOrderPage() {
                   autoComplete="email"
                   required
                 />
-                <Button type="submit" variant="primary" size="lg" fullWidth>
+                <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth>
                   ট্র্যাক করুন
                 </Button>
                 <div className="pt-2 border-t border-[var(--border-muted)]">

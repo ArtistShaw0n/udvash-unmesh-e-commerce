@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
                   autoComplete="email"
                   required
                 />
-                <Button type="submit" variant="primary" size="lg" fullWidth>
+                <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth>
                   রিসেট লিংক পাঠান
                 </Button>
               </form>

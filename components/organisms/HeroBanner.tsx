@@ -31,15 +31,20 @@ export function HeroBanner({
             <h1 className="text-h1 font-bold leading-[1.1] tracking-tight">{title}</h1>
             <p className="text-body text-white/85 leading-relaxed max-w-xl">{description}</p>
             <div className="flex flex-wrap gap-3 pt-1">
-              <Button href={primaryCta.href} variant="primary" size="md"
-                      className="!bg-brand-600 hover:!bg-brand-500">
+              {/* Hero CTAs scale up on tablet+ for impact */}
+              <Button
+                href={primaryCta.href}
+                variant="primary"
+                size={{ base: "md", md: "lg" }}
+                className="!bg-brand-600 hover:!bg-brand-500"
+              >
                 {primaryCta.label}
               </Button>
               {secondaryCta && (
                 <Button
                   href={secondaryCta.href}
                   variant="white"
-                  size="md"
+                  size={{ base: "md", md: "lg" }}
                 >
                   {secondaryCta.label}
                 </Button>
