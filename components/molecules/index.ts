@@ -4,6 +4,9 @@ export type { CartItemRowProps, CartItem } from "./CartItemRow";
 export { CountdownTimer } from "./CountdownTimer";
 export type { CountdownTimerProps } from "./CountdownTimer";
 
+export { CountdownInline } from "./CountdownInline";
+export type { CountdownInlineProps } from "./CountdownInline";
+
 export { FormField } from "./FormField";
 export type { FormFieldProps } from "./FormField";
 

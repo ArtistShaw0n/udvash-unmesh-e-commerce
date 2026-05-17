@@ -9,7 +9,7 @@ import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock, Heart } from "lucide-re
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
   BreadcrumbPill,
-  CountdownTimer,
+  CountdownInline,
   InfoChip,
   NotifyMeForm,
   PriceBlock,
@@ -110,12 +110,10 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
           <div className="rounded-lg bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30 p-4 sm:p-5 space-y-3">
             <PriceBlock price={book.price} oldPrice={book.oldPrice} size="lg" />
             {offerEndsAt && (
-              <div className="flex items-center gap-2 text-body-sm text-[var(--fg-secondary)]">
+              <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-body-sm text-[var(--fg-secondary)]">
                 <Clock size={16} className="text-brand-700 dark:text-brand-400" />
                 <span>অফার শেষ হতে বাকি:</span>
-                <span className="font-bold text-brand-700 dark:text-brand-400 tabular-nums">
-                  <CountdownTimerInline target={offerEndsAt} />
-                </span>
+                <CountdownInline targetDate={offerEndsAt} variant="chip" />
               </div>
             )}
           </div>
@@ -206,6 +204,3 @@ function BookCover() {
   );
 }
 
-function CountdownTimerInline({ target }: { target: Date }) {
-  return <CountdownTimer targetDate={target} tone="default" format="hms" className="!gap-0.5 [&>div]:bg-transparent [&>div]:p-0 [&>div]:min-w-0 [&_span:last-child]:hidden" />;
-}
