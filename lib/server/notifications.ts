@@ -19,6 +19,16 @@
 
 import "server-only";
 import type { ServerOrder, ServerUser } from "./store";
+import {
+  renderWelcome,
+  renderPasswordReset,
+  renderOrderConfirmed,
+  renderOrderShipped,
+  renderOrderDelivered,
+  renderOrderCancelled,
+  renderReturnRequested,
+  renderReturnRefunded,
+} from "./email-templates";
 
 export type Channel = "email" | "sms";
 
@@ -26,7 +36,10 @@ export interface NotificationEnvelope {
   to: string;
   channel: Channel;
   subject: string;
+  /** Plain-text body — always present; used by SMS and as email text fallback. */
   body: string;
+  /** Rich HTML body — only set for email channel when a template exists. */
+  html?: string;
   templateName: string;
   /** Payload metadata for analytics / debugging */
   metadata?: Record<string, string | number | boolean>;
@@ -40,12 +53,17 @@ async function dispatch(env: NotificationEnvelope): Promise<void> {
   if (process.env.NODE_ENV === "production") {
     // TODO: swap with Resend / Bulk SMS BD call
     // Example:
-    //   if (env.channel === "email") await resend.emails.send({...})
-    //   if (env.channel === "sms")   await bulkSmsBd.send({...})
+    //   if (env.channel === "email") await resend.emails.send({
+    //     to: env.to, subject: env.subject, html: env.html, text: env.body,
+    //   });
+    //   if (env.channel === "sms")   await bulkSmsBd.send({
+    //     to: env.to, message: env.body,
+    //   });
   }
   const tag = env.channel === "email" ? "📧" : "📱";
+  const meta = env.html ? " [html+text]" : "";
   console.info(
-    `${tag} [notification] ${env.templateName} → ${env.to}\n   ${env.subject}\n   ${env.body.slice(0, 120)}${env.body.length > 120 ? "..." : ""}`,
+    `${tag} [notification]${meta} ${env.templateName} → ${env.to}\n   ${env.subject}\n   ${env.body.slice(0, 120)}${env.body.length > 120 ? "..." : ""}`,
   );
 }
 
@@ -63,34 +81,40 @@ async function safeSend(env: NotificationEnvelope): Promise<void> {
 
 export const notify = {
   async onWelcome(user: ServerUser, verifyCode: string) {
+    const r = renderWelcome(user, verifyCode);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `স্বাগতম ${user.name} — উদ্ভাস-উন্মেষে`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "welcome",
-      body: `${user.name}, আপনার একাউন্ট সফলভাবে তৈরি হয়েছে। ভেরিফাই করতে এই কোডটি ব্যবহার করুন: ${verifyCode}`,
       metadata: { userId: user.id, code: verifyCode },
     });
   },
 
   async onPasswordReset(user: ServerUser, resetCode: string) {
+    const r = renderPasswordReset(user, resetCode);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: "পাসওয়ার্ড রিসেট কোড",
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "password-reset",
-      body: `${user.name}, আপনার পাসওয়ার্ড রিসেট কোড: ${resetCode}। এই কোড ৩০ মিনিট পর মেয়াদ শেষ হবে।`,
       metadata: { userId: user.id },
     });
   },
 
   async onOrderConfirmed(user: ServerUser, order: ServerOrder) {
+    const r = renderOrderConfirmed(user, order);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `অর্ডার নিশ্চিত — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "order-confirmed",
-      body: `${user.name}, আপনার অর্ডার (#${order.id}, ৳${order.total}) সফলভাবে নেওয়া হয়েছে। আমরা ৩-৫ কর্মদিবসের মধ্যে ডেলিভারি করব।`,
       metadata: { orderId: order.id, total: order.total },
     });
     if (user.phone) {
@@ -105,60 +129,75 @@ export const notify = {
   },
 
   async onOrderShipped(user: ServerUser, order: ServerOrder, trackingCode?: string) {
+    const r = renderOrderShipped(user, order, trackingCode);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `অর্ডার পাঠানো হয়েছে — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "order-shipped",
-      body: `${user.name}, আপনার অর্ডার (#${order.id}) কুরিয়ারে দেওয়া হয়েছে।${trackingCode ? ` ট্র্যাকিং নম্বর: ${trackingCode}` : ""}`,
       metadata: { orderId: order.id, trackingCode: trackingCode ?? "" },
     });
+    if (user.phone) {
+      await safeSend({
+        to: user.phone,
+        channel: "sms",
+        subject: "Order shipped",
+        templateName: "order-shipped-sms",
+        body: `উদ্ভাস: অর্ডার #${order.id} কুরিয়ারে।${trackingCode ? ` ট্র্যাক: ${trackingCode}` : ""}`,
+      });
+    }
   },
 
   async onOrderDelivered(user: ServerUser, order: ServerOrder) {
+    const r = renderOrderDelivered(user, order);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `অর্ডার ডেলিভার্ড — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "order-delivered",
-      body: `${user.name}, আপনার অর্ডার (#${order.id}) ডেলিভার্ড হয়েছে। দয়া করে আপনার অভিজ্ঞতা শেয়ার করুন।`,
       metadata: { orderId: order.id },
     });
   },
 
   async onOrderCancelled(user: ServerUser, order: ServerOrder, byAdmin = false) {
+    const r = renderOrderCancelled(user, order, byAdmin);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `অর্ডার বাতিল — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: byAdmin ? "order-cancelled-by-admin" : "order-cancelled-by-customer",
-      body: `${user.name}, আপনার অর্ডার (#${order.id}) বাতিল করা হয়েছে।${
-        order.payment.status === "paid"
-          ? " রিফান্ড ৩-৭ কর্মদিবসের মধ্যে পাবেন।"
-          : ""
-      }`,
       metadata: { orderId: order.id, byAdmin: String(byAdmin) },
     });
   },
 
   async onReturnRequested(user: ServerUser, order: ServerOrder) {
+    const r = renderReturnRequested(user, order);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `রিটার্ন রিকোয়েস্ট পেয়েছি — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "return-requested",
-      body: `${user.name}, আপনার রিটার্ন রিকোয়েস্ট পেয়েছি। ২৪ ঘণ্টার মধ্যে আমাদের প্রতিনিধি যোগাযোগ করবেন।`,
       metadata: { orderId: order.id },
     });
   },
 
   async onReturnRefunded(user: ServerUser, order: ServerOrder) {
+    const r = renderReturnRefunded(user, order);
     await safeSend({
       to: user.email,
       channel: "email",
-      subject: `রিফান্ড সম্পন্ন — #${order.id}`,
+      subject: r.subject,
+      html: r.html,
+      body: r.text,
       templateName: "return-refunded",
-      body: `${user.name}, আপনার রিটার্ন প্রসেস হয়েছে। ৳${order.total} রিফান্ড পাঠানো হয়েছে।`,
       metadata: { orderId: order.id },
     });
   },

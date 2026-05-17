@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Star,
   Tag,
+  Mail,
   LogOut,
   Menu,
   X,
@@ -27,6 +28,7 @@ const NAV = [
   { label: "রিটার্ন", href: "/admin/returns", icon: RotateCcw },
   { label: "রিভিউ", href: "/admin/reviews", icon: Star },
   { label: "কুপন", href: "/admin/coupons", icon: Tag },
+  { label: "নোটিফিকেশন", href: "/admin/notifications/preview", icon: Mail },
 ];
 
 export function AdminSidebar() {
