@@ -150,7 +150,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
         <div className="space-y-6">
           {/* Status timeline */}
           <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">

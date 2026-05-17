@@ -21,7 +21,7 @@ export function HeroBanner({
   return (
     <section className={clsx("section-pad-sm container-site", className)}>
       <div className="relative overflow-hidden rounded-xl bg-brand-700 text-white px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-10 lg:min-h-[400px] flex items-center">
-        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10 items-center w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10 items-center w-full min-w-0 [&>*]:min-w-0">
           <div className="space-y-4">
             {badge && (
               <span className="inline-flex items-center px-3 py-1.5 rounded-pill bg-white/10 text-white text-caption font-bold uppercase tracking-wider border border-white/15">

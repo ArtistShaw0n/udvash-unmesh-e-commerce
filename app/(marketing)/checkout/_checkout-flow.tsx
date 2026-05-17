@@ -204,7 +204,7 @@ export function CheckoutFlow() {
           <CheckoutStepper steps={STEPS} current={step} />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
           <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card space-y-5">
             {step === 0 && (
               <>

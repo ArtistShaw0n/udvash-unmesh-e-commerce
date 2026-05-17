@@ -53,10 +53,10 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
   }
 
   return (
-    <section className={clsx("section-pad-sm", className)}>
-      <div className="container-site grid gap-8 lg:gap-12 lg:grid-cols-2 lg:items-start">
-        {/* Gallery */}
-        <div className="space-y-4">
+    <section className={clsx("section-pad-sm overflow-x-hidden", className)}>
+      <div className="container-site grid grid-cols-1 gap-8 lg:gap-12 lg:grid-cols-2 lg:items-start">
+        {/* Gallery — min-w-0 lets the grid item shrink under the content's intrinsic width */}
+        <div className="space-y-4 min-w-0">
           <div className="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-[var(--bg-surface-muted)] border border-[var(--border-default)]">
             <BookCover />
             {book.badge && book.badge.type === "bestseller" && (
@@ -76,14 +76,14 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
           </Button>
         </div>
 
-        {/* Info panel */}
-        <div className="space-y-5">
+        {/* Info panel — min-w-0 prevents long titles from blowing out the grid */}
+        <div className="space-y-5 min-w-0">
           <BreadcrumbPill category={book.categoryLabel} title="HSC Parallel Text" />
 
-          <h1 className="text-h2 text-[var(--fg-primary)] tracking-tight">
+          <h1 className="text-h2 text-[var(--fg-primary)] tracking-tight break-words">
             {book.title}
           </h1>
-          <p className="text-body text-[var(--fg-secondary)] leading-relaxed">
+          <p className="text-body text-[var(--fg-secondary)] leading-relaxed break-words">
             {book.description}
           </p>
 
