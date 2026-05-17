@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { track, Events } from "@/lib/analytics";
 import { getStock, type StockSnapshot } from "@/lib/inventory";
-import { BookOpen, RotateCcw, Truck, ShoppingCart, Clock } from "lucide-react";
+import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
   BreadcrumbPill,
@@ -153,7 +153,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
               variant="primary"
               size={{ base: "md", md: "lg" }}
               fullWidth
-              leftIcon={<ShoppingCart size={18} />}
+              leftIcon={<ShoppingBag size={18} />}
               onClick={handleBuyNow}
             >
               Buy Now

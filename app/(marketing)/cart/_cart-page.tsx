@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ShoppingBag } from "lucide-react";
 import { Button, Checkbox } from "@/components/atoms";
 import {
   CartItemRow,
@@ -71,7 +71,7 @@ export function CartPage() {
       <section className="section-pad-sm">
         <div className="container-site">
           <EmptyState
-            icon={<ShoppingCart size={36} />}
+            icon={<ShoppingBag size={36} />}
             title="আপনার কার্ট খালি"
             description="বই যোগ করতে নিচের বাটন চাপুন।"
             cta={
@@ -99,7 +99,7 @@ export function CartPage() {
           {/* Cart list */}
           <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
             <div className="flex items-center gap-3 pb-4 border-b border-[var(--border-default)]">
-              <ShoppingCart size={22} className="text-brand-700" />
+              <ShoppingBag size={22} className="text-brand-700" />
               <h1 className="text-h3 text-[var(--fg-primary)]">
                 আপনার কার্ট ({toBengaliNumber(itemCount)}টি বই)
               </h1>
