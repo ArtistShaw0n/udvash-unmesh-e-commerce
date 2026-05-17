@@ -1,28 +1,56 @@
-import { Check } from "lucide-react";
+"use client";
+
+import { useEffect, useRef } from "react";
+import { Check, Minus } from "lucide-react";
 import { clsx } from "@/lib/clsx";
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
   label?: React.ReactNode;
+  /**
+   * Tri-state: when true, renders the indeterminate (mixed) glyph regardless
+   * of `checked`. Use on a parent "Select All" when some-but-not-all children
+   * are checked. Sets `aria-checked="mixed"` for screen readers.
+   */
+  indeterminate?: boolean;
 }
 
 /**
- * Custom-styled checkbox.
+ * Canonical checkbox covering the full standard state machine:
  *
- * Structural note: the styled box must be a SIBLING of the `peer` input, not
- * its parent, because Tailwind's `peer-checked:` compiles to `.peer:checked ~`
- * which is a sibling selector. The previous version had the input nested
- * inside the styled span, so `peer-checked:bg-brand-600` silently never
- * applied — checkboxes looked unstyled regardless of state.
+ *   - unchecked          (default)
+ *   - hover              (border tints toward brand)
+ *   - focus-visible      (brand ring + offset for keyboard users)
+ *   - active / pressed   (no separate visual; relies on browser default)
+ *   - checked            (brand fill + white check glyph)
+ *   - indeterminate      (brand fill + white minus glyph; aria-checked="mixed")
+ *   - disabled           (opacity 60, muted bg)
+ *   - checked+disabled   (filled but desaturated)
+ *
+ * Structural note: the styled box is a SIBLING of the `peer` input, never its
+ * parent. `peer-checked:` compiles to a `~` sibling selector, so nesting the
+ * peer inside the styled element silently breaks the style. The `indeterminate`
+ * property of `HTMLInputElement` is set imperatively via a ref because React
+ * does not surface it as a prop.
  */
 export function Checkbox({
   label,
   checked,
+  indeterminate = false,
   className,
   id,
   disabled,
   ...rest
 }: CheckboxProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Sync the DOM `indeterminate` flag — React does not bind it via JSX.
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+
+  const showAsFilled = indeterminate || !!checked;
+
   return (
     <label
       htmlFor={id}
@@ -34,10 +62,12 @@ export function Checkbox({
     >
       <span className="relative inline-flex w-5 h-5 shrink-0">
         <input
+          ref={inputRef}
           id={id}
           type="checkbox"
           checked={checked}
           disabled={disabled}
+          aria-checked={indeterminate ? "mixed" : checked ? "true" : "false"}
           className="peer absolute inset-0 w-full h-full opacity-0 cursor-inherit z-10"
           {...rest}
         />
@@ -45,27 +75,53 @@ export function Checkbox({
           aria-hidden="true"
           className={clsx(
             "absolute inset-0 inline-flex items-center justify-center rounded-[4px]",
-            "border-2 border-[var(--border-strong)] bg-[var(--bg-surface)]",
-            "transition-[background-color,border-color] duration-150",
-            "peer-checked:bg-brand-600 peer-checked:border-brand-600",
+            "border-2 transition-[background-color,border-color] duration-150",
+            // Idle vs filled (covers both checked and indeterminate)
+            showAsFilled
+              ? "bg-brand-600 border-brand-600"
+              : "bg-[var(--bg-surface)] border-[var(--border-strong)]",
+            // Hover only when not filled — once filled, keep brand
+            !showAsFilled && !disabled
+              ? "peer-hover:border-brand-500"
+              : undefined,
+            // Focus ring (keyboard) — visible in any state
             "peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2",
             "peer-focus-visible:ring-brand-500",
-            "peer-hover:border-brand-500",
-            "peer-disabled:bg-[var(--bg-surface-muted)] peer-disabled:border-[var(--border-default)]",
+            // Disabled — desaturated
+            disabled && !showAsFilled
+              ? "bg-[var(--bg-surface-muted)] border-[var(--border-default)]"
+              : undefined,
+            disabled && showAsFilled
+              ? "bg-brand-300 border-brand-300 dark:bg-brand-700 dark:border-brand-700"
+              : undefined,
           )}
         >
-          <Check
-            size={14}
-            strokeWidth={3}
-            className={clsx(
-              "text-white pointer-events-none transition-opacity duration-150",
-              checked ? "opacity-100" : "opacity-0",
-            )}
-          />
+          {/* Indeterminate takes priority over checked when both true */}
+          {indeterminate ? (
+            <Minus
+              size={14}
+              strokeWidth={3.5}
+              className="text-white pointer-events-none"
+            />
+          ) : (
+            <Check
+              size={14}
+              strokeWidth={3}
+              className={clsx(
+                "text-white pointer-events-none transition-opacity duration-150",
+                checked ? "opacity-100" : "opacity-0",
+              )}
+            />
+          )}
         </span>
       </span>
       {label && (
-        <span className="text-body-sm font-medium text-[var(--fg-primary)]">
+        <span
+          className={clsx(
+            "text-body-sm font-medium",
+            disabled ? "text-[var(--fg-muted)]" : "text-[var(--fg-primary)]",
+          )}
+        >
           {label}
         </span>
       )}

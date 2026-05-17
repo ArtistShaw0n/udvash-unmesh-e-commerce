@@ -21,6 +21,7 @@ export function CartPage() {
   const {
     items,
     hydrated,
+    itemCount,
     selectedCount,
     allSelected,
     toggleSelected,
@@ -38,6 +39,9 @@ export function CartPage() {
       return { entry, book };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
+
+  // Tri-state select-all: indeterminate when some-but-not-all selected.
+  const selectAllIndeterminate = selectedCount > 0 && !allSelected;
 
   // Selected-only totals.
   const selectedResolved = resolved.filter((r) => r.entry.selected);
@@ -96,15 +100,20 @@ export function CartPage() {
             <div className="flex items-center gap-3 pb-4 border-b border-[var(--border-default)]">
               <ShoppingBag size={22} className="text-brand-700" />
               <h1 className="text-h3 text-[var(--fg-primary)]">
-                Shopping Cart ({selectedCount} {selectedCount === 1 ? "item" : "items"})
+                Shopping Cart ({itemCount} {itemCount === 1 ? "item" : "items"})
               </h1>
             </div>
 
             <div className="flex items-center justify-between py-4">
               <Checkbox
-                label="Select All"
+                label={
+                  selectAllIndeterminate
+                    ? `Select All (${selectedCount} / ${itemCount})`
+                    : "Select All"
+                }
                 id="select-all"
                 checked={allSelected}
+                indeterminate={selectAllIndeterminate}
                 onChange={toggleSelectAll}
               />
               <button

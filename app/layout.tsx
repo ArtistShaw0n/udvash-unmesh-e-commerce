@@ -7,7 +7,6 @@ import { ConsentProvider } from "@/lib/consent-context";
 import { OrdersProvider } from "@/lib/orders-store";
 import { ReviewsProvider } from "@/lib/reviews-store";
 import { ToastProvider } from "@/lib/toast-context";
-import { WishlistProvider } from "@/lib/wishlist-context";
 import { ConsentAnalyticsSync, PageViewTracker, StructuredData } from "@/components/atoms";
 import { CookieConsentBanner } from "@/components/organisms";
 import { organizationLd, websiteLd } from "@/lib/structured-data";
@@ -109,14 +108,12 @@ export default function RootLayout({
             <AuthProvider>
               <OrdersProvider>
                 <ReviewsProvider>
-                  <WishlistProvider>
-                    <CartProvider>
-                      {children}
-                      <ConsentAnalyticsSync />
-                      <PageViewTracker />
-                      <CookieConsentBanner />
-                    </CartProvider>
-                  </WishlistProvider>
+                  <CartProvider>
+                    {children}
+                    <ConsentAnalyticsSync />
+                    <PageViewTracker />
+                    <CookieConsentBanner />
+                  </CartProvider>
                 </ReviewsProvider>
               </OrdersProvider>
             </AuthProvider>

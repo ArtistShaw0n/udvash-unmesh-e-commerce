@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { User, Package, MapPin, Heart, Shield, LogOut } from "lucide-react";
+import { User, Package, MapPin, Shield, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/lib/toast-context";
 import { clsx } from "@/lib/clsx";
@@ -12,7 +12,6 @@ const ITEMS = [
   { label: "আমার অর্ডার", href: "/account/orders", icon: Package },
   { label: "প্রোফাইল", href: "/account/profile", icon: User },
   { label: "ঠিকানা", href: "/account/addresses", icon: MapPin },
-  { label: "উইশলিস্ট", href: "/account/wishlist", icon: Heart },
   { label: "সিকিউরিটি", href: "/account/security", icon: Shield },
 ];
 

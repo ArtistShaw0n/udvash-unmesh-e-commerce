@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Heart, Shield } from "lucide-react";
+import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
-import { useWishlist } from "@/lib/wishlist-context";
 import { useToast } from "@/lib/toast-context";
 import { clsx } from "@/lib/clsx";
 
@@ -19,7 +18,6 @@ export interface HeaderProps {
 export function Header({ className }: HeaderProps) {
   const router = useRouter();
   const { itemCount, hydrated: cartHydrated } = useCart();
-  const { count: wishlistCount, hydrated: wishlistHydrated } = useWishlist();
   const { user, hydrated: authHydrated, logout } = useAuth();
   const toast = useToast();
 
@@ -53,10 +51,7 @@ export function Header({ className }: HeaderProps) {
   }
 
   const showBadge = cartHydrated && itemCount > 0;
-  const showWishlistBadge = wishlistHydrated && wishlistCount > 0;
   const isLoggedIn = authHydrated && !!user;
-  // Wishlist requires login — anonymous visitors get bounced to /login by the page.
-  const wishlistHref = isLoggedIn ? "/account/wishlist" : "/login?next=/account/wishlist";
 
   return (
     <header
@@ -74,20 +69,6 @@ export function Header({ className }: HeaderProps) {
         </div>
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
-          {/* Wishlist — desktop/tablet only; mobile uses the bottom nav rail */}
-          <Link
-            href={wishlistHref}
-            aria-label={`Wishlist${showWishlistBadge ? ` (${wishlistCount})` : ""}`}
-            className="relative hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-md hover:bg-[var(--bg-surface-muted)] transition-colors"
-          >
-            <Heart size={22} className="text-[var(--fg-primary)]" />
-            {showWishlistBadge && (
-              <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 rounded-full bg-discount-600 text-white text-caption font-bold inline-flex items-center justify-center">
-                {wishlistCount > 99 ? "99+" : wishlistCount}
-              </span>
-            )}
-          </Link>
-
           <Link
             href="/cart"
             aria-label={`Cart (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
@@ -137,9 +118,6 @@ export function Header({ className }: HeaderProps) {
                   </MenuLink>
                   <MenuLink href="/account/orders" icon={<Package size={16} />} onClick={() => setMenuOpen(false)}>
                     আমার অর্ডার
-                  </MenuLink>
-                  <MenuLink href="/account/wishlist" icon={<Heart size={16} />} onClick={() => setMenuOpen(false)}>
-                    উইশলিস্ট
                   </MenuLink>
                   {user!.isAdmin && (
                     <>

@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Heart, ShoppingBag, User } from "lucide-react";
+import { Home, Search, ShoppingBag, User, Package } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
-import { useWishlist } from "@/lib/wishlist-context";
 import { useAuth } from "@/lib/auth-context";
 import { clsx } from "@/lib/clsx";
 
@@ -23,13 +22,12 @@ interface NavItem {
 export function MobileBottomNav() {
   const pathname = usePathname() ?? "/";
   const { itemCount } = useCart();
-  const { count: wishlistCount } = useWishlist();
   const { isLoggedIn } = useAuth();
 
   const items: NavItem[] = [
     { label: "হোম", href: "/", icon: Home },
     { label: "সার্চ", href: "/search", icon: Search },
-    { label: "উইশলিস্ট", href: "/account/wishlist", icon: Heart, badge: wishlistCount },
+    { label: "অর্ডার", href: isLoggedIn ? "/account/orders" : "/orders/track", icon: Package },
     { label: "কার্ট", href: "/cart", icon: ShoppingBag, badge: itemCount },
     {
       label: "একাউন্ট",

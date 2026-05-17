@@ -169,11 +169,6 @@ export const api = {
   postReview: (slug: string, input: { rating: number; title?: string; body: string }) =>
     call<{ review: unknown }>(`/api/reviews/${slug}`, { method: "POST", body: input }),
 
-  // Wishlist -----------------------------------------------------------
-  getWishlist: () => call<{ slugs: string[] }>("/api/wishlist"),
-  toggleWishlist: (slug: string) =>
-    call<{ added: boolean }>("/api/wishlist", { method: "POST", body: { slug } }),
-
   // Addresses ----------------------------------------------------------
   listAddresses: () => call<{ addresses: unknown[] }>("/api/addresses"),
   createAddress: (input: {

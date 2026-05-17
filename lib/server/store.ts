@@ -52,12 +52,6 @@ export interface ServerCartItem {
   updatedAt: number;
 }
 
-export interface ServerWishlistItem {
-  userId: string;
-  slug: string;
-  addedAt: number;
-}
-
 export interface ServerOrder {
   id: string;
   userId: string;
@@ -96,7 +90,6 @@ interface DbShape {
   users: Record<string, ServerUser>;
   addresses: Record<string, ServerAddress>;
   cart: ServerCartItem[];
-  wishlist: ServerWishlistItem[];
   orders: Record<string, ServerOrder>;
   reviews: Record<string, ServerReview>;
   inventory: ServerInventory;
@@ -115,7 +108,6 @@ function emptyDb(): DbShape {
     users: {},
     addresses: {},
     cart: [],
-    wishlist: [],
     orders: {},
     reviews: {},
     inventory,
@@ -233,23 +225,6 @@ export const store = {
       return false;
     });
     persist();
-  },
-
-  // ---- Wishlist -------------------------------------------------------
-  wishlistFor(userId: string): ServerWishlistItem[] {
-    return load().wishlist.filter((w) => w.userId === userId);
-  },
-  toggleWishlist(userId: string, slug: string): { added: boolean } {
-    const db = load();
-    const idx = db.wishlist.findIndex((w) => w.userId === userId && w.slug === slug);
-    if (idx >= 0) {
-      db.wishlist.splice(idx, 1);
-      persist();
-      return { added: false };
-    }
-    db.wishlist.push({ userId, slug, addedAt: Date.now() });
-    persist();
-    return { added: true };
   },
 
   // ---- Orders ---------------------------------------------------------

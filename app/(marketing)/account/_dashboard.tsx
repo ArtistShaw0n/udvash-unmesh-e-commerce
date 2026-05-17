@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Package, Heart, MapPin, User, MailCheck, MailWarning } from "lucide-react";
+import { Package, MapPin, User, MailCheck, MailWarning } from "lucide-react";
 import { ArrowLink, Button } from "@/components/atoms";
 import { EmptyState, OrderCard, type OrderSummary } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
 import { useOrders, formatBnDate } from "@/lib/orders-store";
-import { useWishlist } from "@/lib/wishlist-context";
 import { toBengaliNumber } from "@/lib/site";
 
 export function AccountDashboard() {
   const { user } = useAuth();
   const { ordersFor } = useOrders();
-  const { count: wishlistCount } = useWishlist();
 
   if (!user) return null;
 
@@ -27,8 +25,8 @@ export function AccountDashboard() {
 
   const stats = [
     { label: "মোট অর্ডার", value: toBengaliNumber(myOrders.length), icon: Package, href: "/account/orders" },
-    { label: "উইশলিস্ট", value: toBengaliNumber(wishlistCount), icon: Heart, href: "/account/wishlist" },
     { label: "ঠিকানা", value: toBengaliNumber(user.addresses.length), icon: MapPin, href: "/account/addresses" },
+    { label: "প্রোফাইল", value: user.emailVerified ? "ভেরিফাইড" : "অসম্পূর্ণ", icon: User, href: "/account/profile" },
   ];
 
   return (

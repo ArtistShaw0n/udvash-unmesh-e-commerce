@@ -41,10 +41,6 @@ export const Events = {
   cart_remove: "cart_remove",
   cart_view: "cart_view",
 
-  // Wishlist
-  wishlist_add: "wishlist_add",
-  wishlist_remove: "wishlist_remove",
-
   // Checkout
   checkout_begin: "checkout_begin",
   checkout_address_complete: "checkout_address_complete",

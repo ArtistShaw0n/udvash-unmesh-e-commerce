@@ -40,8 +40,6 @@ The frontend talks to these via the typed client in `lib/api-client.ts`.
 | POST | `/api/coupons/validate` | Validate + compute coupon discount |
 | GET  | `/api/reviews/:slug` | Reviews + summary |
 | POST | `/api/reviews/:slug` | Add review (must have purchased) |
-| GET  | `/api/wishlist` | My wishlist slugs |
-| POST | `/api/wishlist` | Toggle slug |
 | GET  | `/api/addresses` | List my addresses |
 | POST | `/api/addresses` | Create address |
 | PATCH| `/api/addresses/:id` | Update / set default |
@@ -61,7 +59,7 @@ The frontend talks to these via the typed client in `lib/api-client.ts`.
 Everything persists through `lib/server/store.ts`. In dev it writes to
 `.data/store.json` after each mutation, debounced 100ms. The store
 exposes a typed CRUD API per domain (users, addresses, cart, orders,
-reviews, wishlist, inventory).
+reviews, inventory).
 
 On Netlify the file-system is read-only at runtime, so writes succeed in
 memory and silently no-op on disk — perfect for demo, **NOT durable
@@ -120,7 +118,6 @@ model User {
   orders          Order[]
   reviews         Review[]
   cart            CartItem[]
-  wishlist        WishlistItem[]
 }
 
 model Address {
@@ -145,14 +142,6 @@ model CartItem {
   selected  Boolean  @default(true)
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@id([userId, slug])
-}
-
-model WishlistItem {
-  userId  String
-  slug    String
-  addedAt DateTime @default(now())
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@id([userId, slug])
 }
 
@@ -261,7 +250,6 @@ Swap them one at a time:
 | `cart-context` | `/lib/cart-context.tsx` | ⏳ wire to `api.getCart` / `api.addToCart` etc. |
 | `orders-store` | `/lib/orders-store.tsx` | ⏳ wire to `api.listOrders` / `api.placeOrder` |
 | `reviews-store` | `/lib/reviews-store.tsx` | ⏳ wire to `api.listReviews` / `api.postReview` |
-| `wishlist-context` | `/lib/wishlist-context.tsx` | ⏳ wire to `api.getWishlist` / `api.toggleWishlist` |
 
 Migration pattern: each `useXxx` hook keeps the same return shape but
 sources state from `api.xxx()` instead of localStorage. The UI doesn't
