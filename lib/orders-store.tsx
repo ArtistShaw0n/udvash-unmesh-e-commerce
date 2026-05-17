@@ -6,15 +6,22 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
+import { api } from "./api-client";
+import { useAuth } from "./auth-context";
 import type { OrderStatus } from "@/components/molecules/OrderCard";
-import { decrementStock, incrementStock } from "./inventory";
 
-const STORAGE_KEY = "udvash:orders-v1";
+// Re-export OrderStatus so other modules can import it from here
+export type { OrderStatus };
 
-export type ReturnStatus = "none" | "requested" | "approved" | "picked-up" | "refunded" | "rejected";
+export type ReturnStatus =
+  | "none"
+  | "requested"
+  | "approved"
+  | "picked-up"
+  | "refunded"
+  | "rejected";
 export type PaymentMethod = "bkash" | "nagad" | "rocket" | "card" | "cod";
 export type PaymentStatus = "paid" | "pending" | "cod";
 
@@ -38,8 +45,8 @@ export interface StoredAddress {
 
 export interface StoredOrder {
   id: string;
-  email: string;            // owner — used to filter per-user
-  placedAt: number;         // epoch ms
+  email: string;
+  placedAt: number;
   status: OrderStatus;
   items: StoredOrderItem[];
   address: StoredAddress;
@@ -48,138 +55,140 @@ export interface StoredOrder {
   vat: number;
   shipping: number;
   total: number;
+  couponCode?: string;
   returnStatus: ReturnStatus;
   returnReason?: string;
   cancelReason?: string;
 }
 
 export interface PlaceOrderInput {
-  email: string;
-  items: StoredOrderItem[];
-  address: StoredAddress;
-  payment: { method: PaymentMethod; status: PaymentStatus };
-  subtotal: number;
-  vat: number;
-  shipping: number;
-  total: number;
+  addressId: string;
+  payment: { method: PaymentMethod };
+  couponCode?: string;
 }
 
 export interface OrdersStoreValue {
   orders: StoredOrder[];
   hydrated: boolean;
-  /** All orders that belong to a given email (sorted newest-first). */
   ordersFor: (email: string | undefined) => StoredOrder[];
-  /** Look up one order by id. */
   getOrder: (id: string) => StoredOrder | undefined;
-  /** Persist a new order and return its id. */
-  placeOrder: (input: PlaceOrderInput) => string;
-  cancelOrder: (id: string, reason?: string) => void;
-  requestReturn: (id: string, reason: string) => void;
+  placeOrder: (
+    input: PlaceOrderInput,
+  ) => Promise<{ ok: true; id: string } | { ok: false; error: string }>;
+  cancelOrder: (id: string, reason?: string) => Promise<{ ok: boolean; error?: string }>;
+  requestReturn: (id: string, reason: string) => Promise<{ ok: boolean; error?: string }>;
+  refresh: () => Promise<void>;
 }
 
 const OrdersContext = createContext<OrdersStoreValue | null>(null);
 
-function readFromStorage(): StoredOrder[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
-  } catch {
-    return [];
-  }
+interface ServerOrderResponse {
+  id: string;
+  userId: string;
+  placedAt: number;
+  status: OrderStatus;
+  items: StoredOrderItem[];
+  address: { label?: string } & StoredAddress;
+  payment: { method: PaymentMethod; status: PaymentStatus };
+  subtotal: number;
+  vat: number;
+  shipping: number;
+  total: number;
+  couponCode?: string;
+  returnStatus: ReturnStatus;
+  returnReason?: string;
+  cancelReason?: string;
 }
 
-function newOrderId(): string {
-  return "UU" + Date.now().toString().slice(-6);
+function fromServer(o: ServerOrderResponse, email: string): StoredOrder {
+  return {
+    id: o.id,
+    email,
+    placedAt: o.placedAt,
+    status: o.status,
+    items: o.items,
+    address: {
+      recipientName: o.address.recipientName,
+      phone: o.address.phone,
+      line1: o.address.line1,
+      line2: o.address.line2,
+      city: o.address.city,
+      zip: o.address.zip,
+    },
+    payment: o.payment,
+    subtotal: o.subtotal,
+    vat: o.vat,
+    shipping: o.shipping,
+    total: o.total,
+    couponCode: o.couponCode,
+    returnStatus: o.returnStatus,
+    returnReason: o.returnReason,
+    cancelReason: o.cancelReason,
+  };
 }
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
+  const { user, hydrated: authHydrated, isLoggedIn } = useAuth();
   const [orders, setOrders] = useState<StoredOrder[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  const writeRef = useRef(false);
 
-  useEffect(() => {
-    setOrders(readFromStorage());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!writeRef.current) {
-      writeRef.current = true;
+  const refresh = useCallback(async () => {
+    if (!isLoggedIn || !user) {
+      setOrders([]);
       return;
     }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    } catch {
-      /* ignore */
+    const r = await api.listOrders();
+    if (r.ok) {
+      const list = (r.data.orders as ServerOrderResponse[]).map((o) =>
+        fromServer(o, user.email),
+      );
+      setOrders(list);
     }
-  }, [orders, hydrated]);
+  }, [isLoggedIn, user]);
 
   useEffect(() => {
-    function onStorage(e: StorageEvent) {
-      if (e.key !== STORAGE_KEY) return;
-      setOrders(readFromStorage());
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  const placeOrder = useCallback((input: PlaceOrderInput): string => {
-    // Decrement inventory atomically with the order being saved. If stock
-    // is insufficient, throw — the checkout flow catches and surfaces it.
-    const decrement = decrementStock(
-      input.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
-    );
-    if (!decrement.ok) {
-      throw new Error(decrement.error);
-    }
-
-    const id = newOrderId();
-    const next: StoredOrder = {
-      id,
-      email: input.email.trim().toLowerCase(),
-      placedAt: Date.now(),
-      status: "confirmed",
-      items: input.items,
-      address: input.address,
-      payment: input.payment,
-      subtotal: input.subtotal,
-      vat: input.vat,
-      shipping: input.shipping,
-      total: input.total,
-      returnStatus: "none",
+    if (!authHydrated) return;
+    let cancelled = false;
+    void refresh().finally(() => {
+      if (!cancelled) setHydrated(true);
+    });
+    return () => {
+      cancelled = true;
     };
-    setOrders((prev) => [next, ...prev]);
-    return id;
-  }, []);
+  }, [authHydrated, refresh]);
 
-  const cancelOrder = useCallback((id: string, reason?: string) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== id) return o;
-        if (o.status !== "placed" && o.status !== "confirmed") return o;
-        // Restock cancelled order items
-        incrementStock(
-          o.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
-        );
-        return { ...o, status: "cancelled", cancelReason: reason };
-      }),
-    );
-  }, []);
+  const placeOrder = useCallback<OrdersStoreValue["placeOrder"]>(
+    async (input) => {
+      const r = await api.placeOrder(input);
+      if (!r.ok) return { ok: false, error: r.error };
+      const order = r.data.order as ServerOrderResponse;
+      if (user) {
+        setOrders((prev) => [fromServer(order, user.email), ...prev]);
+      }
+      return { ok: true, id: order.id };
+    },
+    [user],
+  );
 
-  const requestReturn = useCallback((id: string, reason: string) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === id && o.status === "delivered" && o.returnStatus === "none"
-          ? { ...o, returnStatus: "requested", returnReason: reason }
-          : o,
-      ),
-    );
-  }, []);
+  const cancelOrder = useCallback<OrdersStoreValue["cancelOrder"]>(
+    async (id, reason) => {
+      const r = await api.cancelOrder(id, reason);
+      if (!r.ok) return { ok: false, error: r.error };
+      await refresh();
+      return { ok: true };
+    },
+    [refresh],
+  );
+
+  const requestReturn = useCallback<OrdersStoreValue["requestReturn"]>(
+    async (id, reason) => {
+      const r = await api.requestReturn(id, reason);
+      if (!r.ok) return { ok: false, error: r.error };
+      await refresh();
+      return { ok: true };
+    },
+    [refresh],
+  );
 
   const value = useMemo<OrdersStoreValue>(
     () => ({
@@ -196,8 +205,9 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       placeOrder,
       cancelOrder,
       requestReturn,
+      refresh,
     }),
-    [orders, hydrated, placeOrder, cancelOrder, requestReturn],
+    [orders, hydrated, placeOrder, cancelOrder, requestReturn, refresh],
   );
 
   return <OrdersContext.Provider value={value}>{children}</OrdersContext.Provider>;
@@ -209,14 +219,21 @@ export function useOrders(): OrdersStoreValue {
   return ctx;
 }
 
-/**
- * Format an epoch timestamp as a Bengali short date (e.g. "১৬ মে, ২০২৬").
- * Lives here so other code can stay free of date deps.
- */
+// Date formatter (kept here to avoid breaking imports across the app)
 const BN_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 const BN_MONTHS = [
-  "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
-  "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর",
+  "জানুয়ারি",
+  "ফেব্রুয়ারি",
+  "মার্চ",
+  "এপ্রিল",
+  "মে",
+  "জুন",
+  "জুলাই",
+  "আগস্ট",
+  "সেপ্টেম্বর",
+  "অক্টোবর",
+  "নভেম্বর",
+  "ডিসেম্বর",
 ];
 function toBn(value: number | string): string {
   return String(value).replace(/\d/g, (d) => BN_DIGITS[Number(d)]);

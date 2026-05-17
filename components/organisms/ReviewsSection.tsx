@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, PenSquare } from "lucide-react";
 import { Button, StarRating } from "@/components/atoms";
@@ -26,7 +26,7 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { ordersFor } = useOrders();
-  const { forSlug, summaryFor, hasReviewed, addReview } = useReviews();
+  const { forSlug, summaryFor, hasReviewed, addReview, ensureLoaded } = useReviews();
   const toast = useToast();
 
   const [visible, setVisible] = useState(3);
@@ -34,6 +34,12 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Lazy-load reviews for this slug on mount
+  useEffect(() => {
+    void ensureLoaded(slug);
+  }, [slug, ensureLoaded]);
 
   const list = forSlug(slug);
   const visibleList = list.slice(0, visible);
@@ -47,10 +53,10 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
         )
       : false;
 
-  const alreadyReviewed = user ? hasReviewed(slug, user.email) : false;
+  const alreadyReviewed = user ? hasReviewed(slug) : false;
   const canWriteReview = user && userBoughtIt && !alreadyReviewed;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
     if (rating < 1) {
@@ -61,15 +67,18 @@ export function ReviewsSection({ slug, className }: ReviewsSectionProps) {
       toast.error("আপনার মন্তব্য লিখুন");
       return;
     }
-    addReview({
+    setSubmitting(true);
+    const result = await addReview({
       slug,
-      authorEmail: user.email,
-      authorName: user.name,
       rating,
       title: title.trim() || "—",
       body: body.trim(),
-      verifiedPurchase: userBoughtIt,
     });
+    setSubmitting(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
     toast.success("রিভিউ যুক্ত হয়েছে। ধন্যবাদ!");
     setComposing(false);
     setRating(0);

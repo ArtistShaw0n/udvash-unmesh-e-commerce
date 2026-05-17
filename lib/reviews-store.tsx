@@ -9,15 +9,15 @@ import {
   useRef,
   useState,
 } from "react";
-
-const STORAGE_KEY = "udvash:reviews-v1";
+import { api } from "./api-client";
+import { useAuth } from "./auth-context";
 
 export interface Review {
   id: string;
-  slug: string;          // book slug this review is for
-  authorEmail: string;
+  slug: string;
+  userId: string;
   authorName: string;
-  rating: number;        // 1-5
+  rating: number;
   title: string;
   body: string;
   createdAt: number;
@@ -31,138 +31,104 @@ export interface ReviewSummary {
 }
 
 export interface ReviewsStoreValue {
-  reviews: Review[];
-  hydrated: boolean;
-  /** All reviews for a slug, newest first. */
+  /** Get reviews for a slug (fetches on first access, caches after). */
   forSlug: (slug: string) => Review[];
-  /** Aggregated summary (count, average, distribution). */
   summaryFor: (slug: string) => ReviewSummary;
-  /** Whether `email` has already posted a review for this slug. */
-  hasReviewed: (slug: string, email: string) => boolean;
-  /** Add a new review. */
-  addReview: (input: Omit<Review, "id" | "createdAt">) => string;
+  hasReviewed: (slug: string) => boolean;
+  /** Ensure reviews for this slug are loaded — call on mount. */
+  ensureLoaded: (slug: string) => Promise<void>;
+  /** Add a review. Returns the review id or null on failure. */
+  addReview: (input: {
+    slug: string;
+    rating: number;
+    title: string;
+    body: string;
+  }) => Promise<{ ok: true; id: string } | { ok: false; error: string }>;
 }
 
 const ReviewsContext = createContext<ReviewsStoreValue | null>(null);
 
-// Seed a few demo reviews for the most popular books.
-const SEED_REVIEWS: Omit<Review, "id" | "createdAt">[] = [
-  {
-    slug: "udvash-physics-parallel-text-hsc-2026",
-    authorEmail: "tania@example.com",
-    authorName: "Tania Akter",
-    rating: 5,
-    title: "অসাধারণ বই",
-    body: "ব্যাখ্যা পরিষ্কার, প্রশ্নসংখ্যা যথেষ্ট। HSC পরীক্ষার জন্য must-have।",
-    verifiedPurchase: true,
-  },
-  {
-    slug: "udvash-physics-parallel-text-hsc-2026",
-    authorEmail: "rakib@example.com",
-    authorName: "Rakib Hasan",
-    rating: 4,
-    title: "ভালো কিন্তু কিছু টপিক ছোট",
-    body: "অধিকাংশ চ্যাপ্টার দারুণ। তবে কিছু চ্যাপ্টারে আরও উদাহরণ থাকলে ভালো হতো।",
-    verifiedPurchase: true,
-  },
-  {
-    slug: "udvash-chemistry-parallel-text-hsc-2026",
-    authorEmail: "fatima@example.com",
-    authorName: "Fatima Sultana",
-    rating: 5,
-    title: "সেরা চয়েস",
-    body: "Concept + practice — দুটোই এক বইতে। দাম-অনুপাতে best।",
-    verifiedPurchase: true,
-  },
-];
-
-function readFromStorage(): Review[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      // First visit — seed demo reviews
-      const seeded: Review[] = SEED_REVIEWS.map((r, i) => ({
-        ...r,
-        id: `seed-${i}`,
-        createdAt: Date.now() - (i + 1) * 86400000 * 3,
-      }));
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-      return seeded;
-    }
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+const EMPTY_DIST: ReviewSummary["distribution"] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
 export function ReviewsProvider({ children }: { children: React.ReactNode }) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [hydrated, setHydrated] = useState(false);
-  const writeRef = useRef(false);
+  const { user } = useAuth();
+  const [bySlug, setBySlug] = useState<Record<string, Review[]>>({});
+  const [summaryBySlug, setSummaryBySlug] = useState<Record<string, ReviewSummary>>({});
+  const loadingSlugs = useRef<Set<string>>(new Set());
 
+  const ensureLoaded = useCallback(
+    async (slug: string) => {
+      if (bySlug[slug] || loadingSlugs.current.has(slug)) return;
+      loadingSlugs.current.add(slug);
+      const r = await api.listReviews(slug);
+      loadingSlugs.current.delete(slug);
+      if (r.ok) {
+        setBySlug((prev) => ({ ...prev, [slug]: r.data.reviews as Review[] }));
+        setSummaryBySlug((prev) => ({
+          ...prev,
+          [slug]: {
+            count: r.data.summary.count,
+            average: r.data.summary.average,
+            distribution: (r.data.summary.distribution as unknown) as ReviewSummary["distribution"],
+          },
+        }));
+      }
+    },
+    [bySlug],
+  );
+
+  // Auto-reset on logout so "hasReviewed" doesn't leak across sessions
   useEffect(() => {
-    setReviews(readFromStorage());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!writeRef.current) {
-      writeRef.current = true;
-      return;
+    if (!user) {
+      // keep cached reviews (they're public anyway) but clear so we re-fetch fresh
+      setBySlug({});
+      setSummaryBySlug({});
     }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
-    } catch {
-      /* ignore */
-    }
-  }, [reviews, hydrated]);
+  }, [user]);
 
-  const addReview = useCallback(
-    (input: Omit<Review, "id" | "createdAt">): string => {
-      const id = Math.random().toString(36).slice(2, 10);
-      const next: Review = { ...input, id, createdAt: Date.now() };
-      setReviews((prev) => [next, ...prev]);
-      return id;
+  const addReview = useCallback<ReviewsStoreValue["addReview"]>(
+    async (input) => {
+      const r = await api.postReview(input.slug, {
+        rating: input.rating,
+        title: input.title,
+        body: input.body,
+      });
+      if (!r.ok) return { ok: false, error: r.error };
+
+      const review = r.data.review as Review;
+      setBySlug((prev) => ({
+        ...prev,
+        [input.slug]: [review, ...(prev[input.slug] ?? [])],
+      }));
+      // Refresh summary
+      const fresh = await api.listReviews(input.slug);
+      if (fresh.ok) {
+        setSummaryBySlug((prev) => ({
+          ...prev,
+          [input.slug]: {
+            count: fresh.data.summary.count,
+            average: fresh.data.summary.average,
+            distribution: (fresh.data.summary.distribution as unknown) as ReviewSummary["distribution"],
+          },
+        }));
+      }
+      return { ok: true, id: review.id };
     },
     [],
   );
 
-  const value = useMemo<ReviewsStoreValue>(() => {
-    const byEmailSlug = new Map<string, true>();
-    for (const r of reviews) {
-      byEmailSlug.set(`${r.slug}::${r.authorEmail.toLowerCase()}`, true);
-    }
-    return {
-      reviews,
-      hydrated,
-      forSlug: (slug) =>
-        reviews
-          .filter((r) => r.slug === slug)
-          .sort((a, b) => b.createdAt - a.createdAt),
-      summaryFor: (slug) => {
-        const list = reviews.filter((r) => r.slug === slug);
-        const count = list.length;
-        const dist: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        let sum = 0;
-        for (const r of list) {
-          const k = Math.max(1, Math.min(5, Math.round(r.rating))) as 1 | 2 | 3 | 4 | 5;
-          dist[k] += 1;
-          sum += r.rating;
-        }
-        return {
-          count,
-          average: count > 0 ? Number((sum / count).toFixed(1)) : 0,
-          distribution: dist,
-        };
-      },
-      hasReviewed: (slug, email) =>
-        byEmailSlug.has(`${slug}::${email.toLowerCase()}`),
+  const value = useMemo<ReviewsStoreValue>(
+    () => ({
+      forSlug: (slug) => bySlug[slug] ?? [],
+      summaryFor: (slug) =>
+        summaryBySlug[slug] ?? { count: 0, average: 0, distribution: EMPTY_DIST },
+      hasReviewed: (slug) =>
+        user ? (bySlug[slug] ?? []).some((r) => r.userId === user.id) : false,
+      ensureLoaded,
       addReview,
-    };
-  }, [reviews, hydrated, addReview]);
+    }),
+    [bySlug, summaryBySlug, user, ensureLoaded, addReview],
+  );
 
   return <ReviewsContext.Provider value={value}>{children}</ReviewsContext.Provider>;
 }

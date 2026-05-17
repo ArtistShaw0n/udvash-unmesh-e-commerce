@@ -6,92 +6,103 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
-
-const STORAGE_KEY = "udvash:wishlist-v1";
+import { api } from "./api-client";
+import { useAuth } from "./auth-context";
 
 export interface WishlistContextValue {
   slugs: string[];
   hydrated: boolean;
   count: number;
   has: (slug: string) => boolean;
-  add: (slug: string) => void;
-  remove: (slug: string) => void;
-  toggle: (slug: string) => boolean; // returns the new state
-  clear: () => void;
+  add: (slug: string) => Promise<void>;
+  remove: (slug: string) => Promise<void>;
+  /** Toggle a slug. Returns the new state (true = added). */
+  toggle: (slug: string) => Promise<boolean>;
+  clear: () => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
-function readFromStorage(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((s): s is string => typeof s === "string");
-  } catch {
-    return [];
-  }
-}
-
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, hydrated: authHydrated } = useAuth();
   const [slugs, setSlugs] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  const writeRef = useRef(false);
 
+  // Load wishlist from server when logged in; clear when logged out
   useEffect(() => {
-    setSlugs(readFromStorage());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!writeRef.current) {
-      writeRef.current = true;
+    if (!authHydrated) return;
+    if (!isLoggedIn) {
+      setSlugs([]);
+      setHydrated(true);
       return;
     }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs));
-    } catch {
-      /* ignore */
-    }
-  }, [slugs, hydrated]);
-
-  useEffect(() => {
-    function onStorage(e: StorageEvent) {
-      if (e.key !== STORAGE_KEY) return;
-      setSlugs(readFromStorage());
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  const add = useCallback((slug: string) => {
-    setSlugs((prev) => (prev.includes(slug) ? prev : [slug, ...prev]));
-  }, []);
-
-  const remove = useCallback((slug: string) => {
-    setSlugs((prev) => prev.filter((s) => s !== slug));
-  }, []);
-
-  const toggle = useCallback((slug: string): boolean => {
-    let added = false;
-    setSlugs((prev) => {
-      if (prev.includes(slug)) {
-        added = false;
-        return prev.filter((s) => s !== slug);
-      }
-      added = true;
-      return [slug, ...prev];
+    let cancelled = false;
+    void api.getWishlist().then((r) => {
+      if (cancelled) return;
+      if (r.ok) setSlugs(r.data.slugs);
+      setHydrated(true);
     });
-    return added;
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [authHydrated, isLoggedIn]);
 
-  const clear = useCallback(() => setSlugs([]), []);
+  const add = useCallback(
+    async (slug: string) => {
+      if (slugs.includes(slug)) return;
+      // optimistic
+      setSlugs((prev) => [slug, ...prev]);
+      const result = await api.toggleWishlist(slug);
+      // If it was already there (shouldn't happen here) or call failed, refetch
+      if (!result.ok || !result.data.added) {
+        const r = await api.getWishlist();
+        if (r.ok) setSlugs(r.data.slugs);
+      }
+    },
+    [slugs],
+  );
+
+  const remove = useCallback(
+    async (slug: string) => {
+      if (!slugs.includes(slug)) return;
+      setSlugs((prev) => prev.filter((s) => s !== slug));
+      const result = await api.toggleWishlist(slug);
+      if (!result.ok || result.data.added) {
+        const r = await api.getWishlist();
+        if (r.ok) setSlugs(r.data.slugs);
+      }
+    },
+    [slugs],
+  );
+
+  const toggle = useCallback(
+    async (slug: string): Promise<boolean> => {
+      const wasPresent = slugs.includes(slug);
+      // optimistic
+      setSlugs((prev) =>
+        wasPresent ? prev.filter((s) => s !== slug) : [slug, ...prev],
+      );
+      const result = await api.toggleWishlist(slug);
+      if (!result.ok) {
+        // revert
+        setSlugs((prev) =>
+          wasPresent ? [slug, ...prev.filter((s) => s !== slug)] : prev.filter((s) => s !== slug),
+        );
+        return wasPresent;
+      }
+      return result.data.added;
+    },
+    [slugs],
+  );
+
+  const clear = useCallback(async () => {
+    // No clear endpoint — toggle each off (could be batched on server later)
+    const current = [...slugs];
+    setSlugs([]);
+    await Promise.all(current.map((s) => api.toggleWishlist(s)));
+  }, [slugs]);
 
   const value = useMemo<WishlistContextValue>(
     () => ({

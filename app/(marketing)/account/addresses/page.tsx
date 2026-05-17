@@ -57,24 +57,24 @@ export default function AddressesPage() {
     setForm(EMPTY);
   }
 
-  function save() {
+  async function save() {
     if (!form.recipientName.trim() || !form.phone.trim() || !form.line1.trim() || !form.city.trim()) {
       toast.error("সব ঘর পূরণ করুন");
       return;
     }
     if (editing) {
-      updateAddress(editing.id, form);
+      await updateAddress(editing.id, form);
       toast.success("ঠিকানা আপডেট হয়েছে");
     } else {
-      addAddress(form);
+      await addAddress(form);
       toast.success("ঠিকানা যোগ হয়েছে");
     }
     closeForm();
   }
 
-  function doDelete() {
+  async function doDelete() {
     if (!confirmDelete) return;
-    removeAddress(confirmDelete.id);
+    await removeAddress(confirmDelete.id);
     toast.success("ঠিকানা মুছে ফেলা হয়েছে");
     setConfirmDelete(null);
   }
@@ -101,8 +101,8 @@ export default function AddressesPage() {
               address={a}
               onEdit={() => openEdit(a)}
               onDelete={() => setConfirmDelete(a)}
-              onSetDefault={() => {
-                setDefaultAddress(a.id);
+              onSetDefault={async () => {
+                await setDefaultAddress(a.id);
                 toast.success("ডিফল্ট সেট হয়েছে");
               }}
             />

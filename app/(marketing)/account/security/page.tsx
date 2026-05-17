@@ -16,10 +16,10 @@ export default function SecurityPage() {
   const matches = data.next.length >= 6 && data.next === data.confirm;
   const canSubmit = matches && data.current.length >= 6;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const result = changePassword(data.current, data.next);
+    const result = await changePassword(data.current, data.next);
     if (!result.ok) {
       setError(result.error ?? "পাসওয়ার্ড আপডেট ব্যর্থ");
       return;

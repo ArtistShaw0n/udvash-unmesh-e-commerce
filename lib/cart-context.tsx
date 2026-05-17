@@ -9,6 +9,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { api } from "./api-client";
+import { useAuth } from "./auth-context";
 
 const STORAGE_KEY = "udvash:cart-v1";
 
@@ -21,146 +23,205 @@ export interface CartItem {
 export interface CartContextValue {
   items: CartItem[];
   hydrated: boolean;
-  /** Quantity of a specific item in cart (0 if not present). */
   getQuantity: (slug: string) => number;
-  /** Returns true if the slug is in the cart. */
   has: (slug: string) => boolean;
-  /** Add to cart. If item exists, increment by qty. */
-  addItem: (slug: string, qty?: number) => void;
-  /** Remove the item entirely. */
-  removeItem: (slug: string) => void;
-  /** Set absolute quantity. If qty <= 0, removes the item. */
-  setQuantity: (slug: string, qty: number) => void;
-  /** Toggle the selected state for checkout. */
-  toggleSelected: (slug: string) => void;
-  /** Select / unselect all items at once. */
-  toggleSelectAll: () => void;
-  /** Empty the cart. */
-  clearCart: () => void;
-  /** Remove just the selected items (after a successful checkout). */
-  clearSelected: () => void;
-  /** Sum of all quantities (for the header badge). */
+  addItem: (slug: string, qty?: number) => Promise<void>;
+  removeItem: (slug: string) => Promise<void>;
+  setQuantity: (slug: string, qty: number) => Promise<void>;
+  toggleSelected: (slug: string) => Promise<void>;
+  toggleSelectAll: () => Promise<void>;
+  clearCart: () => Promise<void>;
+  clearSelected: () => Promise<void>;
   itemCount: number;
-  /** Number of unique books in the cart. */
   uniqueCount: number;
-  /** Number of *selected* unique books. */
   selectedCount: number;
-  /** True when every item is selected. */
   allSelected: boolean;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function readFromStorage(): CartItem[] {
+/**
+ * Hybrid cart strategy:
+ *   - Logged in: persisted server-side via /api/cart, mirror in state
+ *   - Logged out: persisted in localStorage (so guests can build a cart)
+ *
+ * On login the local guest cart could be merged via a sync step — for now
+ * we keep them separate. Both modes expose the same hook API so the UI
+ * doesn't change.
+ */
+
+function readLocal(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (x): x is CartItem =>
-          x && typeof x === "object" &&
-          typeof x.slug === "string" &&
-          typeof x.quantity === "number" &&
-          typeof x.selected === "boolean",
-      )
-      .map((x) => ({ ...x, quantity: Math.max(1, Math.floor(x.quantity)) }));
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
+function writeLocal(items: CartItem[]): void {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, hydrated: authHydrated } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  // Avoid writing to storage on the very first commit (before hydration).
-  const writeRef = useRef(false);
+  // Track the previous logged-in state so we know when to refetch
+  const lastLoggedIn = useRef<boolean | null>(null);
 
-  // Load from storage on first client render.
+  // Hydrate cart whenever auth state settles
   useEffect(() => {
-    setItems(readFromStorage());
-    setHydrated(true);
-  }, []);
+    if (!authHydrated) return;
+    let cancelled = false;
 
-  // Persist on every change (after hydration).
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!writeRef.current) {
-      writeRef.current = true;
-      return;
-    }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      /* storage full or disabled — ignore */
-    }
-  }, [items, hydrated]);
-
-  // Cross-tab sync.
-  useEffect(() => {
-    function onStorage(e: StorageEvent) {
-      if (e.key !== STORAGE_KEY) return;
-      setItems(readFromStorage());
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  const addItem = useCallback((slug: string, qty: number = 1) => {
-    if (qty <= 0) return;
-    setItems((prev) => {
-      const existing = prev.find((i) => i.slug === slug);
-      if (existing) {
-        return prev.map((i) =>
-          i.slug === slug
-            ? { ...i, quantity: Math.min(99, i.quantity + qty) }
-            : i,
-        );
+    async function hydrate() {
+      if (isLoggedIn) {
+        const r = await api.getCart();
+        if (cancelled) return;
+        if (r.ok) {
+          const fromServer: CartItem[] = (r.data.items as Array<{
+            slug: string;
+            quantity: number;
+            selected: boolean;
+          }>).map((i) => ({
+            slug: i.slug,
+            quantity: i.quantity,
+            selected: i.selected,
+          }));
+          setItems(fromServer);
+        }
+      } else {
+        setItems(readLocal());
       }
-      return [...prev, { slug, quantity: Math.min(99, qty), selected: true }];
-    });
-  }, []);
+      setHydrated(true);
+      lastLoggedIn.current = isLoggedIn;
+    }
 
-  const removeItem = useCallback((slug: string) => {
-    setItems((prev) => prev.filter((i) => i.slug !== slug));
-  }, []);
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [authHydrated, isLoggedIn]);
 
-  const setQuantity = useCallback((slug: string, qty: number) => {
-    setItems((prev) => {
-      if (qty <= 0) return prev.filter((i) => i.slug !== slug);
-      const existing = prev.find((i) => i.slug === slug);
-      if (existing) {
-        return prev.map((i) =>
-          i.slug === slug ? { ...i, quantity: Math.min(99, qty) } : i,
-        );
+  // Persist guest cart to localStorage whenever it changes
+  useEffect(() => {
+    if (!hydrated || isLoggedIn) return;
+    writeLocal(items);
+  }, [items, hydrated, isLoggedIn]);
+
+  // Helpers that pick the right backend ----------------------------
+
+  const addItem = useCallback(
+    async (slug: string, qty = 1) => {
+      if (qty <= 0) return;
+      // Optimistic update
+      setItems((prev) => {
+        const existing = prev.find((i) => i.slug === slug);
+        if (existing) {
+          return prev.map((i) =>
+            i.slug === slug
+              ? { ...i, quantity: Math.min(99, i.quantity + qty) }
+              : i,
+          );
+        }
+        return [...prev, { slug, quantity: Math.min(99, qty), selected: true }];
+      });
+      if (isLoggedIn) {
+        const result = await api.addToCart(slug, qty);
+        if (!result.ok) {
+          // Refetch on failure to ensure consistency
+          const r = await api.getCart();
+          if (r.ok) {
+            setItems(
+              (r.data.items as Array<{ slug: string; quantity: number; selected: boolean }>).map(
+                (i) => ({ slug: i.slug, quantity: i.quantity, selected: i.selected }),
+              ),
+            );
+          }
+        }
       }
-      // Allow setting qty for a slug that wasn't there yet (counter button on a card).
-      return [...prev, { slug, quantity: Math.min(99, qty), selected: true }];
-    });
-  }, []);
+    },
+    [isLoggedIn],
+  );
 
-  const toggleSelected = useCallback((slug: string) => {
-    setItems((prev) =>
-      prev.map((i) =>
-        i.slug === slug ? { ...i, selected: !i.selected } : i,
-      ),
-    );
-  }, []);
+  const removeItem = useCallback(
+    async (slug: string) => {
+      setItems((prev) => prev.filter((i) => i.slug !== slug));
+      if (isLoggedIn) await api.removeCartItem(slug);
+    },
+    [isLoggedIn],
+  );
 
-  const toggleSelectAll = useCallback(() => {
-    setItems((prev) => {
-      const everySelected = prev.length > 0 && prev.every((i) => i.selected);
-      return prev.map((i) => ({ ...i, selected: !everySelected }));
-    });
-  }, []);
+  const setQuantity = useCallback(
+    async (slug: string, qty: number) => {
+      if (qty <= 0) {
+        await removeItem(slug);
+        return;
+      }
+      const clamped = Math.min(99, qty);
+      setItems((prev) => {
+        const existing = prev.find((i) => i.slug === slug);
+        if (existing) {
+          return prev.map((i) => (i.slug === slug ? { ...i, quantity: clamped } : i));
+        }
+        return [...prev, { slug, quantity: clamped, selected: true }];
+      });
+      if (isLoggedIn) {
+        const r = await api.updateCartItem(slug, { quantity: clamped });
+        if (!r.ok) {
+          // Try to add instead — could have been a "not in cart yet" path
+          await api.addToCart(slug, clamped);
+        }
+      }
+    },
+    [isLoggedIn, removeItem],
+  );
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const toggleSelected = useCallback(
+    async (slug: string) => {
+      let nextSelected = false;
+      setItems((prev) =>
+        prev.map((i) => {
+          if (i.slug !== slug) return i;
+          nextSelected = !i.selected;
+          return { ...i, selected: nextSelected };
+        }),
+      );
+      if (isLoggedIn) {
+        await api.updateCartItem(slug, { selected: nextSelected });
+      }
+    },
+    [isLoggedIn],
+  );
 
-  const clearSelected = useCallback(() => {
+  const toggleSelectAll = useCallback(async () => {
+    const everySelected = items.length > 0 && items.every((i) => i.selected);
+    const next = !everySelected;
+    setItems((prev) => prev.map((i) => ({ ...i, selected: next })));
+    if (isLoggedIn) {
+      await Promise.all(
+        items.map((i) => api.updateCartItem(i.slug, { selected: next })),
+      );
+    }
+  }, [items, isLoggedIn]);
+
+  const clearCart = useCallback(async () => {
+    setItems([]);
+    if (isLoggedIn) await api.clearCart("all");
+  }, [isLoggedIn]);
+
+  const clearSelected = useCallback(async () => {
     setItems((prev) => prev.filter((i) => !i.selected));
-  }, []);
+    if (isLoggedIn) await api.clearCart("selected");
+  }, [isLoggedIn]);
 
   const value = useMemo<CartContextValue>(() => {
     const itemCount = items.reduce((s, i) => s + i.quantity, 0);

@@ -66,8 +66,8 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
     addItem(book.slug, Math.max(1, qty));
   }
 
-  function handleWishlistToggle() {
-    const added = wishlist.toggle(book.slug);
+  async function handleWishlistToggle() {
+    const added = await wishlist.toggle(book.slug);
     if (added) toast.success("উইশলিস্টে যোগ হয়েছে");
     else toast.info("উইশলিস্ট থেকে সরানো হয়েছে");
   }

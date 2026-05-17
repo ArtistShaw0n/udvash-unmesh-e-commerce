@@ -43,8 +43,8 @@ export function Header({ className }: HeaderProps) {
     };
   }, [menuOpen]);
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     setMenuOpen(false);
     toast.info("লগআউট হয়েছে");
     router.push("/");

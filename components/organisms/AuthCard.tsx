@@ -62,7 +62,7 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
       setData((d) => ({ ...d, [field]: e.target.value }));
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setPending(true);
@@ -73,7 +73,7 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
         setPending(false);
         return;
       }
-      const result = signup({
+      const result = await signup({
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -86,11 +86,13 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
       }
       toast.success(
         "একাউন্ট তৈরি হয়েছে",
-        "ইমেইল ভেরিফাই করতে কোড দিন।",
+        result.devCode
+          ? `ভেরিফাই কোড: ${result.devCode}`
+          : "ইমেইল ভেরিফাই করতে কোড দিন।",
       );
       router.push(`/verify-email?next=${encodeURIComponent(next)}`);
     } else {
-      const result = login(data.email, data.password);
+      const result = await login(data.email, data.password);
       setPending(false);
       if (!result.ok) {
         setError(result.error ?? "লগইন ব্যর্থ");

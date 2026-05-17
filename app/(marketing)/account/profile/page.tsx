@@ -30,13 +30,20 @@ export default function ProfilePage() {
     setDirty(false);
   }
 
-  function save(e: React.FormEvent) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("নাম দিন");
       return;
     }
-    updateProfile({ name: name.trim(), phone: phone.trim() || undefined });
+    const result = await updateProfile({
+      name: name.trim(),
+      phone: phone.trim() || undefined,
+    });
+    if (!result.ok) {
+      toast.error(result.error ?? "আপডেট ব্যর্থ");
+      return;
+    }
     setDirty(false);
     toast.success("প্রোফাইল আপডেট হয়েছে");
   }

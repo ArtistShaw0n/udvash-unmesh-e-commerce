@@ -60,27 +60,35 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   const canReturn = order.status === "delivered" && order.returnStatus === "none";
   const canReorder = order.items.length > 0;
 
-  function handleCancel() {
-    cancelOrder(orderId, cancelReason.trim() || undefined);
+  async function handleCancel() {
+    const r = await cancelOrder(orderId, cancelReason.trim() || undefined);
+    if (!r.ok) {
+      toast.error(r.error ?? "বাতিল করা যায়নি");
+      return;
+    }
     setCancelOpen(false);
     setCancelReason("");
     toast.success("অর্ডার বাতিল হয়েছে");
   }
 
-  function handleReturn() {
+  async function handleReturn() {
     if (!returnReason.trim()) {
       toast.error("রিটার্নের কারণ লিখুন");
       return;
     }
-    requestReturn(orderId, returnReason.trim());
+    const r = await requestReturn(orderId, returnReason.trim());
+    if (!r.ok) {
+      toast.error(r.error ?? "রিটার্ন পাঠানো যায়নি");
+      return;
+    }
     setReturnOpen(false);
     setReturnReason("");
     toast.success("রিটার্ন রিকোয়েস্ট পাঠানো হয়েছে", "আমরা শিগগিরই যোগাযোগ করব।");
   }
 
-  function handleReorder() {
+  async function handleReorder() {
     if (!order) return;
-    order.items.forEach((it) => cart.addItem(it.slug, it.quantity));
+    await Promise.all(order.items.map((it) => cart.addItem(it.slug, it.quantity)));
     toast.success("কার্টে যোগ হয়েছে", `${toBengaliNumber(itemCount)} টি বই`);
     router.push("/cart");
   }

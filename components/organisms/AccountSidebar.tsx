@@ -22,8 +22,8 @@ export function AccountSidebar({ className }: { className?: string }) {
   const { logout } = useAuth();
   const toast = useToast();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     toast.info("লগআউট হয়েছে");
     router.push("/");
   }

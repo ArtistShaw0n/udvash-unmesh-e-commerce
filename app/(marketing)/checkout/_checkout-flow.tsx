@@ -16,12 +16,7 @@ import { useAuth, type AddressInput } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { getBookBySlug } from "@/lib/books";
 import { applyCoupon, type Coupon } from "@/lib/coupons";
-import {
-  useOrders,
-  type PaymentMethod,
-  type PaymentStatus,
-  type StoredOrderItem,
-} from "@/lib/orders-store";
+import { useOrders, type PaymentMethod } from "@/lib/orders-store";
 import { useToast } from "@/lib/toast-context";
 import { toBengaliNumber } from "@/lib/site";
 
@@ -162,12 +157,16 @@ export function CheckoutFlow() {
   const addresses = user.addresses;
   const selectedAddress = addresses.find((a) => a.id === addressId);
 
-  function handleSaveNewAddress() {
+  async function handleSaveNewAddress() {
     if (!newAddr.recipientName || !newAddr.phone || !newAddr.line1 || !newAddr.city) {
       toast.error("সব ঘর পূরণ করুন");
       return;
     }
-    const created = addAddress(newAddr, addresses.length === 0);
+    const created = await addAddress(newAddr, addresses.length === 0);
+    if (!created) {
+      toast.error("ঠিকানা যোগ করা যায়নি");
+      return;
+    }
     setAddressId(created.id);
     setAdding(false);
     setNewAddr({ label: "বাসা", recipientName: "", phone: "", line1: "", city: "", zip: "" });
@@ -186,43 +185,20 @@ export function CheckoutFlow() {
     if (!selectedAddress || !user) return;
     setPlacing(true);
     try {
-      const orderItems: StoredOrderItem[] = selectedItems.map(({ entry, book }) => ({
-        slug: book.slug,
-        quantity: entry.quantity,
-        price: book.price,
-        titleBn: book.titleBn,
-      }));
+      const result = await orders.placeOrder({
+        addressId: selectedAddress.id,
+        payment: { method: payment as PaymentMethod },
+        couponCode: appliedCoupon?.coupon.code,
+      });
 
-      const paymentStatus: PaymentStatus =
-        payment === "cod" ? "cod" : payment === "card" ? "paid" : "pending";
-
-      try {
-        const orderId = orders.placeOrder({
-          email: user.email,
-          items: orderItems,
-          address: {
-            recipientName: selectedAddress.recipientName,
-            phone: selectedAddress.phone,
-            line1: selectedAddress.line1,
-            line2: selectedAddress.line2,
-            city: selectedAddress.city,
-            zip: selectedAddress.zip,
-          },
-          payment: { method: payment as PaymentMethod, status: paymentStatus },
-          subtotal,
-          vat,
-          shipping,
-          total,
-        });
-
-        clearSelected();
-        toast.success("অর্ডার সফল!", `Order #${orderId}`);
-        router.push(`/order/${orderId}/success`);
-      } catch (err) {
-        // Inventory check failed (insufficient stock) or other server-side error
-        const msg = err instanceof Error ? err.message : "অর্ডার সম্পন্ন করতে সমস্যা";
-        toast.error("অর্ডার ব্যর্থ", msg);
+      if (!result.ok) {
+        toast.error("অর্ডার ব্যর্থ", result.error);
+        return;
       }
+
+      await clearSelected();
+      toast.success("অর্ডার সফল!", `Order #${result.id}`);
+      router.push(`/order/${result.id}/success`);
     } finally {
       setPlacing(false);
     }

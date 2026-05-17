@@ -85,11 +85,11 @@ function Inner() {
     inputsRef.current[Math.min(text.length, 5)]?.focus();
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     const code = digits.join("");
-    const result = verifyEmail(code);
+    const result = await verifyEmail(code);
     if (!result.ok) {
       setError(result.error ?? "ভুল কোড");
       return;
