@@ -211,7 +211,7 @@ export function CheckoutFlow() {
           href="/cart"
           className="inline-flex items-center gap-1 text-body-sm text-[var(--fg-secondary)] hover:text-brand-700"
         >
-          <ChevronLeft size={16} /> Back to Cart
+          <ChevronLeft size={16} /> কার্টে ফিরে যান
         </Link>
 
         <div className="flex justify-center pb-2">

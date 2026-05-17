@@ -148,7 +148,10 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
     setPage(1);
   }
 
-  const filterPanel = (
+  // Desktop sidebar and mobile drawer both render this panel — same
+  // controls, separate inputs. Prefix IDs so labels resolve to the right
+  // input (duplicate IDs are an a11y violation and break `htmlFor`).
+  const renderFilterPanel = (scope: "desktop" | "mobile") => (
     <div className="space-y-5">
       <Section title="দাম">
         <div className="space-y-1.5">
@@ -156,7 +159,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
             <label key={b.label} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                name="price"
+                name={`price-${scope}`}
                 checked={filters.priceIdx === i}
                 onChange={() => updateFilter("priceIdx", i)}
                 className="accent-brand-600"
@@ -169,19 +172,19 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
       <Section title="অপশন">
         <div className="space-y-2">
           <Checkbox
-            id="ff-free"
+            id={`${scope}-ff-free`}
             label="ফ্রি ডেলিভারি"
             checked={filters.freeDelivery}
             onChange={(e) => updateFilter("freeDelivery", e.target.checked)}
           />
           <Checkbox
-            id="ff-stock"
+            id={`${scope}-ff-stock`}
             label="স্টকে আছে"
             checked={filters.inStockOnly}
             onChange={(e) => updateFilter("inStockOnly", e.target.checked)}
           />
           <Checkbox
-            id="ff-disc"
+            id={`${scope}-ff-disc`}
             label="ডিসকাউন্ট চলছে"
             checked={filters.discountOnly}
             onChange={(e) => updateFilter("discountOnly", e.target.checked)}
@@ -199,7 +202,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
   return (
     <>
       <CategoryFilterSection
-        title="Category"
+        title="ক্যাটাগরি"
         variant="compact"
         categories={[...CATEGORIES]}
         defaultCategory={filters.category}
@@ -238,7 +241,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
 
           <div className="grid gap-6 lg:grid-cols-[240px_1fr] min-w-0 [&>*]:min-w-0">
             <aside className="hidden lg:block sticky top-24 self-start rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
-              {filterPanel}
+              {renderFilterPanel("desktop")}
             </aside>
 
             <div>
@@ -266,7 +269,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
               )}
 
               <p className="text-center text-body-sm text-[var(--fg-muted)] pt-4">
-                Showing {toBengaliNumber(visible.length)} of {toBengaliNumber(sorted.length)} products
+                {toBengaliNumber(sorted.length)}টি বইয়ের মধ্যে {toBengaliNumber(visible.length)}টি দেখানো হচ্ছে
               </p>
             </div>
           </div>
@@ -304,7 +307,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
               <X size={16} />
             </button>
           </div>
-          <div className="p-5">{filterPanel}</div>
+          <div className="p-5">{renderFilterPanel("mobile")}</div>
         </div>
       </div>
     </>

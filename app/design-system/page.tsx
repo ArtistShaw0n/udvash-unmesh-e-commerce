@@ -191,17 +191,64 @@ export default function DesignSystemPage() {
         </div>
       </Block>
 
-      <Block title="Atoms — IconBox · ArrowLink · Checkbox · Dropdown">
+      <Block title="Atoms — IconBox · ArrowLink · Dropdown">
         <div className="flex items-center gap-5 flex-wrap">
           <IconBox icon={<ShieldCheck size={20} />} />
           <IconBox icon={<Phone size={20} />} tone="neutral" />
           <IconBox icon={<BookOpen size={20} />} size="lg" />
           <ArrowLink href="/products">সব দেখুন</ArrowLink>
-          <Checkbox label="Select All" id="ds-select" />
           <Dropdown defaultValue="popular" options={[
             { label: "সবগুলো", value: "popular" },
             { label: "নতুন আগে", value: "newest" },
           ]} />
+        </div>
+      </Block>
+
+      <Block title="Atoms — Checkbox (full state machine)">
+        <p className="text-body-sm text-[var(--fg-secondary)] mb-3">
+          ক্যানোনিকাল ৭ স্টেট: unchecked / hover / focus / checked /
+          indeterminate / disabled / checked+disabled. Select All-এ
+          partial-select হলে indeterminate (mixed) দেখায়।
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <CheckboxState title="Unchecked" desc="Default idle state">
+            <Checkbox label="সব নির্বাচন" id="ds-cb-unchecked" />
+          </CheckboxState>
+          <CheckboxState title="Checked" desc="Brand-teal fill + check glyph">
+            <Checkbox label="সব নির্বাচন" id="ds-cb-checked" checked readOnly />
+          </CheckboxState>
+          <CheckboxState
+            title="Indeterminate"
+            desc="aria-checked='mixed' — for partial-select parents"
+          >
+            <Checkbox
+              label="সব নির্বাচন (২ / ৫)"
+              id="ds-cb-mixed"
+              indeterminate
+              readOnly
+            />
+          </CheckboxState>
+          <CheckboxState title="Disabled" desc="Muted bg, not clickable">
+            <Checkbox label="সব নির্বাচন" id="ds-cb-disabled" disabled />
+          </CheckboxState>
+          <CheckboxState
+            title="Checked + Disabled"
+            desc="Brand-300 (desaturated), still shows state"
+          >
+            <Checkbox
+              label="সব নির্বাচন"
+              id="ds-cb-checked-disabled"
+              checked
+              disabled
+              readOnly
+            />
+          </CheckboxState>
+          <CheckboxState
+            title="Without label"
+            desc="Used inline (e.g. per-row in a table)"
+          >
+            <Checkbox id="ds-cb-bare" />
+          </CheckboxState>
         </div>
       </Block>
 
@@ -290,5 +337,25 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
       <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>
       <div className="pt-2">{children}</div>
     </section>
+  );
+}
+
+function CheckboxState({
+  title,
+  desc,
+  children,
+}: {
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-md border border-[var(--border-muted)] bg-[var(--bg-page)] p-4">
+      <div className="mb-3">{children}</div>
+      <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)]">
+        {title}
+      </p>
+      <p className="text-caption text-[var(--fg-secondary)] mt-0.5">{desc}</p>
+    </div>
   );
 }

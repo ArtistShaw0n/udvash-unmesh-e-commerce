@@ -11,7 +11,7 @@ export const SITE_EMAIL = "support@udvash-unmesh.com";
 export const SITE_ADDRESS_BN = "হাউজ ৭১, রোড ৪, ব্লক সি, বনশ্রী, ঢাকা ১২১৯";
 
 export const CATEGORIES = [
-  { slug: "all", label: "All" },
+  { slug: "all", label: "সব" },
   { slug: "academic", label: "একাডেমিক" },
   { slug: "model-test", label: "মডেল টেস্ট" },
   { slug: "admission", label: "এডমিশন" },

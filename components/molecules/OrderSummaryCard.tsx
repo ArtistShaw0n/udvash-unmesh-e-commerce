@@ -35,36 +35,36 @@ export function OrderSummaryCard({
         className,
       )}
     >
-      <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
+      <h3 className="text-h3 text-[var(--fg-primary)]">অর্ডার সারাংশ</h3>
 
       <dl className="space-y-3">
         <div className="flex items-center justify-between">
           <dt className="text-body-sm text-[var(--fg-secondary)]">
-            Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
+            সাবটোটাল ({toBengaliNumber(itemCount)}টি)
           </dt>
           <dd className="text-body font-semibold text-[var(--fg-primary)]">{fmt(subtotal)}</dd>
         </div>
         <div className="flex items-center justify-between">
-          <dt className="text-body-sm text-[var(--fg-secondary)]">Vat</dt>
+          <dt className="text-body-sm text-[var(--fg-secondary)]">ভ্যাট</dt>
           <dd className="text-body font-semibold text-[var(--fg-primary)]">{fmt(vat)}</dd>
         </div>
         <div className="flex items-center justify-between">
-          <dt className="text-body-sm text-[var(--fg-secondary)]">Shipping</dt>
+          <dt className="text-body-sm text-[var(--fg-secondary)]">ডেলিভারি</dt>
           <dd className="text-body font-semibold text-[var(--fg-primary)]">{fmt(shipping)}</dd>
         </div>
       </dl>
 
       <div className="pt-3 border-t border-[var(--border-default)] flex items-center justify-between">
-        <span className="text-body-lg font-bold text-[var(--fg-primary)]">Total</span>
+        <span className="text-body-lg font-bold text-[var(--fg-primary)]">মোট</span>
         <span className="text-h3 font-bold text-[var(--fg-primary)]">{fmt(total)}</span>
       </div>
 
       <div className="space-y-3 pt-2">
         <Button variant="secondary" fullWidth onClick={onAddMore} rightIcon={<Plus size={16} />}>
-          Add More
+          আরও যোগ করুন
         </Button>
         <Button variant="primary" fullWidth onClick={onCheckout} rightIcon={<ArrowRight size={16} />}>
-          Checkout
+          চেকআউট
         </Button>
       </div>
     </aside>

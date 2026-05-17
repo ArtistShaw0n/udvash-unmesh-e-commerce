@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { EmptyState, ProductCard, SearchBar } from "@/components/molecules";
 import type { Book } from "@/lib/books";
+import { toBengaliNumber } from "@/lib/site";
 
 export function SearchClient({ books, initialQ = "" }: { books: Book[]; initialQ?: string }) {
   const [q, setQ] = useState(initialQ);
@@ -31,7 +32,7 @@ export function SearchClient({ books, initialQ = "" }: { books: Book[]; initialQ
 
         {q.trim() && (
           <p className="text-body-sm text-[var(--fg-muted)]">
-            {results.length} result(s) for &quot;{q.trim()}&quot;
+            &quot;{q.trim()}&quot; এর জন্য {toBengaliNumber(results.length)}টি ফলাফল পাওয়া গেছে
           </p>
         )}
 

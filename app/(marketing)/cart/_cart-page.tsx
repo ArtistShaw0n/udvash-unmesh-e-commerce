@@ -12,6 +12,7 @@ import {
 } from "@/components/molecules";
 import { useCart } from "@/lib/cart-context";
 import { getBookBySlug } from "@/lib/books";
+import { toBengaliNumber } from "@/lib/site";
 
 const VAT_RATE = 0.05;
 const SHIPPING_FLAT = 50;
@@ -91,7 +92,7 @@ export function CartPage() {
           href="/products"
           className="inline-flex items-center gap-1 text-body-sm text-[var(--fg-secondary)] hover:text-brand-700 transition-colors"
         >
-          <ChevronLeft size={16} /> Continue Shopping
+          <ChevronLeft size={16} /> কেনাকাটা চালিয়ে যান
         </Link>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
@@ -100,7 +101,7 @@ export function CartPage() {
             <div className="flex items-center gap-3 pb-4 border-b border-[var(--border-default)]">
               <ShoppingBag size={22} className="text-brand-700" />
               <h1 className="text-h3 text-[var(--fg-primary)]">
-                Shopping Cart ({itemCount} {itemCount === 1 ? "item" : "items"})
+                আপনার কার্ট ({toBengaliNumber(itemCount)}টি বই)
               </h1>
             </div>
 
@@ -108,8 +109,8 @@ export function CartPage() {
               <Checkbox
                 label={
                   selectAllIndeterminate
-                    ? `Select All (${selectedCount} / ${itemCount})`
-                    : "Select All"
+                    ? `সব নির্বাচন (${toBengaliNumber(selectedCount)} / ${toBengaliNumber(itemCount)})`
+                    : "সব নির্বাচন"
                 }
                 id="select-all"
                 checked={allSelected}
@@ -121,7 +122,7 @@ export function CartPage() {
                 onClick={clearCart}
                 className="text-body-sm text-discount-600 hover:text-discount-700 font-semibold"
               >
-                Delete All
+                সব মুছুন
               </button>
             </div>
 
