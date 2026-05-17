@@ -13,6 +13,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "postinstall": "prisma generate",
+    "build:prod": "prisma migrate deploy && next build",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "db:generate": "dotenv -e .env.local -- prisma generate",

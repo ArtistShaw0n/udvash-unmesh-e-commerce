@@ -1,0 +1,29 @@
+# Netlify deploy config — Udvash-Unmesh
+#
+# What this does:
+#   - On every deploy, Netlify installs deps (which triggers
+#     `postinstall: prisma generate`), then runs `build:prod` which
+#     applies any pending Prisma migrations against DATABASE_URL
+#     before running `next build`.
+#   - Environment variables (DATABASE_URL, AUTH_SECRET, ADMIN_EMAILS)
+#     must be set in the Netlify UI under Site Settings → Environment
+#     variables. They're NOT committed to the repo.
+#
+# To deploy a new schema change:
+#   1. `npm run db:migrate -- --name <change>` locally → creates a
+#      migration file under prisma/migrations/
+#   2. Commit the migration
+#   3. Push — Netlify picks it up, runs `prisma migrate deploy`
+#      against prod, then builds. Zero manual SQL.
+
+[build]
+  command = "npm run build:prod"
+  publish = ".next"
+
+[build.environment]
+  # Force Node 22 to match local dev. Netlify's default sometimes lags.
+  NODE_VERSION = "22"
+
+# Next.js plugin handles dynamic routes, API routes, etc.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
