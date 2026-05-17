@@ -291,6 +291,27 @@ export const store = {
     return r;
   },
 
+  // ---- Admin helpers (full table dumps) -------------------------------
+  // These are deliberately separate from the per-user helpers above so
+  // the admin route handlers can paginate / filter without leaking user
+  // scoping into customer-facing code. When migrating to Prisma each of
+  // these becomes `prisma.<table>.findMany()`.
+  dumpAllOrders(): ServerOrder[] {
+    return Object.values(load().orders);
+  },
+  dumpAllUsers(): ServerUser[] {
+    return Object.values(load().users);
+  },
+  dumpAllReviews(): ServerReview[] {
+    return Object.values(load().reviews);
+  },
+  setInventory(slug: string, units: number): number {
+    const db = load();
+    db.inventory[slug] = Math.max(0, Math.floor(units));
+    persist();
+    return db.inventory[slug];
+  },
+
   // ---- Inventory ------------------------------------------------------
   getInventory(slug: string): number {
     const db = load();

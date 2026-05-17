@@ -74,6 +74,7 @@ export interface SessionUser {
   name: string;
   phone?: string;
   emailVerified: boolean;
+  isAdmin?: boolean;
 }
 
 export const api = {
@@ -193,4 +194,36 @@ export const api = {
   // Profile ------------------------------------------------------------
   updateProfile: (input: { name?: string; phone?: string }) =>
     call<{ user: SessionUser }>("/api/profile", { method: "PATCH", body: input }),
+
+  // Admin --------------------------------------------------------------
+  adminStats: () =>
+    call<{ stats: Record<string, unknown> }>("/api/admin/stats"),
+  adminOrders: (q?: { status?: string; q?: string }) => {
+    const params = new URLSearchParams();
+    if (q?.status) params.set("status", q.status);
+    if (q?.q) params.set("q", q.q);
+    return call<{ orders: unknown[]; total: number }>(
+      `/api/admin/orders${params.toString() ? `?${params}` : ""}`,
+    );
+  },
+  adminGetOrder: (id: string) =>
+    call<{ order: unknown; customer: unknown }>(`/api/admin/orders/${id}`),
+  adminUpdateOrder: (id: string, patch: { status?: string; returnStatus?: string }) =>
+    call<{ order: unknown }>(`/api/admin/orders/${id}`, { method: "PATCH", body: patch }),
+  adminInventory: () =>
+    call<{ inventory: unknown[] }>("/api/admin/inventory"),
+  adminSetInventory: (slug: string, units: number) =>
+    call<{ slug: string; units: number }>("/api/admin/inventory", {
+      method: "PATCH",
+      body: { slug, units },
+    }),
+  adminCustomers: (q?: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    return call<{ customers: unknown[]; total: number }>(
+      `/api/admin/customers${params.toString() ? `?${params}` : ""}`,
+    );
+  },
+  adminReturns: () => call<{ returns: unknown[] }>("/api/admin/returns"),
+  adminReviews: () => call<{ reviews: unknown[] }>("/api/admin/reviews"),
 };

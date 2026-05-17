@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/server/auth";
+import { getCurrentUser, isAdminEmail } from "@/lib/server/auth";
 import { ok, unauthorized } from "@/lib/server/response";
 import { store } from "@/lib/server/store";
 
@@ -15,6 +15,7 @@ export async function GET() {
       name: user.name,
       phone: user.phone,
       emailVerified: user.emailVerified,
+      isAdmin: isAdminEmail(user.email),
     },
     addresses,
   });

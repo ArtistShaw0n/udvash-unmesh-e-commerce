@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Heart } from "lucide-react";
+import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Heart, Shield } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
@@ -122,6 +122,14 @@ export function Header({ className }: HeaderProps) {
                   <MenuLink href="/account/wishlist" icon={<Heart size={16} />} onClick={() => setMenuOpen(false)}>
                     উইশলিস্ট
                   </MenuLink>
+                  {user!.isAdmin && (
+                    <>
+                      <div className="my-1 border-t border-[var(--border-muted)]" />
+                      <MenuLink href="/admin" icon={<Shield size={16} />} onClick={() => setMenuOpen(false)}>
+                        অ্যাডমিন প্যানেল
+                      </MenuLink>
+                    </>
+                  )}
                   <div className="my-1 border-t border-[var(--border-muted)]" />
                   <button
                     type="button"

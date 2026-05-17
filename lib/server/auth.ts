@@ -94,3 +94,38 @@ export async function getCurrentUser(): Promise<ServerUser | null> {
   if (!s?.sub) return null;
   return store.findUserById(s.sub) ?? null;
 }
+
+// --------------------------------------------------------------------
+// Admin role
+// --------------------------------------------------------------------
+
+/**
+ * Admin emails — comma-separated list in ADMIN_EMAILS env var.
+ * Defaults to demo emails so the admin panel is reachable out of the box.
+ */
+function adminEmails(): string[] {
+  const raw = process.env.ADMIN_EMAILS ?? "admin@udvash.com,super@udvash.com";
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isAdminEmail(email: string): boolean {
+  return adminEmails().includes(email.trim().toLowerCase());
+}
+
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return !!u && isAdminEmail(u.email);
+}
+
+/**
+ * Resolve the current user, requiring admin. Throws if not.
+ */
+export async function requireAdmin(): Promise<ServerUser> {
+  const u = await getCurrentUser();
+  if (!u) throw new Error("UNAUTHORIZED");
+  if (!isAdminEmail(u.email)) throw new Error("FORBIDDEN");
+  return u;
+}
