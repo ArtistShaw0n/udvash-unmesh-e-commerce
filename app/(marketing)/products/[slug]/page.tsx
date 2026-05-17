@@ -2,8 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { ProductDetailHero, ProductGridSection } from "@/components/organisms";
+import {
+  ProductDetailHero,
+  ProductGridSection,
+  RecentlyViewedSection,
+  ReviewsSection,
+} from "@/components/organisms";
+import { StructuredData } from "@/components/atoms";
 import { getAllBooks, getBookBySlug, getRelatedBooks } from "@/lib/books";
+import { productLd, breadcrumbLd } from "@/lib/structured-data";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,6 +41,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <StructuredData
+        data={[
+          productLd(book),
+          breadcrumbLd([
+            { name: "হোম", href: "/" },
+            { name: "বই", href: "/products" },
+            { name: book.categoryLabel, href: `/products?category=${book.category}` },
+            { name: book.title, href: `/products/${book.slug}` },
+          ]),
+        ]}
+      />
       <div className="container-site pt-6 pb-2">
         <Link
           href="/products"
@@ -45,6 +63,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       <ProductDetailHero book={book} offerEndsAt={OFFER_END} />
 
+      <ReviewsSection slug={book.slug} />
+
       {related.length > 0 && (
         <ProductGridSection
           title="সম্পর্কিত বই"
@@ -54,6 +74,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
           tone="muted"
         />
       )}
+
+      <RecentlyViewedSection excludeSlug={book.slug} />
     </>
   );
 }

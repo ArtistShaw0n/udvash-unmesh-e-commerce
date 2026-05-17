@@ -15,6 +15,7 @@ import {
 import { useAuth, type AddressInput } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { getBookBySlug } from "@/lib/books";
+import { applyCoupon, type Coupon } from "@/lib/coupons";
 import {
   useOrders,
   type PaymentMethod,
@@ -56,6 +57,12 @@ export function CheckoutFlow() {
   });
   const [payment, setPayment] = useState<PaymentMethodId>("bkash");
   const [promo, setPromo] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    coupon: Coupon;
+    discount: number;
+    shippingAfter: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
 
   // Resolve selected cart items against the catalog.
@@ -75,8 +82,33 @@ export function CheckoutFlow() {
     0,
   );
   const vat = subtotal > 0 ? Math.round(subtotal * VAT_RATE) : 0;
-  const shipping = subtotal > 0 ? SHIPPING_FLAT : 0;
-  const total = subtotal + vat + shipping;
+  const baseShipping = subtotal > 0 ? SHIPPING_FLAT : 0;
+  // Coupon adjustments
+  const couponDiscount = appliedCoupon?.discount ?? 0;
+  const shipping = appliedCoupon?.shippingAfter ?? baseShipping;
+  const total = Math.max(0, subtotal - couponDiscount + vat + shipping);
+
+  function handleApplyCoupon() {
+    setCouponError(null);
+    const result = applyCoupon(promo, { subtotal, shipping: baseShipping });
+    if (!result.ok) {
+      setCouponError(result.error);
+      setAppliedCoupon(null);
+      return;
+    }
+    setAppliedCoupon({
+      coupon: result.coupon,
+      discount: result.coupon.kind === "free-shipping" ? 0 : result.discount,
+      shippingAfter: result.shippingAfter,
+    });
+    toast.success(result.label);
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null);
+    setPromo("");
+    setCouponError(null);
+  }
 
   // Auto-select the default (or first) address once user data is hydrated.
   useEffect(() => {
@@ -355,17 +387,50 @@ export function CheckoutFlow() {
                     <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)] mb-2">
                       প্রোমো কোড
                     </p>
-                    <div className="flex gap-2">
-                      <Input
-                        leftIcon={<Tag size={16} />}
-                        placeholder="কোড দিন"
-                        value={promo}
-                        onChange={(e) => setPromo(e.target.value)}
-                      />
-                      <Button variant="secondary" onClick={() => toast.info("কোডটি বৈধ নয়")}>
-                        Apply
-                      </Button>
-                    </div>
+                    {appliedCoupon ? (
+                      <div className="flex items-center justify-between gap-3 rounded-md bg-success-50 dark:bg-success-700/15 border border-success-200 dark:border-success-700/40 px-3 py-2.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-body-sm font-semibold text-success-800 dark:text-success-200 flex items-center gap-1.5">
+                            <Tag size={14} /> {appliedCoupon.coupon.code}
+                          </p>
+                          <p className="text-caption text-success-700 dark:text-success-300 mt-0.5">
+                            {appliedCoupon.coupon.successLabel}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveCoupon}
+                          className="text-caption font-semibold text-success-700 dark:text-success-300 hover:underline"
+                        >
+                          সরান
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex gap-2">
+                          <Input
+                            leftIcon={<Tag size={16} />}
+                            placeholder="কোড দিন (যেমন: NEW10)"
+                            value={promo}
+                            onChange={(e) => {
+                              setPromo(e.target.value);
+                              setCouponError(null);
+                            }}
+                          />
+                          <Button variant="secondary" onClick={handleApplyCoupon} disabled={!promo.trim()}>
+                            Apply
+                          </Button>
+                        </div>
+                        {couponError && (
+                          <p className="text-caption text-discount-600 dark:text-discount-400 mt-1.5">
+                            {couponError}
+                          </p>
+                        )}
+                        <p className="text-caption text-[var(--fg-muted)] mt-1.5">
+                          Try: <span className="font-mono">NEW10</span>, <span className="font-mono">STUDENT100</span>, <span className="font-mono">FREESHIP</span>, <span className="font-mono">HSC2026</span>
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </>
@@ -404,8 +469,19 @@ export function CheckoutFlow() {
                 label={`Subtotal (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
                 value={subtotal}
               />
+              {couponDiscount > 0 && (
+                <SummaryRow
+                  label={`Coupon (${appliedCoupon!.coupon.code})`}
+                  value={-couponDiscount}
+                  tone="discount"
+                />
+              )}
               <SummaryRow label="Vat" value={vat} />
-              <SummaryRow label="Shipping" value={shipping} />
+              <SummaryRow
+                label="Shipping"
+                value={shipping}
+                tone={appliedCoupon?.coupon.kind === "free-shipping" ? "discount" : undefined}
+              />
             </dl>
             <div className="pt-3 border-t border-[var(--border-default)] flex items-center justify-between">
               <span className="text-body-lg font-bold text-[var(--fg-primary)]">Total</span>
@@ -431,12 +507,27 @@ function SectionMini({ title, children }: { title: string; children: React.React
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: number }) {
+function SummaryRow({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "discount";
+}) {
+  const isNegative = value < 0;
+  const isDiscount = tone === "discount" || isNegative;
   return (
     <div className="flex items-center justify-between">
       <dt className="text-body-sm text-[var(--fg-secondary)]">{label}</dt>
-      <dd className="text-body font-semibold text-[var(--fg-primary)]">
-        {toBengaliNumber(value.toLocaleString("en-US"))}৳
+      <dd
+        className={`text-body font-semibold ${
+          isDiscount ? "text-success-700 dark:text-success-400" : "text-[var(--fg-primary)]"
+        }`}
+      >
+        {isNegative ? "−" : ""}
+        {toBengaliNumber(Math.abs(value).toLocaleString("en-US"))}৳
       </dd>
     </div>
   );

@@ -3,9 +3,14 @@ import { Hind_Siliguri, Inter, Poppins } from "next/font/google";
 import Script from "next/script";
 import { AuthProvider } from "@/lib/auth-context";
 import { CartProvider } from "@/lib/cart-context";
+import { ConsentProvider } from "@/lib/consent-context";
 import { OrdersProvider } from "@/lib/orders-store";
+import { ReviewsProvider } from "@/lib/reviews-store";
 import { ToastProvider } from "@/lib/toast-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
+import { ConsentAnalyticsSync, PageViewTracker, StructuredData } from "@/components/atoms";
+import { CookieConsentBanner } from "@/components/organisms";
+import { organizationLd, websiteLd } from "@/lib/structured-data";
 import "./globals.css";
 
 const inter = Inter({
@@ -97,15 +102,26 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInitScript}
         </Script>
-        <ToastProvider>
-          <AuthProvider>
-            <OrdersProvider>
-              <WishlistProvider>
-                <CartProvider>{children}</CartProvider>
-              </WishlistProvider>
-            </OrdersProvider>
-          </AuthProvider>
-        </ToastProvider>
+        {/* Site-wide JSON-LD: Organization + WebSite (with SearchAction) */}
+        <StructuredData data={[organizationLd(), websiteLd()]} />
+        <ConsentProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <OrdersProvider>
+                <ReviewsProvider>
+                  <WishlistProvider>
+                    <CartProvider>
+                      {children}
+                      <ConsentAnalyticsSync />
+                      <PageViewTracker />
+                      <CookieConsentBanner />
+                    </CartProvider>
+                  </WishlistProvider>
+                </ReviewsProvider>
+              </OrdersProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ConsentProvider>
       </body>
     </html>
   );

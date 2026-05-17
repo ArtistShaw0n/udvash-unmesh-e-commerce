@@ -38,6 +38,9 @@ export type { InfoChipProps } from "./InfoChip";
 export { LoadMoreButton } from "./LoadMoreButton";
 export type { LoadMoreButtonProps } from "./LoadMoreButton";
 
+export { NotifyMeForm } from "./NotifyMeForm";
+export type { NotifyMeFormProps } from "./NotifyMeForm";
+
 export { OrderSummaryCard } from "./OrderSummaryCard";
 export type { OrderSummaryCardProps } from "./OrderSummaryCard";
 

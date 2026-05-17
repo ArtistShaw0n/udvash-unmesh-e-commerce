@@ -42,6 +42,18 @@ export type { LogoProps } from "./Logo";
 export { LogoWhite } from "./LogoWhite";
 export type { LogoWhiteProps } from "./LogoWhite";
 
+export { StructuredData } from "./StructuredData";
+export type { StructuredDataProps } from "./StructuredData";
+
+export { PageViewTracker } from "./PageViewTracker";
+
+export { ConsentAnalyticsSync } from "./ConsentAnalyticsSync";
+
+export { StarRating } from "./StarRating";
+export type { StarRatingProps } from "./StarRating";
+
+export { WhatsAppButton } from "./WhatsAppButton";
+
 export { SectionLabel } from "./SectionLabel";
 export type { SectionLabelProps } from "./SectionLabel";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Package, RotateCcw, X } from "lucide-react";
+import { ChevronLeft, FileText, Package, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/atoms";
 import {
   EmptyState,
@@ -103,6 +103,13 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            href={`/account/orders/${orderId}/invoice`}
+            variant="secondary"
+            leftIcon={<FileText size={16} />}
+          >
+            ইনভয়েস
+          </Button>
           {canReorder && (
             <Button variant="secondary" leftIcon={<RotateCcw size={16} />} onClick={handleReorder}>
               আবার অর্ডার করুন

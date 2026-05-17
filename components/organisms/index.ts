@@ -2,6 +2,14 @@ export { AccountSidebar } from "./AccountSidebar";
 
 export { AccountGuard } from "./AccountGuard";
 
+export { CookieConsentBanner } from "./CookieConsentBanner";
+
+export { ReviewsSection } from "./ReviewsSection";
+export type { ReviewsSectionProps } from "./ReviewsSection";
+
+export { RecentlyViewedSection } from "./RecentlyViewedSection";
+export type { RecentlyViewedSectionProps } from "./RecentlyViewedSection";
+
 export { AuthCard } from "./AuthCard";
 export type { AuthCardProps } from "./AuthCard";
 

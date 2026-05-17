@@ -342,3 +342,24 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-transform: none;
 }
+
+/* ============================================
+   Print styles (invoice + receipt pages)
+   ============================================ */
+@media print {
+  /* On the invoice page, body has class .invoice-print added via JS */
+  body.invoice-print {
+    background: white !important;
+  }
+  body.invoice-print header,
+  body.invoice-print footer,
+  body.invoice-print .floating-design-system-button,
+  body.invoice-print [aria-label="Open WhatsApp chat"],
+  body.invoice-print [aria-label="Close chat options"],
+  body.invoice-print [role="dialog"][aria-label="Cookie consent"] {
+    display: none !important;
+  }
+  body.invoice-print main {
+    padding: 0 !important;
+  }
+}

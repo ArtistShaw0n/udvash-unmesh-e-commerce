@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { pushRecentlyViewed } from "@/lib/recently-viewed";
+import { track, Events } from "@/lib/analytics";
 import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock, Heart } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
   BreadcrumbPill,
   CountdownTimer,
   InfoChip,
+  NotifyMeForm,
   PriceBlock,
   QuantityCounter,
   SpecificationRow,
@@ -36,6 +39,15 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
   const [qty, setQty] = useState(1);
 
   const inWishlist = wishlist.hydrated ? wishlist.has(book.slug) : false;
+
+  // Track product view + push to recently-viewed list on mount
+  useEffect(() => {
+    pushRecentlyViewed(book.slug);
+    track({
+      name: Events.product_view,
+      props: { slug: book.slug, category: book.category, price: book.price },
+    });
+  }, [book.slug, book.category, book.price]);
 
   function handleBuyNow() {
     addItem(book.slug, Math.max(1, qty));
@@ -114,6 +126,9 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             <InfoChip icon={<RotateCcw size={18} />} label="৭ দিনের রিটার্ন পলিসি" />
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>
+
+          {/* Out-of-stock variant: replace the action row with a notify-me form */}
+          {book.stock === "out-of-stock" && <NotifyMeForm slug={book.slug} />}
 
           {/* Bottom row — responsive: tighter on mobile, full on desktop */}
           <div className="flex items-center gap-2 sm:gap-3 pt-2">
