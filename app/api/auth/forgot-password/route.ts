@@ -14,12 +14,17 @@ export async function POST(req: NextRequest) {
   }
 
   // Never leak whether the email exists. Always 200 with the same shape.
+  // In production the reset code goes only to Postgres + the dispatch log
+  // (Vercel function logs); the client never sees it. In dev/staging we
+  // include `devResetCode` so the manual flow works without a real email
+  // provider. Once Resend / SMTP is wired, drop this entirely.
+  const isProd = process.env.NODE_ENV === "production";
   const user = await store.findUserByEmail(email);
   if (user) {
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     await store.updateUser(user.id, { resetCode });
     void notify.onPasswordReset(user, resetCode);
-    return ok({ sent: true, devResetCode: resetCode });
+    return ok({ sent: true, ...(isProd ? {} : { devResetCode: resetCode }) });
   }
 
   return ok({ sent: true });

@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, MailCheck, ShieldCheck } from "lucide-react";
+import { CheckCircle2, MailCheck } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/lib/toast-context";
@@ -144,10 +144,7 @@ function Inner() {
           <h1 className="text-h2 text-[var(--fg-primary)]">ইমেইল ভেরিফাই করুন</h1>
           <p className="text-body-sm text-[var(--fg-secondary)]">
             <span className="font-semibold text-[var(--fg-primary)]">{user?.email ?? "..."}</span>{" "}
-            এ একটি ৬ ডিজিটের কোড পাঠানো হয়েছে।
-          </p>
-          <p className="text-caption text-[var(--fg-muted)] flex items-center justify-center gap-1.5 pt-1">
-            <ShieldCheck size={14} /> ডেমো: কোড <span className="font-bold tabular-nums">123456</span>
+            এ একটি ৬ ডিজিটের কোড পাঠানো হয়েছে। ইনবক্স চেক করুন।
           </p>
         </div>
 

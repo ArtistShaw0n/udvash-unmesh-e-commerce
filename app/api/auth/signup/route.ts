@@ -50,8 +50,12 @@ export async function POST(req: NextRequest) {
   // Fire the welcome email (in dev this just logs to stdout)
   void notify.onWelcome(user, verifyCode);
 
-  // In production, dispatch an email with verifyCode here (Resend/SendGrid).
-  // For demo we return it so the user can paste it. Remove `devCode` for prod.
+  // The verify code is leaked back to the client ONLY in development so the
+  // dev / staging flow doesn't require a real email provider. In production
+  // the code lives only in Postgres + the dispatch log (Vercel function
+  // logs); the client must wait for the real email. Once Resend (or any
+  // SMTP provider) is wired, drop this branch entirely.
+  const isProd = process.env.NODE_ENV === "production";
   return ok({
     user: {
       id: user.id,
@@ -60,6 +64,6 @@ export async function POST(req: NextRequest) {
       phone: user.phone,
       emailVerified: user.emailVerified,
     },
-    devCode: verifyCode,
+    ...(isProd ? {} : { devCode: verifyCode }),
   });
 }

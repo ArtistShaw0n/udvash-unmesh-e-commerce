@@ -5,10 +5,30 @@ import Link from "next/link";
 import { Mail, ChevronLeft, MailCheck } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { FormField } from "@/components/molecules";
+import { api } from "@/lib/api-client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (!email.trim()) return;
+    setBusy(true);
+    const r = await api.forgotPassword(email.trim());
+    setBusy(false);
+    // Generic success on either path — we never reveal whether the email exists
+    // (avoids the "is this user registered?" enumeration attack). The API
+    // already silently noop's for unknown emails.
+    if (r.ok) {
+      setSent(true);
+    } else {
+      setError(r.error || "অনুরোধ পাঠাতে সমস্যা হয়েছে");
+    }
+  }
 
   return (
     <section className="section-pad-sm">
@@ -26,14 +46,20 @@ export default function ForgotPasswordPage() {
                 </div>
                 <h1 className="text-h2 text-[var(--fg-primary)]">পাসওয়ার্ড ভুলে গেছেন?</h1>
                 <p className="text-body-sm text-[var(--fg-secondary)]">
-                  আপনার ইমেইল দিন — আমরা পাসওয়ার্ড রিসেট লিংক পাঠিয়ে দেব।
+                  আপনার ইমেইল দিন — আমরা পাসওয়ার্ড রিসেট কোড পাঠিয়ে দেব।
                 </p>
               </div>
 
-              <form
-                className="space-y-4"
-                onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-              >
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-md bg-discount-50 dark:bg-discount-900/20 border border-discount-200 dark:border-discount-700/40 px-3 py-2 text-body-sm text-discount-800 dark:text-discount-200"
+                >
+                  {error}
+                </div>
+              )}
+
+              <form className="space-y-4" onSubmit={onSubmit}>
                 <FormField
                   id="email"
                   type="email"
@@ -45,8 +71,8 @@ export default function ForgotPasswordPage() {
                   autoComplete="email"
                   required
                 />
-                <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth>
-                  রিসেট লিংক পাঠান
+                <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth disabled={busy}>
+                  {busy ? "পাঠানো হচ্ছে..." : "রিসেট কোড পাঠান"}
                 </Button>
               </form>
             </>
@@ -57,12 +83,25 @@ export default function ForgotPasswordPage() {
               </div>
               <h1 className="text-h2 text-[var(--fg-primary)]">ইমেইল পাঠানো হয়েছে</h1>
               <p className="text-body text-[var(--fg-secondary)]">
-                <span className="font-semibold text-[var(--fg-primary)]">{email}</span> এ একটি রিসেট লিংক পাঠানো হয়েছে। ইনবক্স চেক করুন।
+                <span className="font-semibold text-[var(--fg-primary)]">{email}</span>{" "}
+                এ একটি রিসেট কোড পাঠানো হয়েছে। ইমেইল ইনবক্স চেক করুন।
               </p>
               <p className="text-caption text-[var(--fg-muted)] pt-2">
-                লিংক না পেলে স্প্যাম ফোল্ডার চেক করুন বা আবার চেষ্টা করুন।
+                কোড না পেলে স্প্যাম ফোল্ডার চেক করুন, অথবা আবার চেষ্টা করুন।
               </p>
-              <Button variant="secondary" onClick={() => setSent(false)}>আবার চেষ্টা করুন</Button>
+              <div className="space-y-2 pt-2">
+                <Button
+                  href={`/reset-password?email=${encodeURIComponent(email)}`}
+                  variant="primary"
+                  size={{ base: "md", md: "lg" }}
+                  fullWidth
+                >
+                  কোড দিয়ে নতুন পাসওয়ার্ড সেট করুন
+                </Button>
+                <Button variant="secondary" onClick={() => setSent(false)} fullWidth>
+                  আবার চেষ্টা করুন
+                </Button>
+              </div>
             </div>
           )}
         </div>
