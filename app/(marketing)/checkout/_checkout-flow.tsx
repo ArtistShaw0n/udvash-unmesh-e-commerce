@@ -196,27 +196,33 @@ export function CheckoutFlow() {
       const paymentStatus: PaymentStatus =
         payment === "cod" ? "cod" : payment === "card" ? "paid" : "pending";
 
-      const orderId = orders.placeOrder({
-        email: user.email,
-        items: orderItems,
-        address: {
-          recipientName: selectedAddress.recipientName,
-          phone: selectedAddress.phone,
-          line1: selectedAddress.line1,
-          line2: selectedAddress.line2,
-          city: selectedAddress.city,
-          zip: selectedAddress.zip,
-        },
-        payment: { method: payment as PaymentMethod, status: paymentStatus },
-        subtotal,
-        vat,
-        shipping,
-        total,
-      });
+      try {
+        const orderId = orders.placeOrder({
+          email: user.email,
+          items: orderItems,
+          address: {
+            recipientName: selectedAddress.recipientName,
+            phone: selectedAddress.phone,
+            line1: selectedAddress.line1,
+            line2: selectedAddress.line2,
+            city: selectedAddress.city,
+            zip: selectedAddress.zip,
+          },
+          payment: { method: payment as PaymentMethod, status: paymentStatus },
+          subtotal,
+          vat,
+          shipping,
+          total,
+        });
 
-      clearSelected();
-      toast.success("অর্ডার সফল!", `Order #${orderId}`);
-      router.push(`/order/${orderId}/success`);
+        clearSelected();
+        toast.success("অর্ডার সফল!", `Order #${orderId}`);
+        router.push(`/order/${orderId}/success`);
+      } catch (err) {
+        // Inventory check failed (insufficient stock) or other server-side error
+        const msg = err instanceof Error ? err.message : "অর্ডার সম্পন্ন করতে সমস্যা";
+        toast.error("অর্ডার ব্যর্থ", msg);
+      }
     } finally {
       setPlacing(false);
     }

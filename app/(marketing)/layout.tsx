@@ -1,4 +1,4 @@
-import { FloatingDesignSystemButton, WhatsAppButton } from "@/components/atoms";
+import { FloatingDesignSystemButton, InstallPrompt, WhatsAppButton } from "@/components/atoms";
 import { Header, Footer } from "@/components/organisms";
 
 export default function MarketingLayout({
@@ -13,6 +13,7 @@ export default function MarketingLayout({
       <main id="main-content" className="flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
+      <InstallPrompt />
       <FloatingDesignSystemButton />
     </>
   );

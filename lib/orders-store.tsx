@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import type { OrderStatus } from "@/components/molecules/OrderCard";
+import { decrementStock, incrementStock } from "./inventory";
 
 const STORAGE_KEY = "udvash:orders-v1";
 
@@ -128,6 +129,15 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const placeOrder = useCallback((input: PlaceOrderInput): string => {
+    // Decrement inventory atomically with the order being saved. If stock
+    // is insufficient, throw — the checkout flow catches and surfaces it.
+    const decrement = decrementStock(
+      input.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
+    );
+    if (!decrement.ok) {
+      throw new Error(decrement.error);
+    }
+
     const id = newOrderId();
     const next: StoredOrder = {
       id,
@@ -149,11 +159,15 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
   const cancelOrder = useCallback((id: string, reason?: string) => {
     setOrders((prev) =>
-      prev.map((o) =>
-        o.id === id && (o.status === "placed" || o.status === "confirmed")
-          ? { ...o, status: "cancelled", cancelReason: reason }
-          : o,
-      ),
+      prev.map((o) => {
+        if (o.id !== id) return o;
+        if (o.status !== "placed" && o.status !== "confirmed") return o;
+        // Restock cancelled order items
+        incrementStock(
+          o.items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
+        );
+        return { ...o, status: "cancelled", cancelReason: reason };
+      }),
     );
   }, []);
 

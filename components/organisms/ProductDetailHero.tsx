@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { track, Events } from "@/lib/analytics";
+import { getStock, type StockSnapshot } from "@/lib/inventory";
 import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock, Heart } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
@@ -39,15 +40,22 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
   const [qty, setQty] = useState(1);
 
   const inWishlist = wishlist.hydrated ? wishlist.has(book.slug) : false;
+  const [stock, setStock] = useState<StockSnapshot | null>(null);
 
-  // Track product view + push to recently-viewed list on mount
+  // Track product view + push to recently-viewed list on mount.
+  // Also read inventory snapshot client-side (server doesn't know about adjustments).
   useEffect(() => {
     pushRecentlyViewed(book.slug);
+    setStock(getStock(book.slug));
     track({
       name: Events.product_view,
       props: { slug: book.slug, category: book.category, price: book.price },
     });
   }, [book.slug, book.category, book.price]);
+
+  const isStockOut =
+    stock?.status === "out-of-stock" || book.stock === "out-of-stock";
+  const isLowStock = stock?.status === "low-stock";
 
   function handleBuyNow() {
     addItem(book.slug, Math.max(1, qty));
@@ -127,8 +135,16 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>
 
+          {/* Low-stock urgency badge */}
+          {isLowStock && stock && (
+            <p className="text-body-sm font-semibold text-warning-700 dark:text-warning-400 flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-warning-500 animate-pulse" />
+              শুধু {stock.units} কপি অবশিষ্ট — তাড়াতাড়ি অর্ডার করুন
+            </p>
+          )}
+
           {/* Out-of-stock variant: replace the action row with a notify-me form */}
-          {book.stock === "out-of-stock" && <NotifyMeForm slug={book.slug} />}
+          {isStockOut && <NotifyMeForm slug={book.slug} />}
 
           {/* Bottom row — responsive: tighter on mobile, full on desktop */}
           <div className="flex items-center gap-2 sm:gap-3 pt-2">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Heart } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
-import { SearchBar } from "@/components/molecules";
+import { SearchAutocomplete } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { useToast } from "@/lib/toast-context";
@@ -17,7 +17,6 @@ export interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const router = useRouter();
-  const [q, setQ] = useState("");
   const { itemCount, hydrated: cartHydrated } = useCart();
   const { user, hydrated: authHydrated, logout } = useAuth();
   const toast = useToast();
@@ -44,12 +43,6 @@ export function Header({ className }: HeaderProps) {
     };
   }, [menuOpen]);
 
-  function submitSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const term = q.trim();
-    router.push(term ? `/search?q=${encodeURIComponent(term)}` : "/search");
-  }
-
   function handleLogout() {
     logout();
     setMenuOpen(false);
@@ -71,9 +64,9 @@ export function Header({ className }: HeaderProps) {
         {/* Logo shrinks on mobile so the right-side CTA fits */}
         <Logo size="md" className="!h-7 sm:!h-8 md:!h-9" />
 
-        <form className="flex-1 max-w-2xl mx-2 hidden sm:block" onSubmit={submitSearch} role="search">
-          <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
-        </form>
+        <div className="flex-1 max-w-2xl mx-2 hidden sm:block">
+          <SearchAutocomplete />
+        </div>
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
           <Link
@@ -155,9 +148,9 @@ export function Header({ className }: HeaderProps) {
         </div>
       </div>
 
-      <form className="container-site pb-3 sm:hidden" onSubmit={submitSearch} role="search">
-        <SearchBar value={q} onChange={(e) => setQ(e.target.value)} />
-      </form>
+      <div className="container-site pb-3 sm:hidden">
+        <SearchAutocomplete />
+      </div>
     </header>
   );
 }

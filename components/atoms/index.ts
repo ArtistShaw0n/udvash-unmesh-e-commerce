@@ -54,6 +54,8 @@ export type { StarRatingProps } from "./StarRating";
 
 export { WhatsAppButton } from "./WhatsAppButton";
 
+export { InstallPrompt } from "./InstallPrompt";
+
 export { SectionLabel } from "./SectionLabel";
 export type { SectionLabelProps } from "./SectionLabel";
 

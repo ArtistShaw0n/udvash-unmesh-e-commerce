@@ -59,6 +59,9 @@ export type { QuantityCounterProps } from "./QuantityCounter";
 export { SearchBar } from "./SearchBar";
 export type { SearchBarProps } from "./SearchBar";
 
+export { SearchAutocomplete } from "./SearchAutocomplete";
+export type { SearchAutocompleteProps } from "./SearchAutocomplete";
+
 export { SocialLoginButton } from "./SocialLoginButton";
 export type { SocialLoginButtonProps, SocialProvider } from "./SocialLoginButton";
 
