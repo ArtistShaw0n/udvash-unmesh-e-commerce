@@ -7,6 +7,14 @@ export interface HeroBannerProps {
   description: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  /**
+   * Optional product photo for the hero right slot (Figma 358×415).
+   * When set, replaces the stylised SVG fallback. Drop the file
+   * at /public/hero/book.png (or .jpg) then pass `imageSrc="/hero/book.png"`
+   * from the home-page render.
+   */
+  imageSrc?: string;
+  imageAlt?: string;
   className?: string;
 }
 
@@ -34,6 +42,8 @@ export function HeroBanner({
   description,
   primaryCta,
   secondaryCta,
+  imageSrc,
+  imageAlt,
   className,
 }: HeroBannerProps) {
   return (
@@ -77,7 +87,7 @@ export function HeroBanner({
           </div>
 
           <div className="hidden lg:flex justify-center">
-            <HeroBookIllustration />
+            <HeroBookIllustration imageSrc={imageSrc} imageAlt={imageAlt} />
           </div>
         </div>
 

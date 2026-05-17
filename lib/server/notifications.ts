@@ -46,20 +46,63 @@ export interface NotificationEnvelope {
 }
 
 /**
- * Replace the body of this function in production to dispatch through
- * the real provider. The default implementation logs to stdout.
+ * Provider dispatch. Three-mode behavior:
+ *
+ *   1. Email channel + RESEND_API_KEY set → send via Resend.
+ *      (Real customer email. Live for prod once env var exists.)
+ *   2. SMS channel + (future) BULK_SMS_BD_API_KEY → send via Bulk SMS BD.
+ *      (Placeholder — Resend doesn't do SMS.)
+ *   3. Otherwise → log to stdout / Vercel function logs.
+ *      (Local dev, staging without keys.)
+ *
+ * Resend errors fall through to the log so notification failures never
+ * block the calling flow (signup must still complete even if the welcome
+ * email can't be sent).
+ *
+ * Required env:
+ *   RESEND_API_KEY     `re_...`                            (Resend dashboard)
+ *   RESEND_FROM_EMAIL  `noreply@your-domain.com`           (verified sender)
+ *                       or `onboarding@resend.dev`         (Resend's default)
  */
 async function dispatch(env: NotificationEnvelope): Promise<void> {
-  if (process.env.NODE_ENV === "production") {
-    // TODO: swap with Resend / Bulk SMS BD call
-    // Example:
-    //   if (env.channel === "email") await resend.emails.send({
-    //     to: env.to, subject: env.subject, html: env.html, text: env.body,
-    //   });
-    //   if (env.channel === "sms")   await bulkSmsBd.send({
-    //     to: env.to, message: env.body,
-    //   });
+  // -------- 1. Email via Resend (when key + email channel) -----------
+  if (env.channel === "email" && process.env.RESEND_API_KEY) {
+    try {
+      // Lazy import so the bundle stays small for code paths that don't
+      // actually send email (e.g. SMS-only flows, or local dev without
+      // the key set).
+      const { Resend } = await import("resend");
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const result = await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
+        to: env.to,
+        subject: env.subject,
+        html: env.html ?? `<pre>${env.body}</pre>`,
+        text: env.body,
+      });
+      if (result.error) {
+        console.warn(
+          `[notifications] Resend rejected ${env.templateName}:`,
+          result.error,
+        );
+      } else {
+        console.info(
+          `📧 [resend] ${env.templateName} → ${env.to} (id=${result.data?.id ?? "?"})`,
+        );
+      }
+      return;
+    } catch (err) {
+      // Network glitch, expired key, etc — fall through to logging so we
+      // don't lose visibility into what would have been sent.
+      console.warn(`[notifications] Resend threw (${env.templateName}):`, err);
+    }
   }
+
+  // -------- 2. SMS provider (placeholder) ----------------------------
+  // When you wire Bulk SMS BD / Twilio / etc, add a similar block here:
+  //   if (env.channel === "sms" && process.env.BULK_SMS_BD_API_KEY) { ... }
+
+  // -------- 3. Fallback — log to stdout ------------------------------
   const tag = env.channel === "email" ? "📧" : "📱";
   const meta = env.html ? " [html+text]" : "";
   console.info(

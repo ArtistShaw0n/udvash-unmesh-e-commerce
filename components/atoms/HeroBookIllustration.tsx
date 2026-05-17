@@ -1,15 +1,50 @@
+import Image from "next/image";
 import { clsx } from "@/lib/clsx";
 
 export interface HeroBookIllustrationProps {
   className?: string;
+  /**
+   * Optional product photo. If set, renders via `next/image` at the
+   * Figma spec (358×415) instead of the stylised SVG fallback.
+   *
+   * Drop the file at /public/hero/book.png (or .jpg) and pass the
+   * path here from the home-page render:
+   *   <HeroBanner imageSrc="/hero/book.png" ... />
+   *
+   * Or pass a remote URL — Next.js will optimize either way.
+   */
+  imageSrc?: string;
+  /** Alt text for the photo when imageSrc is set. */
+  imageAlt?: string;
 }
 
 /**
- * Stylised stack-of-books illustration with a bookmark — used on the Hero
- * banner right side. Decorative; replaced with a real product mockup PNG
- * once art assets are ready.
+ * Hero right-side illustration. Two modes:
+ *
+ *   1. With `imageSrc` → renders a `next/image` at the Figma spec
+ *      (358×415, the doc-reserved hero-photo slot).
+ *   2. Without → renders the stylised stack-of-books SVG as a
+ *      placeholder so the hero never has a blank slot.
  */
-export function HeroBookIllustration({ className }: HeroBookIllustrationProps) {
+export function HeroBookIllustration({
+  className,
+  imageSrc,
+  imageAlt = "প্রোডাক্ট প্রিভিউ",
+}: HeroBookIllustrationProps) {
+  if (imageSrc) {
+    return (
+      <Image
+        src={imageSrc}
+        alt={imageAlt}
+        width={358}
+        height={415}
+        priority
+        sizes="(max-width: 1024px) 60vw, 358px"
+        className={clsx("w-full max-w-[358px] h-auto object-contain", className)}
+      />
+    );
+  }
+
   return (
     <svg
       viewBox="0 0 320 360"
