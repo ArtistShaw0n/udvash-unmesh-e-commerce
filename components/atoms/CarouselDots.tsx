@@ -27,11 +27,19 @@ export function CarouselDots({
     tone === "onDark" ? "bg-[#469097] hover:bg-[#5aa5ad]" : "bg-[#E5F0F1] hover:bg-neutral-300";
   const activeCls = tone === "onDark" ? "bg-[#E5F0F1]" : "bg-[#006D77]";
 
+  // Dots that just indicate carousel position (no user interaction) are
+  // decorative — using `role="tablist"` triggers a Lighthouse a11y fail
+  // because tab roles require focusable `role="tab"` children. When
+  // `onSelect` is provided we DO use tablist semantics (the children
+  // become real tabs); otherwise we render plain decorative dots.
+  const isInteractive = !!onSelect;
+
   return (
     <div
       className={clsx("flex items-center gap-2", className)}
-      role="tablist"
-      aria-label="Carousel slides"
+      role={isInteractive ? "tablist" : undefined}
+      aria-label={isInteractive ? "Carousel slides" : undefined}
+      aria-hidden={isInteractive ? undefined : "true"}
     >
       {Array.from({ length: count }).map((_, i) => {
         const isActive = i === active;

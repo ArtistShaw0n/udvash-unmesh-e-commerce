@@ -59,8 +59,11 @@ export function MobileBottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
+                // 44px min tap target (WCAG 2.5.5). Previous py-2 + 20px icon
+                // + 10px label gave ~52px total but per-cell flex height was
+                // smaller; explicit min-h-[48px] guarantees the spec.
                 className={clsx(
-                  "flex flex-col items-center justify-center gap-0.5 py-2 text-caption transition-colors",
+                  "flex flex-col items-center justify-center gap-0.5 py-2.5 min-h-[48px] text-caption transition-colors",
                   active
                     ? "text-brand-700 dark:text-brand-400"
                     : "text-[var(--fg-muted)] hover:text-[var(--fg-primary)]",
