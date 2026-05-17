@@ -159,12 +159,12 @@ export function ProductCard({ book, className }: ProductCardProps) {
                   isPreorder ? "bg-[#F59E0B]" : "bg-[#006D77]",
                 )}
               >
-                {isPreorder ? "Pre Order" : "Add to Cart"}
+                {isPreorder ? "Pre Order" : "Buy Now"}
               </button>
               <button
                 type="button"
                 onClick={handleAddToCart}
-                aria-label="Add to cart"
+                aria-label="Buy now"
                 className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[#006D77] hover:bg-[#006D77]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
               >
                 <ShoppingCart size={18} className="text-[#006D77]" strokeWidth={1.5} />
