@@ -20,20 +20,24 @@ export function CarouselDots({
   onSelect,
   className,
 }: CarouselDotsProps) {
+  // Per Figma spec:
+  //   onDark — active 32×8 bg #E5F0F1 (cream-tinted white), inactive 8×8 bg #469097 (mid-teal)
+  //   onLight — active 32×8 bg #006D77 (brand), inactive 8×8 bg #E5F0F1 (cream)
   const inactive =
-    tone === "onDark" ? "bg-white/40 hover:bg-white/60" : "bg-neutral-300 hover:bg-neutral-400";
-  const activeCls = tone === "onDark" ? "bg-white" : "bg-brand-700";
+    tone === "onDark" ? "bg-[#469097] hover:bg-[#5aa5ad]" : "bg-[#E5F0F1] hover:bg-neutral-300";
+  const activeCls = tone === "onDark" ? "bg-[#E5F0F1]" : "bg-[#006D77]";
 
   return (
     <div
-      className={clsx("flex items-center gap-1.5", className)}
+      className={clsx("flex items-center gap-2", className)}
       role="tablist"
       aria-label="Carousel slides"
     >
       {Array.from({ length: count }).map((_, i) => {
         const isActive = i === active;
-        const sizeCls = isActive ? clsx("w-6", activeCls) : clsx("w-1.5", inactive);
-        const baseCls = clsx("h-1.5 rounded-full transition-all", sizeCls);
+        // active = 32×8, inactive = 8×8, both 4px radius
+        const sizeCls = isActive ? clsx("w-8", activeCls) : clsx("w-2", inactive);
+        const baseCls = clsx("h-2 rounded transition-all", sizeCls);
 
         // Render <button> only when interactive (avoids passing event handlers
         // through a server-component boundary).
