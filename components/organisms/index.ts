@@ -10,6 +10,8 @@ export type { ReviewsSectionProps } from "./ReviewsSection";
 export { RecentlyViewedSection } from "./RecentlyViewedSection";
 export type { RecentlyViewedSectionProps } from "./RecentlyViewedSection";
 
+export { MobileBottomNav } from "./MobileBottomNav";
+
 export { AuthCard } from "./AuthCard";
 export type { AuthCardProps } from "./AuthCard";
 
