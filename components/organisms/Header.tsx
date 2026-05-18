@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
@@ -17,19 +17,14 @@ export interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const { itemCount, hydrated: cartHydrated } = useCart();
   const { user, hydrated: authHydrated, logout } = useAuth();
   const toast = useToast();
 
-  // Figma divergence: the home page header sits on a white band (matches
-  // the white hero/filter/flash sections below); every other page header
-  // sits on the cream page bg (matches the body). One Header component
-  // serves both — choose the bg from the current route.
-  const isHome = pathname === "/";
-  const headerBg = isHome
-    ? "bg-[var(--bg-surface)]"  // white
-    : "bg-[var(--bg-page)]";    // cream #F7F9FB
+  // Pixel-sampled Figma node 9:5883 across all pages: the header outer
+  // band is uniformly #F7F9FB (cream) on every route. The white you
+  // see if you sample naively is the search input pill inside the
+  // header, not the band itself. So: always cream, no pathname switch.
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -80,8 +75,7 @@ export function Header({ className }: HeaderProps) {
   return (
     <header
       className={clsx(
-        "sticky top-0 z-40 w-full border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
-        headerBg,
+        "sticky top-0 z-40 w-full bg-[var(--bg-page)] border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
         className,
       )}
     >
