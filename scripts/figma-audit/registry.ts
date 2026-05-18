@@ -272,6 +272,75 @@ export const registry: AuditEntry[] = [
     tolerance: { h: 4 },
   },
 
+  // ---------- Home — typography + content elements ----------
+  {
+    route: "/",
+    figmaNodeId: "home.hero.h1",
+    selector: '[data-figma-id="9:5403"] h1',
+    description: "Home — Hero h1 (HSC প্যারালাল টেক্সট ...)",
+    // Figma: Inter ExtraBold 40 / 50 white at desktop, scales down on
+    // smaller. `tracking-[-1.0992px]` letter-spacing is Figma-exact.
+    expected: { fontFamily: "Inter", fontWeight: 800, color: "#ffffff" },
+    // Title font-size ramps via the responsive utility chain:
+    // 28 (mobile) → 32 (sm/tablet) → 40 (xl ≥1280). Both desktop (1440)
+    // and figma (1920) hit xl, so they share the 40/50 expectation.
+    byViewport: {
+      mobile: { fontSize: 28, lineHeight: 36 },
+      tablet: { fontSize: 32, lineHeight: 40 },
+      desktop: { fontSize: 40, lineHeight: 50 },
+      figma: { fontSize: 40, lineHeight: 50 },
+    },
+  },
+  {
+    route: "/",
+    figmaNodeId: "home.section-title.popular",
+    selector: '[data-figma-id="9:5434"] h2',
+    description: "Home — Popular books section title",
+    // ProductGridSection h2: Poppins SemiBold 30/36 (capitalize),
+    // tracking -0.012em, color #3D3D3D.
+    expected: {
+      fontFamily: "Poppins",
+      fontWeight: 600,
+      fontSize: 30,
+      lineHeight: 36,
+      color: "#3d3d3d",
+    },
+    byViewport: {
+      // Below sm, the title is text-[24px] leading-9. ProductGridSection
+      // uses `text-[24px] sm:text-[30px] leading-9`.
+      mobile: { fontSize: 24, lineHeight: 36 },
+    },
+  },
+  {
+    route: "/",
+    figmaNodeId: "home.section-title.flash",
+    selector: '[data-figma-id="9:5575"] h2',
+    description: "Home — Flash sale h2",
+    // Figma: Poppins ExtraBold 30/40 white, tracking -0.04em.
+    expected: {
+      fontFamily: "Poppins",
+      fontWeight: 800,
+      color: "#ffffff",
+    },
+    byViewport: {
+      mobile: { fontSize: 24, lineHeight: 32 },
+      tablet: { fontSize: 30, lineHeight: 40 },
+      desktop: { fontSize: 30, lineHeight: 40 },
+      figma: { fontSize: 30, lineHeight: 40 },
+    },
+  },
+  {
+    route: "/",
+    figmaNodeId: "home.productcard.first",
+    selector: '[data-figma-id="9:5434"] [class*="max-w-[306px]"]',
+    description: "Home — first product card (Figma 306 fixed via max-w)",
+    // The card has `max-w-[306px]` in code, so it's capped at 306 at
+    // every viewport regardless of grid columns. Mobile / tablet
+    // gridders centre it with `mx-auto`.
+    expected: { w: 306, borderRadius: 10 },
+    tolerance: { w: 2 },
+  },
+
   // ---------- /products (Figma 9:6555) ----------
   // Every page below shares the same Header + Footer (cream + teal),
   // which the global selectors `header` / `footer` already audit. Per-

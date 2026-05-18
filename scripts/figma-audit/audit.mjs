@@ -70,10 +70,17 @@ function rgbToHex(rgb) {
   );
 }
 
-function withinTol(actual, expected, tol) {
+function withinTol(actual, expected, tol, key) {
   if (actual === undefined || actual === null) return false;
   if (typeof expected === "string") {
-    return String(actual).toLowerCase() === expected.toLowerCase();
+    const a = String(actual).toLowerCase();
+    const e = expected.toLowerCase();
+    // fontFamily often comes back from getComputedStyle with the full
+    // fallback chain (e.g. `Inter, "Inter Fallback", "Hind Siliguri", …`)
+    // because Next.js's next/font wires every face through a fallback.
+    // Substring-match so "Inter" passes against the full chain.
+    if (key === "fontFamily") return a.includes(e);
+    return a === e;
   }
   return Math.abs(Number(actual) - Number(expected)) <= tol;
 }
@@ -180,7 +187,7 @@ async function main() {
               ? rgbToHex(actual[key])
               : actual[key];
           const tol = resolveTolerance(item, key);
-          if (!withinTol(actualVal, expectedVal, tol)) {
+          if (!withinTol(actualVal, expectedVal, tol, key)) {
             diffs.push({ key, expected: expectedVal, actual: actualVal, tol });
           }
         }
