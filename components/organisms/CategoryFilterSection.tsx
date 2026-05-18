@@ -38,7 +38,10 @@ export function CategoryFilterSection({
   //   Subtitle Inter 14px / 20px weight 400, letter-spacing -0.150px,
   //            color #676767
   return (
-    <section className={clsx("section-pad-sm", className)}>
+    // Figma §3: the home-page category filter sits on a full-bleed WHITE
+    // band (matches Hero above and Flash-Sale below). Explicit
+    // bg-surface so it doesn't pick up the cream page bg behind it.
+    <section className={clsx("section-pad-sm bg-[var(--bg-surface)]", className)}>
       <div className="container-site">
         {variant === "centered" && (
           <div className="text-center space-y-3 mb-12">

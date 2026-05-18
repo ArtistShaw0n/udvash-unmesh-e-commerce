@@ -47,6 +47,7 @@ export default function HomePage() {
         subtitle="Academic সেক্টরের জনপ্রিয় বিভিন্ন বইসমূহ"
         seeAllHref="/products"
         books={fill(popular, 4)}
+        tone="muted"
       />
 
       <FlashSaleBanner
@@ -69,6 +70,7 @@ export default function HomePage() {
         subtitle="ভর্তি পরীক্ষার জন্য নির্বাচিত বইসমূহ"
         seeAllHref="/products?category=admission"
         books={fill(admission, 4)}
+        tone="muted"
       />
     </>
   );

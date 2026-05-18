@@ -57,11 +57,17 @@ export function HeroBanner({
 }: HeroBannerProps) {
   return (
     <section
+      // Figma §2: the Hero section is a full-bleed WHITE band that
+      // contains a teal rounded card. Earlier we let it fall through to
+      // the (cream) page bg, which made the surrounding gutters cream
+      // instead of white. Explicit `bg-[var(--bg-surface)]` puts that
+      // right; the inner card stays brand-teal.
       className={clsx(
-        "container-site pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-10 lg:pb-[30px]",
+        "bg-[var(--bg-surface)] pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-10 lg:pb-[30px]",
         className,
       )}
     >
+      <div className="container-site">
       {/*
         The teal card.
           - Below lg: overflow-hidden so the rounded corners clip cleanly
@@ -96,6 +102,7 @@ export function HeroBanner({
         <div className="mt-4 flex justify-center xl:mt-0 xl:absolute xl:bottom-[14px] xl:left-1/2 xl:-translate-x-1/2">
           <CarouselDots count={3} active={0} tone="onDark" />
         </div>
+      </div>
       </div>
     </section>
   );

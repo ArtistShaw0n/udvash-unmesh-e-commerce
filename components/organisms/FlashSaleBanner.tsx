@@ -32,7 +32,10 @@ export function FlashSaleBanner({
   className,
 }: FlashSaleBannerProps) {
   return (
-    <section className={clsx("py-10 lg:py-[40px]", className)}>
+    // Figma §5: full-bleed WHITE band that wraps a brand-teal rounded
+    // card. Without explicit bg-surface the gutters above/below pick up
+    // the cream page bg and the section reads as cream-on-cream-on-teal.
+    <section className={clsx("py-10 lg:py-[40px] bg-[var(--bg-surface)]", className)}>
       <div className="container-site">
         <div
           className={clsx(
