@@ -6,6 +6,7 @@ import {
   SITE_ADDRESS_BN,
   SITE_EMAIL,
   SITE_PHONE_BN,
+  SITE_SOCIAL,
   SITE_TAGLINE_BN,
 } from "@/lib/site";
 import { clsx } from "@/lib/clsx";
@@ -58,10 +59,10 @@ export function Footer({ className }: FooterProps) {
               {SITE_TAGLINE_BN}
             </p>
             <div className="flex items-center gap-3 pt-2">
-              <SocialIcon href="#" label="Facebook" icon={<FbIcon />} />
-              <SocialIcon href="#" label="Instagram" icon={<IgIcon />} />
-              <SocialIcon href="#" label="YouTube" icon={<YtIcon />} />
-              <SocialIcon href="#" label="LinkedIn" icon={<LiIcon />} />
+              <SocialIcon href={SITE_SOCIAL.facebook} label="Facebook" icon={<FbIcon />} />
+              <SocialIcon href={SITE_SOCIAL.instagram} label="Instagram" icon={<IgIcon />} />
+              <SocialIcon href={SITE_SOCIAL.youtube} label="YouTube" icon={<YtIcon />} />
+              <SocialIcon href={SITE_SOCIAL.linkedin} label="LinkedIn" icon={<LiIcon />} />
             </div>
           </div>
 
@@ -140,9 +141,11 @@ function SocialIcon({ href, label, icon }: { href: string; label: string; icon: 
   return (
     <a
       href={href}
-      aria-label={label}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${label} (opens in new tab)`}
       // Figma: 40×40, 1px white border, rounded-full, 18×18 icon inside
-      className="inline-flex w-10 h-10 items-center justify-center rounded-full border border-white text-white hover:bg-white/10 transition-colors"
+      className="inline-flex w-10 h-10 items-center justify-center rounded-full border border-white text-white hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-600"
     >
       {icon}
     </a>

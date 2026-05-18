@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllBooks } from "@/lib/books";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh-e-commerce.netlify.app";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

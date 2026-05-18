@@ -223,19 +223,30 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
             </Button>
           </form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <span className="w-full border-t border-[var(--border-default)]" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-[var(--bg-surface)] px-3 text-body-sm text-[var(--fg-muted)]">অথবা</span>
-            </div>
-          </div>
+          {/* Social-auth providers are not yet wired up. Showing dead
+              "Google/Facebook" buttons that do nothing on click is worse
+              than not showing them. Gate the entire OR-divider + social
+              row behind an env flag so they appear only when at least
+              one provider is configured. */}
+          {process.env.NEXT_PUBLIC_AUTH_SOCIAL_ENABLED === "1" && (
+            <>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <span className="w-full border-t border-[var(--border-default)]" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[var(--bg-surface)] px-3 text-body-sm text-[var(--fg-muted)]">
+                    অথবা
+                  </span>
+                </div>
+              </div>
 
-          <div className="space-y-3">
-            <SocialLoginButton provider="google" />
-            <SocialLoginButton provider="facebook" />
-          </div>
+              <div className="space-y-3">
+                <SocialLoginButton provider="google" />
+                <SocialLoginButton provider="facebook" />
+              </div>
+            </>
+          )}
 
           <p className="text-center text-body-sm text-[var(--fg-secondary)]">
             {/* Figma 9:5082: "আপনার কি একাউন্ট নেই?" (with কি) */}

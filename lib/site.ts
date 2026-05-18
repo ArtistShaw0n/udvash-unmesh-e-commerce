@@ -1,5 +1,26 @@
 /** Site-wide constants */
 
+/**
+ * Canonical site URL — used by metadataBase, sitemap, robots, JSON-LD,
+ * and OG image generators. Set NEXT_PUBLIC_SITE_URL in your env to
+ * override (Vercel auto-injects it on production deploys). The default
+ * points to the live Vercel host so SEO + canonical tags work even if
+ * the env var is missing.
+ *
+ * Social handles below are read by `organizationLd()` to populate the
+ * structured-data `sameAs` array, and by Footer to wire its social
+ * icons.
+ */
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh-e-commerce.vercel.app";
+
+export const SITE_SOCIAL = {
+  facebook: "https://facebook.com/udvashunmesh",
+  instagram: "https://instagram.com/udvashunmesh",
+  youtube: "https://youtube.com/@udvashunmesh",
+  linkedin: "https://linkedin.com/company/udvashunmesh",
+} as const;
+
 export const SITE_NAME_BN = "উদ্ভাস-উন্মেষ";
 export const SITE_NAME_EN = "Udvash-Unmesh";
 export const SITE_TAGLINE_BN =

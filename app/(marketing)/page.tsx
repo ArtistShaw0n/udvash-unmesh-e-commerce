@@ -1,7 +1,7 @@
 import {
-  CategoryFilterSection,
   FlashSaleBanner,
   HeroBanner,
+  HomeCategoryFilter,
   ProductGridSection,
 } from "@/components/organisms";
 import {
@@ -36,11 +36,10 @@ export default function HomePage() {
         imageAlt="ষষ্ঠ শ্রেণি প্যারালাল টেক্সট — বাংলা ১ম পত্র"
       />
 
-      <CategoryFilterSection
+      <HomeCategoryFilter
         title="বই খুঁজুন"
         subtitle="একাডেমিক থেকে শুরু করে বিভিন্ন ধরনের বই পাবেন এখানে"
         categories={[...CATEGORIES]}
-        defaultCategory="all"
       />
 
       <ProductGridSection

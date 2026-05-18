@@ -1,5 +1,14 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { ChevronLeft, ShieldCheck, Phone, BookOpen } from "lucide-react";
+
+// Design-system gallery is a dev-only tool. In production it should not
+// be reachable — return a 404 so search engines don't index it.
+export const metadata: Metadata = {
+  title: "Design System",
+  robots: { index: false, follow: false },
+};
 import {
   ArrowLink,
   Badge,
@@ -23,11 +32,15 @@ import {
 import { getAllBooks } from "@/lib/books";
 import { CATEGORIES } from "@/lib/site";
 
-export const metadata = { title: "Design System" };
-
 const DEMO_END = new Date(Date.now() + 23 * 60 * 60 * 1000);
 
 export default function DesignSystemPage() {
+  // Gate at request time — even if the file ships, requests resolve to 404
+  // in production builds. Dev keeps the gallery for component review.
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   const sampleBook = getAllBooks()[0];
 
   return (

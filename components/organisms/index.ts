@@ -39,6 +39,9 @@ export type { HeaderProps } from "./Header";
 export { HeroBanner } from "./HeroBanner";
 export type { HeroBannerProps } from "./HeroBanner";
 
+export { HomeCategoryFilter } from "./HomeCategoryFilter";
+export type { HomeCategoryFilterProps } from "./HomeCategoryFilter";
+
 export { ProductDetailHero } from "./ProductDetailHero";
 export type { ProductDetailHeroProps } from "./ProductDetailHero";
 

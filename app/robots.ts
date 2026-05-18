@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh-e-commerce.netlify.app";
+import { SITE_URL } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -17,6 +16,8 @@ export default function robots(): MetadataRoute.Robots {
           "/reset-password",
           "/verify-email",
           "/api/",
+          "/admin/",
+          "/design-system",
         ],
       },
     ],

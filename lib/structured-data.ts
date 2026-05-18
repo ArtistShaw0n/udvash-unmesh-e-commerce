@@ -7,10 +7,7 @@
  */
 
 import type { Book } from "@/lib/books";
-import { SITE_NAME_EN, SITE_NAME_BN } from "@/lib/site";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh-e-commerce.netlify.app";
+import { SITE_NAME_EN, SITE_NAME_BN, SITE_URL, SITE_SOCIAL } from "@/lib/site";
 
 export function organizationLd() {
   return {
@@ -27,10 +24,7 @@ export function organizationLd() {
       areaServed: "BD",
       availableLanguage: ["bn", "en"],
     },
-    sameAs: [
-      "https://facebook.com/udvashunmesh",
-      "https://youtube.com/@udvashunmesh",
-    ],
+    sameAs: Object.values(SITE_SOCIAL),
   };
 }
 

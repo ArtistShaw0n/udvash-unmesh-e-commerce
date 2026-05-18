@@ -10,6 +10,7 @@ import { ToastProvider } from "@/lib/toast-context";
 import { ConsentAnalyticsSync, PageViewTracker, StructuredData } from "@/components/atoms";
 import { CookieConsentBanner } from "@/components/organisms";
 import { organizationLd, websiteLd } from "@/lib/structured-data";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,9 +32,6 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://udvash-unmesh.netlify.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
