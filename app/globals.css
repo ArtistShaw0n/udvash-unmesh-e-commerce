@@ -11,17 +11,24 @@
    ============================================ */
 
 @theme {
-  /* ---------- Brand — Teal (Primary) ---------- */
-  --color-brand-50:  #ecf6f8;
-  --color-brand-100: #c8e3e8;
-  --color-brand-200: #a3d0d7;
-  --color-brand-300: #71b6c0;
-  --color-brand-400: #4499a7;
-  --color-brand-500: #1d7a8c;   /* primary teal */
-  --color-brand-600: #0e6973;   /* CTA / hero bg */
-  --color-brand-700: #0c5860;
-  --color-brand-800: #094249;
-  --color-brand-900: #062d33;
+  /* ---------- Brand — Teal (Primary) ----------
+     Anchored to Figma named tokens:
+       brand-50  = Color 4 (#F2F8F8) — page bg, filter-chip bg
+       brand-100 = Color 3 (#E5F0F1) — subtle borders, dot-rail inactive
+       brand-400 = Color 2 (#469097) — hero pill, mid-teal accent
+       brand-600 = Color 1 (#006D77) — PRIMARY, CTAs, hero card bg
+     Other shades interpolated to fill the scale.
+  */
+  --color-brand-50:  #F2F8F8;   /* Figma Color 4 */
+  --color-brand-100: #E5F0F1;   /* Figma Color 3 */
+  --color-brand-200: #C8E3E8;
+  --color-brand-300: #92C4CB;
+  --color-brand-400: #469097;   /* Figma Color 2 */
+  --color-brand-500: #1F8088;
+  --color-brand-600: #006D77;   /* Figma Color 1 — PRIMARY */
+  --color-brand-700: #00565E;
+  --color-brand-800: #003F45;
+  --color-brand-900: #002A2E;
 
   /* ---------- Discount — Red ---------- */
   --color-discount-50:  #fef2f2;
@@ -91,6 +98,20 @@
   --color-badge-bestseller: #0284C7; /* Tag 4 — best-seller blue */
   --color-badge-stockout: var(--color-neutral-400);
 
+  /* ---------- Semantic — Figma-named text colors ----------
+     Figma uses specific text colors for hierarchy. Promoted here so
+     `text-title` / `text-body` etc. work as Tailwind utilities and
+     designer-developer handoff is unambiguous.
+  */
+  --color-text-title:    #3D3D3D;   /* Figma "Title Text" */
+  --color-text-body:     #676767;   /* Figma "Body Text" */
+  --color-text-secondary:#737373;   /* Figma "second-text-color" */
+  --color-text-primary:  #252B42;   /* Figma "text-color" (darkest copy) */
+  --color-text-discount: #A4A4A4;   /* Figma "Discount" (struck-through price) */
+  --color-text-disabled: #DEDEDE;   /* Figma "Disable" */
+  --color-danger:        #E74040;   /* Figma "danger-color" */
+  --color-bg-page-muted: #F7F9FB;   /* Figma "Background" */
+
   /* ---------- Typography ---------- */
   --font-sans: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui,
     -apple-system, BlinkMacSystemFont, sans-serif;
@@ -134,6 +155,12 @@
   --radius-pill: 9999px;
 
   /* ---------- Shadows ---------- */
+  /* Figma "light-drop-shadow" — small drop shadow for tags + corners. */
+  --shadow-figma-light: 0 2px 4px rgba(0, 0, 0, 0.10);
+  /* Figma "SHADOW" — large drop shadow for elevated cards (Figma uses
+     for hero, modal, primary surface lift). */
+  --shadow-figma: 0 19px 40px rgba(106, 114, 130, 0.10);
+
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.08),
     0 8px 10px -6px rgb(0 0 0 / 0.05);
