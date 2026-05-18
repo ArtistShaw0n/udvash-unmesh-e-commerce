@@ -1,0 +1,107 @@
+name: Figma audit
+
+# Runs the Figma↔code parity audits on every PR and every push to main.
+# - audit:figma         (DOM-level: computed styles + bounding rects)
+# - audit:figma:pixel   (image-level: pixelmatch vs Figma baseline PNGs)
+#
+# Both run against a self-hosted `next start` server boot inside the
+# action runner — no external preview URL needed, no Vercel waitfor.
+#
+# Failure on this job blocks the PR (or signals a regression on main).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  # Allow manual runs from the Actions tab for spot-checks.
+  workflow_dispatch:
+
+# Cancel in-progress runs of the same workflow on the same branch when
+# a new commit lands.
+concurrency:
+  group: figma-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # The runner needs Playwright's browsers. The Playwright GH action
+    # caches them, so subsequent runs are fast.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        # Same prod build the deploy uses. Catches build-time errors
+        # before we waste runner time on the audit.
+        run: npm run build
+        env:
+          # Build needs Prisma client generated; provide a stub
+          # connection string. The audit doesn't touch the DB.
+          DATABASE_URL: postgresql://stub:stub@localhost:5432/stub
+          DIRECT_URL: postgresql://stub:stub@localhost:5432/stub
+          NEXT_PUBLIC_SITE_URL: https://udvash-unmesh-e-commerce.vercel.app
+          # Disable telemetry to avoid noise in the logs.
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Boot the app
+        # next start in the background, then wait until the homepage
+        # responds with 200. No /api/health route in this project.
+        run: |
+          npx next start -p 3000 &
+          echo $! > .next-pid
+          for i in $(seq 1 60); do
+            if curl -fs http://localhost:3000/ > /dev/null; then
+              echo "App is up (after ${i}s)"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::App failed to boot after 60s"
+          exit 1
+        env:
+          DATABASE_URL: postgresql://stub:stub@localhost:5432/stub
+          DIRECT_URL: postgresql://stub:stub@localhost:5432/stub
+
+      - name: Audit — DOM
+        run: npm run audit:figma
+        env:
+          AUDIT_URL: http://localhost:3000
+
+      - name: Audit — pixel diff
+        # Don't fail the whole job on pixel-diff alone — the threshold
+        # is generous and real book-cover changes can swing it. Keep
+        # the report as an artifact for manual inspection.
+        continue-on-error: true
+        run: npm run audit:figma:pixel
+        env:
+          AUDIT_URL: http://localhost:3000
+
+      - name: Stop the app
+        if: always()
+        run: |
+          if [ -f .next-pid ]; then
+            kill $(cat .next-pid) 2>/dev/null || true
+          fi
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: figma-audit-reports
+          path: reports/
+          retention-days: 14
+          if-no-files-found: ignore
