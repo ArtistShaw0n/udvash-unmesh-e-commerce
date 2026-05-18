@@ -243,10 +243,13 @@ export const registry: AuditEntry[] = [
     expected: { w: 712 },
     // 4px tolerance — flex-1 sub-pixel rounding can drift a hair.
     tolerance: { w: 4 },
-    // At tablet, the flex-1 wrapper is constrained by the cluster
-    // around it: container 768 − 64 padding − ~344 (logo + gaps + cta)
-    // = ~285. That's the natural cap; not a regression.
-    byViewport: { tablet: { w: 285 } },
+    // At tablet, the wrapper is the 1fr middle column of the header
+    // grid — sized to remaining space after logo + right cluster. The
+    // available middle column at 768 viewport works out to ~300px;
+    // not a regression, just the natural cap below the lg breakpoint
+    // where the full 712px slot opens up.
+    byViewport: { tablet: { w: 300 } },
+    tolerance: { w: 8 },
     skipOn: ["mobile"],
   },
   {

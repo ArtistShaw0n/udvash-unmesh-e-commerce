@@ -121,7 +121,12 @@ export function Header({ className }: HeaderProps) {
         className,
       )}
     >
-      <div className="container-site flex items-center gap-3 sm:gap-6 h-14 sm:h-16 md:h-20">
+      {/* 3-column grid keeps the search bar visually centered between
+          the logo and the right-side action cluster: outer columns size
+          to their content, middle 1fr fills the rest with the search
+          bar centred inside (justify-self-center). Width capped at 712
+          per Figma node 9:5883. */}
+      <div className="container-site grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-6 h-14 sm:h-16 md:h-20">
         {/* Logo shrinks on mobile so the right-side CTA fits */}
         <div data-figma-id="header.logo" className="flex-shrink-0">
           <Logo size="md" className="!h-7 sm:!h-8 md:!h-9" />
@@ -129,15 +134,12 @@ export function Header({ className }: HeaderProps) {
 
         <div
           data-figma-id="header.search"
-          // Figma 712px — was max-w-2xl (672px) which capped 40px narrower
-          // than the design intends, throwing the rest of the header
-          // cluster off-centre.
-          className="flex-1 max-w-[712px] mx-2 hidden sm:block"
+          className="hidden sm:block w-full max-w-[712px] justify-self-center"
         >
           <SearchAutocomplete />
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <Link
             href="/cart"
             aria-label={`Cart (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
