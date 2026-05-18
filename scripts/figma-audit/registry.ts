@@ -241,15 +241,17 @@ export const registry: AuditEntry[] = [
     // second row under the header chrome). Width-only check on the
     // wrapper; the actual pill style lives in the inner <form>.
     expected: { w: 712 },
-    // 4px tolerance — flex-1 sub-pixel rounding can drift a hair.
-    tolerance: { w: 4 },
+    // 8px tolerance: at desktop/figma the grid 1fr sometimes lands a
+    // couple of px under 712 from gap rounding; at tablet the wrapper
+    // sizes to the remaining middle column (no fixed 712 slot below
+    // the lg breakpoint), so the tolerance has to cover both.
+    tolerance: { w: 8 },
     // At tablet, the wrapper is the 1fr middle column of the header
     // grid — sized to remaining space after logo + right cluster. The
     // available middle column at 768 viewport works out to ~300px;
     // not a regression, just the natural cap below the lg breakpoint
     // where the full 712px slot opens up.
     byViewport: { tablet: { w: 300 } },
-    tolerance: { w: 8 },
     skipOn: ["mobile"],
   },
   {
