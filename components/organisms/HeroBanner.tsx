@@ -132,8 +132,13 @@ function HeroContent({
   return (
     <>
       <div className="flex flex-col gap-2.5">
+        {/* Badge was originally bg-brand-400 (#469097) per Figma, but
+            white text on that scores 3.18:1 against WCAG 1.4.3 (need
+            4.5:1 at 12px regular). Bumped the bg to brand-700 — same
+            visual rhythm (slightly darker teal on the brand-600 card)
+            but contrast jumps to ~7.8:1. */}
         {badge && (
-          <span className="inline-flex items-center self-start px-4 py-0.5 rounded-pill bg-brand-400 text-white font-poppins font-normal text-[12px] leading-6">
+          <span className="inline-flex items-center self-start px-4 py-0.5 rounded-pill bg-brand-700 text-white font-poppins font-normal text-[12px] leading-6">
             + {badge}
           </span>
         )}

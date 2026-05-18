@@ -138,6 +138,11 @@ export function SearchAutocomplete({
         </span>
         <input
           id={inputId}
+          // role="combobox" makes aria-expanded valid on an <input>
+          // and matches the WAI-ARIA combobox pattern (the listbox
+          // panel below is the dropdown). Without the role, axe-core
+          // flags aria-expanded as invalid.
+          role="combobox"
           type="search"
           value={q}
           onChange={(e) => {

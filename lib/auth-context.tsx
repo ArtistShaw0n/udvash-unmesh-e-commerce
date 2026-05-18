@@ -67,7 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(async () => {
     const result = await api.me();
-    if (result.ok) {
+    // /api/auth/me returns `user: null` for logged-out visitors (200,
+    // not 401) — handle both that and a non-ok response by clearing
+    // local state.
+    if (result.ok && result.data.user) {
       setUser({
         ...result.data.user,
         addresses: (result.data.addresses as UserAddress[]) ?? [],

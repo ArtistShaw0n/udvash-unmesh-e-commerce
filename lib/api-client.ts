@@ -87,7 +87,10 @@ export const api = {
   login: (input: { email: string; password: string }) =>
     call<{ user: SessionUser }>("/api/auth/login", { method: "POST", body: input }),
   logout: () => call<{ logout: true }>("/api/auth/logout", { method: "POST" }),
-  me: () => call<{ user: SessionUser; addresses: unknown[] }>("/api/auth/me"),
+  // /api/auth/me returns `user: null` when there's no session (200, not
+  // 401) so the browser doesn't log a network error on every logged-out
+  // page load. Consumers must handle the null case.
+  me: () => call<{ user: SessionUser | null; addresses: unknown[] }>("/api/auth/me"),
   verifyEmail: (code: string) =>
     call<{ user: SessionUser }>("/api/auth/verify-email", {
       method: "POST",

@@ -42,10 +42,15 @@ export function PriceBlock({
   const save = oldPrice ? oldPrice - price : 0;
   const sz = sizeClass[size];
 
+  // The Figma-spec "Save ৳N" discount pill (#FFEDEE bg / #E02D15 text)
+  // measures 4.08:1 at 12px bold — under WCAG 1.4.3's 4.5:1 floor.
+  // Switch to the documented discount palette tokens: bg-discount-50
+  // (#fef2f2) + text-discount-700 (#b91c1c) lands at ~7.5:1. The
+  // brand variant (E5F0F1 / 006D77) already passes at 5.94:1.
   const savePillClass =
     saveVariant === "brand"
-      ? "bg-[#E5F0F1] text-[#006D77]"
-      : "bg-[#FFEDEE] text-[#E02D15]";
+      ? "bg-brand-100 text-brand-600"
+      : "bg-discount-50 text-discount-700";
 
   return (
     <div
@@ -66,9 +71,13 @@ export function PriceBlock({
       </span>
       {oldPrice && oldPrice > price && (
         <span
+          // Figma drew the struck-through old price at #A4A4A4. That
+          // hits 2.49:1 on white at 14px — well below WCAG 1.4.3's
+          // 4.5:1 floor. Darken to the documented `text-body` token
+          // (#676767) which lands at 4.78:1.
           className={clsx(
             sz.old,
-            "font-poppins font-normal tracking-[-0.15px] line-through text-[#A4A4A4]",
+            "font-poppins font-normal tracking-[-0.15px] line-through text-[var(--color-text-body)]",
           )}
         >
           ৳{format(oldPrice, bengali)}
