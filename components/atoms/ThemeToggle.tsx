@@ -6,13 +6,14 @@ import { Moon, Sun } from "lucide-react";
 type Theme = "light" | "dark";
 
 function readInitialTheme(): Theme {
+  // Default is light — the Figma design is authored in light values
+  // only. Honour an explicit user choice from localStorage but don't
+  // auto-flip on `prefers-color-scheme: dark`. This matches the
+  // theme-init script in app/layout.tsx that runs before hydration.
   if (typeof window === "undefined") return "light";
   try {
     const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored === "light" || stored === "dark") return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+    return stored === "dark" ? "dark" : "light";
   } catch {
     return "light";
   }

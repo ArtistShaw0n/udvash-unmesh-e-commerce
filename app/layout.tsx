@@ -73,13 +73,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Default theme is light because the entire Figma design system is
+// authored against light values. Dark mode remains available as an
+// opt-in via the ThemeToggle (it writes 'dark' to localStorage), but we
+// no longer auto-flip based on the OS preference — too many users have
+// "always dark" set system-wide and that gave them a UI we never
+// designed against.
 const themeInitScript = `
   (function(){
     try {
       var stored = localStorage.getItem('theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = stored || (prefersDark ? 'dark' : 'light');
-      if (theme === 'dark') document.documentElement.classList.add('dark');
+      if (stored === 'dark') document.documentElement.classList.add('dark');
     } catch (e) {}
   })();
 `;
