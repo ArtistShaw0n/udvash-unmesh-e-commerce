@@ -128,7 +128,12 @@ export function trackError(
 ): void {
   if (typeof window === "undefined") return;
   const err = error instanceof Error ? error : new Error(String(error));
-  // TODO: Sentry.captureException(err, { extra: context })
-  // eslint-disable-next-line no-console
-  console.error("[trackError]", err.message, { stack: err.stack, ...context });
+  // When a real provider is wired up (Sentry, Datadog, etc.), this is
+  // where the captureException call would go. Until then we only log
+  // to the developer console — dropping straight to prod would spam
+  // every visitor's DevTools, which the audit flagged as MAJOR hygiene.
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.error("[trackError]", err.message, { stack: err.stack, ...context });
+  }
 }

@@ -66,6 +66,7 @@ export function TrackOrderPage() {
   }
 
   function useDemo() {
+    if (!DEMO_TRACKING_HINT) return; // dev-only affordance; no-op in prod
     setOrderId(DEMO_TRACKING_HINT.orderId);
     setEmail(DEMO_TRACKING_HINT.email);
     setErrors({});
@@ -122,19 +123,21 @@ export function TrackOrderPage() {
                 <Button type="submit" variant="primary" size={{ base: "md", md: "lg" }} fullWidth>
                   ট্র্যাক করুন
                 </Button>
-                <div className="pt-2 border-t border-[var(--border-muted)]">
-                  <p className="text-caption text-[var(--fg-muted)]">
-                    ডেমো:{" "}
-                    <button
-                      type="button"
-                      onClick={useDemo}
-                      className="font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 underline underline-offset-2"
-                    >
-                      {DEMO_TRACKING_HINT.orderId} / {DEMO_TRACKING_HINT.email}
-                    </button>{" "}
-                    দিয়ে চেষ্টা করুন।
-                  </p>
-                </div>
+                {DEMO_TRACKING_HINT && (
+                  <div className="pt-2 border-t border-[var(--border-muted)]">
+                    <p className="text-caption text-[var(--fg-muted)]">
+                      ডেমো:{" "}
+                      <button
+                        type="button"
+                        onClick={useDemo}
+                        className="font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 underline underline-offset-2"
+                      >
+                        {DEMO_TRACKING_HINT.orderId} / {DEMO_TRACKING_HINT.email}
+                      </button>{" "}
+                      দিয়ে চেষ্টা করুন।
+                    </p>
+                  </div>
+                )}
               </form>
 
               {result.kind === "not-found" && (

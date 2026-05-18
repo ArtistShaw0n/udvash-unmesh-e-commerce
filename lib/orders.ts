@@ -40,7 +40,7 @@ export interface Order {
 const DEMO_ORDERS: Order[] = [
   {
     id: "UU892145",
-    email: "shawon@example.com",
+    email: "demo+student@udvash-unmesh.test",
     placedAt: "১৪ মে, ২০২৬",
     status: "shipped",
     items: [
@@ -49,7 +49,7 @@ const DEMO_ORDERS: Order[] = [
     ],
     address: {
       recipientName: "Shawon Ahmed",
-      phone: "01798214677",
+      phone: "01700000000",
       line1: "হাউজ ৭১, রোড ৪, ব্লক সি",
       city: "বনশ্রী, ঢাকা",
       zip: "১২১৯",
@@ -65,7 +65,7 @@ const DEMO_ORDERS: Order[] = [
   },
   {
     id: "UU748120",
-    email: "rahim@example.com",
+    email: "demo+returning@udvash-unmesh.test",
     placedAt: "১১ মে, ২০২৬",
     status: "delivered",
     items: [{ slug: "udvash-math-parallel-text-hsc-2026", quantity: 1 }],
@@ -87,7 +87,7 @@ const DEMO_ORDERS: Order[] = [
   },
   {
     id: "UU560331",
-    email: "fatima@example.com",
+    email: "demo+cod@udvash-unmesh.test",
     placedAt: "১৬ মে, ২০২৬",
     status: "confirmed",
     items: [
@@ -165,8 +165,13 @@ export function findOrder(orderId: string, email: string): ResolvedOrder | null 
   return found ? resolve(found) : null;
 }
 
-/** Hint shown on the form so visitors can try it. */
-export const DEMO_TRACKING_HINT = {
-  orderId: "UU892145",
-  email: "shawon@example.com",
-};
+/**
+ * Hint values for the "Try a demo" affordance on /orders/track.
+ * Production returns `null` — we don't publicise a working demo
+ * credential on the public page. Dev returns a fillable combo so
+ * devs can test the flow without seeding a real order.
+ */
+export const DEMO_TRACKING_HINT: { orderId: string; email: string } | null =
+  process.env.NODE_ENV === "production"
+    ? null
+    : { orderId: "UU892145", email: "demo+student@udvash-unmesh.test" };
