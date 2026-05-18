@@ -56,10 +56,11 @@ export function Header({ className }: HeaderProps) {
   return (
     <header
       className={clsx(
-        // Figma "Background" #F7F9FB — the cream/page-muted color, not pure
-        // white. Subtle bottom border defines the chrome edge against the
-        // hero card below.
-        "sticky top-0 z-40 w-full bg-[#F7F9FB] dark:bg-[var(--bg-surface)] border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
+        // Figma "Background" #F7F9FB — the cream page-bg colour. We bind
+        // to the same `--bg-page` token the body uses, so the header
+        // melts into the page without a seam. Subtle bottom border
+        // defines the chrome edge against the hero card below.
+        "sticky top-0 z-40 w-full bg-[var(--bg-page)] border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
         className,
       )}
     >

@@ -179,7 +179,9 @@
    ============================================ */
 
 :root {
-  --bg-page: var(--color-neutral-0);
+  /* Figma uses #F7F9FB as the universal page background ("Background" in
+     the design system). Cards sit on top of it as pure white surfaces. */
+  --bg-page: var(--color-bg-page-muted);
   --bg-surface: var(--color-neutral-0);
   --bg-surface-muted: var(--color-neutral-50);
   --bg-surface-strong: var(--color-brand-600);
