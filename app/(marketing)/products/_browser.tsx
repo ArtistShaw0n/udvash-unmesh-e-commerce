@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dropdown } from "@/components/atoms/Dropdown";
-import { LoadMoreButton, ProductCard } from "@/components/molecules";
+import { LoadMoreButton, ProductCard, SectionHeader } from "@/components/molecules";
 import { CategoryFilterSection } from "@/components/organisms";
 import { CATEGORIES, toBengaliNumber } from "@/lib/site";
 import type { Book } from "@/lib/books";
@@ -129,23 +129,20 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
       <section className="section-pad-sm">
         <div className="container-site space-y-8">
           {/* Toolbar — Figma 9:6571 1296×56.
-              Left: h1 "সকল বই" 30/36 SemiBold #3D3D3D + subtitle 14/20 Inter #676767.
+              Left: h1 "সকল বই" + subtitle via SectionHeader.
               Right: sort dropdown 145×40 anchored top-right. */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-1">
-              <h1 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
-                সকল বই
-              </h1>
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
-                Academic সেকশনের জনপ্রিয় বিক্রিত বইসমূহ
-              </p>
-            </div>
-            <Dropdown
-              options={SORT_OPTIONS}
-              defaultValue={filters.sort}
-              onChange={(v) => updateFilter("sort", v as SortValue)}
-            />
-          </div>
+          <SectionHeader
+            as="h1"
+            title="সকল বই"
+            subtitle="Academic সেকশনের জনপ্রিয় বিক্রিত বইসমূহ"
+            action={
+              <Dropdown
+                options={SORT_OPTIONS}
+                defaultValue={filters.sort}
+                onChange={(v) => updateFilter("sort", v as SortValue)}
+              />
+            }
+          />
 
           {/* Grid — full-width 4-col on lg+, 24px col gap, 50px row gap (Figma). */}
           {visible.length > 0 ? (

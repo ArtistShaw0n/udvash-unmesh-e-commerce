@@ -79,3 +79,6 @@ export type { BookPreviewModalProps } from "./BookPreviewModal";
 
 export { Modal } from "./Modal";
 export type { ModalProps } from "./Modal";
+
+export { SectionHeader } from "./SectionHeader";
+export type { SectionHeaderProps } from "./SectionHeader";

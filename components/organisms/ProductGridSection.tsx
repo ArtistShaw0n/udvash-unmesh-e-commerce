@@ -1,5 +1,5 @@
 import { ArrowLink } from "@/components/atoms";
-import { ProductCard } from "@/components/molecules";
+import { ProductCard, SectionHeader } from "@/components/molecules";
 import type { Book } from "@/lib/books";
 import { clsx } from "@/lib/clsx";
 
@@ -50,19 +50,11 @@ export function ProductGridSection({
       )}
     >
       <div className="container-site space-y-12">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div className="space-y-1">
-            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
-              {title}
-            </h2>
-            {subtitle && (
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
-                {subtitle}
-              </p>
-            )}
-          </div>
-          {seeAllHref && <ArrowLink href={seeAllHref}>সব দেখুন</ArrowLink>}
-        </div>
+        <SectionHeader
+          title={title}
+          subtitle={subtitle}
+          action={seeAllHref && <ArrowLink href={seeAllHref}>সব দেখুন</ArrowLink>}
+        />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {books.map((b) => (

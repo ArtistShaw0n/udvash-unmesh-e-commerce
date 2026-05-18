@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FilterPill } from "@/components/atoms";
+import { SectionHeader } from "@/components/molecules";
 import { clsx } from "@/lib/clsx";
 
 export interface CategoryFilterSectionProps {
@@ -47,18 +48,13 @@ export function CategoryFilterSection({
     >
       <div className="container-site">
         {variant === "centered" && (
-          <div className="text-center space-y-3 mb-12">
-            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-[36px] tracking-[-0.01em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
-              {title}
-            </h2>
-            {subtitle && (
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
-                {subtitle}
-              </p>
-            )}
-          </div>
+          <SectionHeader title={title} subtitle={subtitle} align="center" />
         )}
         {variant === "compact" && (
+          // Compact variant is smaller (24px max) — used inside dense
+          // toolbars where the standard SectionHeader size would crowd
+          // the page. Kept inline for now; if a second `compact` user
+          // appears, extract into the SectionHeader molecule.
           <h2 className="font-poppins font-semibold text-[20px] sm:text-[24px] leading-9 text-center text-[var(--color-text-title)] dark:text-[var(--fg-primary)] mb-6">
             {title}
           </h2>
