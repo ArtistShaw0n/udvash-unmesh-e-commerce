@@ -20,8 +20,18 @@ export function FormField({
       <label htmlFor={id} className="block text-body-sm font-semibold text-[var(--fg-primary)]">
         {label}
       </label>
-      <Input id={id} {...inputProps} />
-      {error && <p className="text-caption text-discount-600">{error}</p>}
+      <Input
+        id={id}
+        invalid={!!error}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        {...inputProps}
+      />
+      {error && (
+        <p id={`${id}-error`} className="text-caption text-discount-600">
+          {error}
+        </p>
+      )}
       {!error && help && <p className="text-caption text-[var(--fg-muted)]">{help}</p>}
     </div>
   );

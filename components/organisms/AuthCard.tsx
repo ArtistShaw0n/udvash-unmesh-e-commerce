@@ -52,10 +52,14 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
 
   const isSignup = mode === "signup";
   const title = isSignup ? "সাইন আপ করুন" : "লগইন করুন";
+  // Subtitle copy lifted verbatim from Figma:
+  //   /signup → 9:5154 "নতুন একাউন্ট তৈরি করে কেনাকাটা শুরু করুন"
+  //   /login  → 9:5082 "আপনার একাউন্টে লগইন করে কেনাকাটা শুরু করুন"
   const subtitle = isSignup
     ? "নতুন একাউন্ট তৈরি করে কেনাকাটা শুরু করুন"
-    : "আপনার একাউন্টে প্রবেশ করুন";
-  const submitLabel = isSignup ? "সাইন আপ করুন" : "লগইন করুন";
+    : "আপনার একাউন্টে লগইন করে কেনাকাটা শুরু করুন";
+  // Figma button: "সাইন আপ করুন" on /signup, single-word "লগইন" on /login.
+  const submitLabel = isSignup ? "সাইন আপ করুন" : "লগইন";
 
   function handle(field: keyof typeof data) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -150,13 +154,18 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
             )}
             <FormField
               id="email"
-              type="email"
-              label="ইমেইল"
-              placeholder="আপনার ইমেইল দিন"
+              type={isSignup ? "email" : "text"}
+              // Figma: signup splits email + phone into two fields; login
+              // takes either in one combined "ইমেইল বা ফোন নাম্বার" field.
+              label={isSignup ? "ইমেইল" : "ইমেইল বা ফোন নাম্বার"}
+              placeholder={isSignup ? "আপনার ইমেইল দিন" : "ইমেইল বা ফোন নাম্বার দিন"}
               value={data.email}
               onChange={handle("email")}
               leftIcon={<Mail size={18} />}
-              autoComplete="email"
+              autoComplete={isSignup ? "email" : "username"}
+              // Login-error state (Figma 9:5013): inline red field + error
+              // text. Banner above still shows the same message for sr users.
+              error={!isSignup && error ? "সঠিক ইমেইল অথবা ফোন নাম্বার দিন" : undefined}
               required
             />
             {isSignup && (
@@ -174,7 +183,9 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
             <FormField
               id="password"
               label="পাসওয়ার্ড"
-              placeholder="কমপক্ষে ৬ অক্ষর"
+              // Figma: signup hints at password length ("কমপক্ষে ৬ অক্ষর"),
+              // login is a generic prompt ("আপনার পাসওয়ার্ড দিন").
+              placeholder={isSignup ? "কমপক্ষে ৬ অক্ষর" : "আপনার পাসওয়ার্ড দিন"}
               value={data.password}
               onChange={handle("password")}
               leftIcon={<Lock size={18} />}
@@ -227,7 +238,8 @@ function AuthCardInner({ mode, className }: AuthCardProps) {
           </div>
 
           <p className="text-center text-body-sm text-[var(--fg-secondary)]">
-            {isSignup ? "আগে থেকেই একাউন্ট আছে? " : "একাউন্ট নেই? "}
+            {/* Figma 9:5082: "আপনার কি একাউন্ট নেই?" (with কি) */}
+            {isSignup ? "আগে থেকেই একাউন্ট আছে? " : "আপনার কি একাউন্ট নেই? "}
             <Link
               href={`${isSignup ? "/login" : "/signup"}${next !== "/account" ? `?next=${encodeURIComponent(next)}` : ""}`}
               className="font-semibold text-brand-700 dark:text-brand-400 hover:underline"

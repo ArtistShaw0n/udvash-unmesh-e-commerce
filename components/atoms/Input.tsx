@@ -9,11 +9,18 @@ export interface InputProps
   leftIcon?: React.ReactNode;
   /** Show eye-toggle for password fields. */
   togglePassword?: boolean;
+  /**
+   * Render an error/invalid state — red border + red focus ring. Matches
+   * Figma login-error state (node 9:5013) where the email field gets a
+   * 1px discount-600 outline and an error message below.
+   */
+  invalid?: boolean;
 }
 
 export function Input({
   leftIcon,
   togglePassword,
+  invalid,
   type = "text",
   className,
   ...rest
@@ -24,7 +31,10 @@ export function Input({
   return (
     <div
       className={clsx(
-        "relative flex items-center w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500 transition-colors",
+        "relative flex items-center w-full rounded-md border bg-[var(--bg-surface)] transition-colors",
+        invalid
+          ? "border-discount-600 focus-within:ring-2 focus-within:ring-discount-600 focus-within:border-discount-600"
+          : "border-[var(--border-default)] focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500",
         className,
       )}
     >
