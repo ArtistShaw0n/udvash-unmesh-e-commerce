@@ -65,7 +65,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
       <Link
         href={detailHref}
         aria-label={book.titleBn}
-        className="relative block w-full aspect-[286/256] rounded-xs overflow-hidden bg-[#F7F9FB] dark:bg-[var(--bg-surface-muted)]"
+        className="relative block w-full aspect-[286/256] rounded-xs overflow-hidden bg-[var(--color-bg-page-muted)] dark:bg-[var(--bg-surface-muted)]"
       >
         <BookCoverPlaceholder />
 
@@ -91,24 +91,24 @@ export function ProductCard({ book, className }: ProductCardProps) {
       {/* Body — full width inside card padding, padding-top 12, gap 8 */}
       <div className="flex flex-col w-full pt-3 gap-2 flex-1">
         {/* Category label */}
-        <p className="font-poppins font-medium text-[10px] leading-[24px] tracking-[0.2px] uppercase text-[#676767]">
+        <p className="font-poppins font-medium text-[10px] leading-[24px] tracking-[0.2px] uppercase text-[var(--color-text-body)]">
           {book.categoryLabel}
         </p>
 
         {/* Title + description — gap 4 */}
         <div className="flex flex-col gap-1">
           <Link href={detailHref}>
-            <h3 className="font-poppins font-bold text-[14px] leading-[22px] tracking-[0.1px] text-[#3D3D3D] dark:text-white line-clamp-2 min-h-[44px] hover:text-[#006D77] dark:hover:text-brand-400 transition-colors">
+            <h3 className="font-poppins font-bold text-[14px] leading-[22px] tracking-[0.1px] text-[var(--color-text-title)] dark:text-white line-clamp-2 min-h-[44px] hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
               {book.title}
             </h3>
           </Link>
-          <p className="font-poppins font-normal text-[12px] leading-[16px] tracking-[0.2px] text-[#676767] dark:text-[var(--fg-secondary)] line-clamp-2 min-h-[32px]">
+          <p className="font-poppins font-normal text-[12px] leading-[16px] tracking-[0.2px] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)] line-clamp-2 min-h-[32px]">
             {book.descriptionBn}
           </p>
         </div>
 
         {/* Divider — Vector 2 */}
-        <hr className="border-0 border-t border-[#E5F0F1] dark:border-[var(--border-muted)] w-full" />
+        <hr className="border-0 border-t border-brand-100 dark:border-[var(--border-muted)] w-full" />
 
         {/* Price row */}
         <PriceBlock
@@ -130,7 +130,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
               <button
                 type="button"
                 disabled
-                className="flex-1 h-[34px] inline-flex items-center justify-center rounded-xs bg-[#DEDEDE] text-[#676767] font-poppins font-normal text-[14px] leading-[21px] cursor-not-allowed"
+                className="flex-1 h-[34px] inline-flex items-center justify-center rounded-xs bg-[var(--color-text-disabled)] text-[var(--color-text-body)] font-poppins font-normal text-[14px] leading-[21px] cursor-not-allowed"
               >
                 Stock Out
               </button>
@@ -138,9 +138,9 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 type="button"
                 disabled
                 aria-label="Cart"
-                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[#DEDEDE] cursor-not-allowed"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[var(--color-text-disabled)] cursor-not-allowed"
               >
-                <ShoppingCart size={18} className="text-[#DEDEDE]" />
+                <ShoppingCart size={18} className="text-[var(--color-text-disabled)]" />
               </button>
             </>
           ) : (
@@ -156,7 +156,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 className={clsx(
                   // Figma target 130×34; allow shrink/grow on narrower cards.
                   "flex-1 min-w-0 max-w-[130px] h-[34px] inline-flex items-center justify-center rounded-xs font-poppins font-normal text-[14px] leading-[21px] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500",
-                  isPreorder ? "bg-[#F59E0B]" : "bg-[#006D77]",
+                  isPreorder ? "bg-warning-500" : "bg-brand-600",
                 )}
               >
                 {isPreorder ? "Pre Order" : "Buy Now"}
@@ -165,9 +165,9 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 type="button"
                 onClick={handleAddToCart}
                 aria-label="Buy now"
-                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-[#006D77] hover:bg-[#006D77]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
+                className="w-[34px] h-[34px] inline-flex items-center justify-center rounded-xs bg-white border border-brand-600 hover:bg-brand-600/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500 transition-colors"
               >
-                <ShoppingCart size={18} className="text-[#006D77]" strokeWidth={1.5} />
+                <ShoppingCart size={18} className="text-brand-600" strokeWidth={1.5} />
               </button>
             </>
           )}
@@ -185,7 +185,7 @@ function FreeDeliveryStatus() {
   return (
     <>
       <CheckIcon />
-      <span className="font-poppins font-medium text-[12px] leading-4 text-[#006D77]">
+      <span className="font-poppins font-medium text-[12px] leading-4 text-brand-600">
         Free Delivery
       </span>
     </>
@@ -195,8 +195,8 @@ function FreeDeliveryStatus() {
 function PreOrderStatus() {
   return (
     <>
-      <AlarmClock size={14} className="text-[#F59E0B]" strokeWidth={2} />
-      <span className="font-poppins font-medium text-[12px] leading-4 text-[#F59E0B]">
+      <AlarmClock size={14} className="text-warning-500" strokeWidth={2} />
+      <span className="font-poppins font-medium text-[12px] leading-4 text-warning-500">
         Pre Order
       </span>
     </>
@@ -208,13 +208,13 @@ function StockOutStatus() {
     <>
       <span
         aria-hidden="true"
-        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-[2px] bg-[#E02D15]"
+        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-[2px] bg-badge-discount"
       >
         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
           <path d="M1.5 1.5L6.5 6.5M6.5 1.5L1.5 6.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       </span>
-      <span className="font-poppins font-medium text-[12px] leading-4 text-[#E02D15]">
+      <span className="font-poppins font-medium text-[12px] leading-4 text-badge-discount">
         Stock Out
       </span>
     </>

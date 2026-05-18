@@ -133,10 +133,10 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
               Right: sort dropdown 145×40 anchored top-right. */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-1">
-              <h1 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[#3D3D3D] dark:text-[var(--fg-primary)]">
+              <h1 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
                 সকল বই
               </h1>
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[#676767] dark:text-[var(--fg-secondary)]">
+              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
                 Academic সেকশনের জনপ্রিয় বিক্রিত বইসমূহ
               </p>
             </div>
@@ -164,7 +164,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
               regardless of hasMore so users can see the page size. */}
           <div className="flex flex-col items-center gap-3 pt-2">
             {hasMore && <LoadMoreButton onClick={() => setPage((p) => p + 1)} />}
-            <p className="font-poppins font-normal text-[14px] leading-4 text-[#676767] dark:text-[var(--fg-muted)]">
+            <p className="font-poppins font-normal text-[14px] leading-4 text-[var(--color-text-body)] dark:text-[var(--fg-muted)]">
               Showing {toBengaliNumber(visible.length)} of {toBengaliNumber(sorted.length)}{" "}
               products
             </p>

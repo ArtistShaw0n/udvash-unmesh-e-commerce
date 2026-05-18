@@ -69,7 +69,7 @@ export function HeroBanner({
           - At lg+: overflow-visible so the absolutely positioned book
             can stick out below per Figma.
       */}
-      <div className="relative rounded-lg bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden">
+      <div className="relative rounded-lg bg-brand-600 text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden">
         {/* Single content tree — typography + layout switches via the
             responsive utility chain inside HeroContent + positioning
             wrapper. Rendering it once keeps a single `<h1>` in the DOM
@@ -122,7 +122,7 @@ function HeroContent({
     <>
       <div className="flex flex-col gap-2.5">
         {badge && (
-          <span className="inline-flex items-center self-start px-4 py-0.5 rounded-pill bg-[#469097] text-white font-poppins font-normal text-[12px] leading-6">
+          <span className="inline-flex items-center self-start px-4 py-0.5 rounded-pill bg-brand-400 text-white font-poppins font-normal text-[12px] leading-6">
             + {badge}
           </span>
         )}
@@ -141,7 +141,10 @@ function HeroContent({
         <Button
           href={primaryCta.href}
           size={{ base: "md", md: "lg" }}
-          className="!bg-white !text-[#006D77] hover:!bg-white/90 !px-[30px] !py-3 !rounded-sm !font-poppins !font-normal !text-[16px] !leading-normal !min-h-0"
+          // Figma "white solid on brand bg" pill — brand-token replaces the
+          // earlier hardcoded #006D77, but the typography/padding/radius
+          // overrides remain because they match the Figma export precisely.
+          className="!bg-white !text-brand-600 hover:!bg-white/90 !px-[30px] !py-3 !rounded-sm !font-poppins !font-normal !text-[16px] !leading-normal !min-h-0"
         >
           {primaryCta.label}
         </Button>
@@ -150,6 +153,7 @@ function HeroContent({
             href={secondaryCta.href}
             variant="ghost"
             size={{ base: "md", md: "lg" }}
+            // Figma "outline on brand bg" pill.
             className="!border !border-white !text-white hover:!bg-white/10 !px-[30px] !py-3 !rounded-sm !font-poppins !font-normal !text-[16px] !leading-normal !min-h-0"
           >
             {secondaryCta.label}

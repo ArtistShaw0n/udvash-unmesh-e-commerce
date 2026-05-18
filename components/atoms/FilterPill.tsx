@@ -50,10 +50,11 @@ export function FilterPill({
         size === "default"
           ? "px-9 py-2 font-poppins text-[18px] leading-9 font-semibold tracking-[-0.02em]"
           : "px-4 py-1.5 text-body-sm font-semibold",
-        // State
+        // State — all colours via brand-* tokens so a palette change
+        // ripples through every filter chip on the site.
         active
-          ? "bg-[#006D77] text-white border-[#006D77] hover:bg-[#005a63] hover:border-[#005a63]"
-          : "bg-[#F2F8F8] text-[#006D77] border-[#F2F8F8] hover:bg-[#e6f0f0] dark:bg-brand-900/20 dark:text-brand-300 dark:border-brand-900/20",
+          ? "bg-brand-600 text-white border-brand-600 hover:bg-brand-700 hover:border-brand-700"
+          : "bg-brand-50 text-brand-600 border-brand-50 hover:bg-brand-100 dark:bg-brand-900/20 dark:text-brand-300 dark:border-brand-900/20",
         className,
       )}
       {...rest}

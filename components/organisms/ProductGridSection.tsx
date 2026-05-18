@@ -38,18 +38,18 @@ export function ProductGridSection({
     <section
       className={clsx(
         "section-pad-sm",
-        tone === "muted" && "bg-[#F7F9FB] dark:bg-[var(--bg-surface-muted)]",
+        tone === "muted" && "bg-[var(--color-bg-page-muted)] dark:bg-[var(--bg-surface-muted)]",
         className,
       )}
     >
       <div className="container-site space-y-12">
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div className="space-y-1">
-            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[#3D3D3D] dark:text-[var(--fg-primary)]">
+            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
               {title}
             </h2>
             {subtitle && (
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[#676767] dark:text-[var(--fg-secondary)]">
+              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
                 {subtitle}
               </p>
             )}

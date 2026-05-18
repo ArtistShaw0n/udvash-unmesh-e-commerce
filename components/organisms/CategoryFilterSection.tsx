@@ -42,18 +42,18 @@ export function CategoryFilterSection({
       <div className="container-site">
         {variant === "centered" && (
           <div className="text-center space-y-3 mb-12">
-            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-[36px] tracking-[-0.01em] capitalize text-[#3D3D3D] dark:text-[var(--fg-primary)]">
+            <h2 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-[36px] tracking-[-0.01em] capitalize text-[var(--color-text-title)] dark:text-[var(--fg-primary)]">
               {title}
             </h2>
             {subtitle && (
-              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[#676767] dark:text-[var(--fg-secondary)]">
+              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[var(--color-text-body)] dark:text-[var(--fg-secondary)]">
                 {subtitle}
               </p>
             )}
           </div>
         )}
         {variant === "compact" && (
-          <h2 className="font-poppins font-semibold text-[20px] sm:text-[24px] leading-9 text-center text-[#3D3D3D] dark:text-[var(--fg-primary)] mb-6">
+          <h2 className="font-poppins font-semibold text-[20px] sm:text-[24px] leading-9 text-center text-[var(--color-text-title)] dark:text-[var(--fg-primary)] mb-6">
             {title}
           </h2>
         )}

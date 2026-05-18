@@ -105,7 +105,7 @@ export function Header({ className }: HeaderProps) {
               // Link's aria-label AND the live region below.
               <span
                 aria-hidden="true"
-                className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1.5 rounded-pill bg-[#E02D15] text-white font-poppins font-semibold text-[12px] leading-none inline-flex items-center justify-center"
+                className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1.5 rounded-pill bg-badge-discount text-white font-poppins font-semibold text-[12px] leading-none inline-flex items-center justify-center"
               >
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
