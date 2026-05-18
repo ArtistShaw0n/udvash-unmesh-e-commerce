@@ -76,3 +76,6 @@ export type { ThumbnailButtonProps } from "./ThumbnailButton";
 
 export { BookPreviewModal } from "./BookPreviewModal";
 export type { BookPreviewModalProps } from "./BookPreviewModal";
+
+export { Modal } from "./Modal";
+export type { ModalProps } from "./Modal";

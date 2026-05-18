@@ -8,6 +8,7 @@ import { Button } from "@/components/atoms";
 import {
   EmptyState,
   FormField,
+  Modal,
   OrderStatusTimeline,
 } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
@@ -233,45 +234,49 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
       </div>
 
       {/* Cancel modal */}
-      {cancelOpen && (
-        <Modal title="অর্ডার বাতিল" onClose={() => setCancelOpen(false)}>
-          <p className="text-body-sm text-[var(--fg-secondary)]">
-            অর্ডার বাতিল করার কারণ লিখুন (ঐচ্ছিক):
-          </p>
-          <FormField
-            id="cancel-reason"
-            label="কারণ"
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            placeholder="যেমন: ভুল আইটেম, সময়মত প্রয়োজন নেই..."
-          />
-          <div className="flex gap-3 justify-end">
-            <Button variant="secondary" onClick={() => setCancelOpen(false)}>বাতিল</Button>
-            <Button variant="danger" onClick={handleCancel}>নিশ্চিত করুন</Button>
-          </div>
-        </Modal>
-      )}
+      <Modal
+        open={cancelOpen}
+        title="অর্ডার বাতিল"
+        onClose={() => setCancelOpen(false)}
+      >
+        <p className="text-body-sm text-[var(--fg-secondary)]">
+          অর্ডার বাতিল করার কারণ লিখুন (ঐচ্ছিক):
+        </p>
+        <FormField
+          id="cancel-reason"
+          label="কারণ"
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+          placeholder="যেমন: ভুল আইটেম, সময়মত প্রয়োজন নেই..."
+        />
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setCancelOpen(false)}>বাতিল</Button>
+          <Button variant="danger" onClick={handleCancel}>নিশ্চিত করুন</Button>
+        </div>
+      </Modal>
 
       {/* Return modal */}
-      {returnOpen && (
-        <Modal title="রিটার্ন রিকোয়েস্ট" onClose={() => setReturnOpen(false)}>
-          <p className="text-body-sm text-[var(--fg-secondary)]">
-            ডেলিভারির ৭ দিনের মধ্যে রিটার্ন করা যাবে। কারণ লিখুন:
-          </p>
-          <FormField
-            id="return-reason"
-            label="রিটার্নের কারণ"
-            value={returnReason}
-            onChange={(e) => setReturnReason(e.target.value)}
-            placeholder="যেমন: ভুল বই, পৃষ্ঠা ছেঁড়া..."
-            required
-          />
-          <div className="flex gap-3 justify-end">
-            <Button variant="secondary" onClick={() => setReturnOpen(false)}>বাতিল</Button>
-            <Button variant="primary" onClick={handleReturn}>সাবমিট</Button>
-          </div>
-        </Modal>
-      )}
+      <Modal
+        open={returnOpen}
+        title="রিটার্ন রিকোয়েস্ট"
+        onClose={() => setReturnOpen(false)}
+      >
+        <p className="text-body-sm text-[var(--fg-secondary)]">
+          ডেলিভারির ৭ দিনের মধ্যে রিটার্ন করা যাবে। কারণ লিখুন:
+        </p>
+        <FormField
+          id="return-reason"
+          label="রিটার্নের কারণ"
+          value={returnReason}
+          onChange={(e) => setReturnReason(e.target.value)}
+          placeholder="যেমন: ভুল বই, পৃষ্ঠা ছেঁড়া..."
+          required
+        />
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setReturnOpen(false)}>বাতিল</Button>
+          <Button variant="primary" onClick={handleReturn}>সাবমিট</Button>
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -307,39 +312,3 @@ function Row({ label, value }: { label: string; value: number }) {
   );
 }
 
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="w-8 h-8 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:bg-[var(--bg-surface-muted)]"
-          >
-            <X size={16} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}

@@ -31,6 +31,15 @@ export const SITE_PHONE_BN = "০৯৬৬৬-৭৭৫৫৩৩";
 export const SITE_EMAIL = "support@udvash-unmesh.com";
 export const SITE_ADDRESS_BN = "হাউজ ৭১, রোড ৪, ব্লক সি, বনশ্রী, ঢাকা ১২১৯";
 
+/**
+ * WhatsApp contact number used by the floating WhatsApp FAB. Read from
+ * NEXT_PUBLIC_WHATSAPP_NUMBER so the production deploy can override
+ * without a code change. Default falls back to a placeholder support
+ * line for dev builds.
+ */
+export const SITE_WHATSAPP =
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "+8801798214677";
+
 export const CATEGORIES = [
   { slug: "all", label: "সব" },
   { slug: "academic", label: "একাডেমিক" },

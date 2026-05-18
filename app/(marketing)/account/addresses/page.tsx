@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { AddressCard, EmptyState, FormField } from "@/components/molecules";
+import { AddressCard, EmptyState, FormField, Modal } from "@/components/molecules";
 import { MapPin } from "lucide-react";
 import {
   useAuth,
@@ -122,11 +122,11 @@ export default function AddressesPage() {
       )}
 
       {/* Create / Edit modal */}
-      {creating && (
-        <Modal
-          title={editing ? "ঠিকানা এডিট করুন" : "নতুন ঠিকানা"}
-          onClose={closeForm}
-        >
+      <Modal
+        open={creating}
+        title={editing ? "ঠিকানা এডিট করুন" : "নতুন ঠিকানা"}
+        onClose={closeForm}
+      >
           <FormField
             id="addr-label"
             label="লেবেল"
@@ -170,59 +170,24 @@ export default function AddressesPage() {
             <Button variant="secondary" onClick={closeForm}>বাতিল</Button>
             <Button variant="primary" onClick={save}>সেভ করুন</Button>
           </div>
-        </Modal>
-      )}
+      </Modal>
 
       {/* Delete confirm */}
-      {confirmDelete && (
-        <Modal title="ঠিকানা মুছবেন?" onClose={() => setConfirmDelete(null)}>
-          <p className="text-body-sm text-[var(--fg-secondary)]">
-            <span className="font-semibold text-[var(--fg-primary)]">{confirmDelete.label}</span>{" "}
-            ঠিকানাটি মুছে ফেলা হবে। এটি ফিরিয়ে আনা যাবে না।
-          </p>
-          <div className="flex gap-3 justify-end">
-            <Button variant="secondary" onClick={() => setConfirmDelete(null)}>বাতিল</Button>
-            <Button variant="danger" onClick={doDelete}>মুছে ফেলুন</Button>
-          </div>
-        </Modal>
-      )}
+      <Modal
+        open={!!confirmDelete}
+        title="ঠিকানা মুছবেন?"
+        onClose={() => setConfirmDelete(null)}
+      >
+        <p className="text-body-sm text-[var(--fg-secondary)]">
+          <span className="font-semibold text-[var(--fg-primary)]">{confirmDelete?.label}</span>{" "}
+          ঠিকানাটি মুছে ফেলা হবে। এটি ফিরিয়ে আনা যাবে না।
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setConfirmDelete(null)}>বাতিল</Button>
+          <Button variant="danger" onClick={doDelete}>মুছে ফেলুন</Button>
+        </div>
+      </Modal>
     </div>
   );
 }
 
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-md bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card-hover p-5 sm:p-6 space-y-4"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-h3 text-[var(--fg-primary)]">{title}</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="w-8 h-8 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:bg-[var(--bg-surface-muted)]"
-          >
-            <X size={16} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}

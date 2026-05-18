@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { clsx } from "@/lib/clsx";
+import { SITE_WHATSAPP } from "@/lib/site";
 
-const WHATSAPP_NUMBER = "+8801798214677";
 const PRESETS = [
   { label: "অর্ডার করতে চাই", message: "হ্যালো! আমি একটি অর্ডার করতে চাই।" },
   { label: "Bulk অর্ডার (১০+ বই)", message: "হ্যালো! আমি bulk অর্ডার করতে চাই। ডিটেইলস লাগবে।" },
@@ -13,7 +13,7 @@ const PRESETS = [
 ];
 
 function buildLink(message: string): string {
-  const num = WHATSAPP_NUMBER.replace(/[^\d]/g, "");
+  const num = SITE_WHATSAPP.replace(/[^\d]/g, "");
   return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
 }
 
