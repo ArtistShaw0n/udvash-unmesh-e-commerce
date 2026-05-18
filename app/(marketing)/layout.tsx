@@ -1,6 +1,11 @@
 import { FloatingDesignSystemButton, InstallPrompt, WhatsAppButton } from "@/components/atoms";
 import { Header, Footer, MobileBottomNav } from "@/components/organisms";
 
+// The design-system palette FAB is a developer-only navigation helper —
+// it has no business sitting on top of the WhatsApp button on every
+// public page. Render it only in dev builds.
+const SHOW_DESIGN_SYSTEM_FAB = process.env.NODE_ENV !== "production";
+
 export default function MarketingLayout({
   children,
 }: {
@@ -17,7 +22,7 @@ export default function MarketingLayout({
       <WhatsAppButton />
       <InstallPrompt />
       <MobileBottomNav />
-      <FloatingDesignSystemButton />
+      {SHOW_DESIGN_SYSTEM_FAB && <FloatingDesignSystemButton />}
     </>
   );
 }
