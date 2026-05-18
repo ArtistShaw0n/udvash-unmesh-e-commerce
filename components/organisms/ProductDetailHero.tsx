@@ -8,6 +8,7 @@ import { getStock, type StockSnapshot } from "@/lib/inventory";
 import { BookOpen, RotateCcw, Truck, ShoppingBag, Clock } from "lucide-react";
 import { Badge, Button, CartIconButton } from "@/components/atoms";
 import {
+  BookPreviewModal,
   BreadcrumbPill,
   CountdownInline,
   InfoChip,
@@ -36,6 +37,10 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
   const [qty, setQty] = useState(1);
 
   const [stock, setStock] = useState<StockSnapshot | null>(null);
+
+  // Preview modal — Figma 9:4879. Triggered by the "একটু পড়ুন (প্রিভিউ)"
+  // button below the gallery. Track open analytics on first open.
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Track product view + push to recently-viewed list on mount.
   // Also read inventory snapshot client-side (server doesn't know about adjustments).
@@ -84,7 +89,12 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
               <ThumbnailButton key={i} active={i === activeThumb} onClick={() => setActiveThumb(i)} />
             ))}
           </div>
-          <Button variant="secondary" leftIcon={<BookOpen size={18} />} fullWidth>
+          <Button
+            variant="secondary"
+            leftIcon={<BookOpen size={18} />}
+            fullWidth
+            onClick={() => setPreviewOpen(true)}
+          >
             একটু পড়ুন (প্রিভিউ)
           </Button>
         </div>
@@ -168,6 +178,12 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
         </div>
         </div>
       </div>
+
+      <BookPreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title={`${book.titleBn} — প্রিভিউ`}
+      />
     </section>
   );
 }

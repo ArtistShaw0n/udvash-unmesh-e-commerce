@@ -73,3 +73,6 @@ export type { SpecificationRowProps } from "./SpecificationRow";
 
 export { ThumbnailButton } from "./ThumbnailButton";
 export type { ThumbnailButtonProps } from "./ThumbnailButton";
+
+export { BookPreviewModal } from "./BookPreviewModal";
+export type { BookPreviewModalProps } from "./BookPreviewModal";
