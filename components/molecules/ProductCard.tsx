@@ -164,7 +164,7 @@ export function ProductCard({ book, className }: ProductCardProps) {
                 className={clsx(
                   // Figma target 130×34; allow shrink/grow on narrower cards.
                   "flex-1 min-w-0 max-w-[130px] h-[34px] inline-flex items-center justify-center rounded-xs font-poppins font-normal text-[14px] leading-[21px] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500",
-                  isPreorder ? "bg-warning-500" : "bg-brand-600",
+                  isPreorder ? "bg-warning-700" : "bg-brand-600",
                 )}
               >
                 {isPreorder ? "Pre Order" : "Buy Now"}
@@ -203,8 +203,8 @@ function FreeDeliveryStatus() {
 function PreOrderStatus() {
   return (
     <>
-      <AlarmClock size={14} className="text-warning-500" strokeWidth={2} />
-      <span className="font-poppins font-medium text-[12px] leading-4 text-warning-500">
+      <AlarmClock size={14} className="text-warning-700" strokeWidth={2} />
+      <span className="font-poppins font-medium text-[12px] leading-4 text-warning-700">
         Pre Order
       </span>
     </>
