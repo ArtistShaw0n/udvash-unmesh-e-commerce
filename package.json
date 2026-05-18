@@ -24,6 +24,15 @@
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:reset": "dotenv -e .env.local -- prisma migrate reset"
   },
+  "browserslist": [
+    "chrome >= 100",
+    "firefox >= 100",
+    "safari >= 15",
+    "edge >= 100",
+    "samsung >= 18",
+    "ios >= 15",
+    "not dead"
+  ],
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",

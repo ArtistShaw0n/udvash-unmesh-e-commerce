@@ -13,6 +13,17 @@ import { organizationLd, websiteLd } from "@/lib/structured-data";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
+// Font setup tuned for performance — Lighthouse showed 349KB of font
+// payload in 16 requests dominating LCP. Cutting the unused weights
+// and the redundant `latin` subset on Hind Siliguri brings that down.
+//
+//  - Inter: variable font (one file). Drop nothing.
+//  - Poppins: code uses 400/500/600/700/800. Was missing 800 in the
+//    config (so font-extrabold was falling back). Added.
+//  - Hind Siliguri: Bengali fallback only — Inter / Poppins already
+//    cover Latin glyphs. Restricted to bengali subset + {400, 600, 700},
+//    the only weights Bengali content actually uses on the site.
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -21,15 +32,15 @@ const inter = Inter({
 
 const bengali = Hind_Siliguri({
   variable: "--font-bengali",
-  subsets: ["bengali", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["bengali"],
+  weight: ["400", "600", "700"],
   display: "swap",
 });
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
