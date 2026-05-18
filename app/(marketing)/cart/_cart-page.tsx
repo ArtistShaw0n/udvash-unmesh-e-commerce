@@ -99,7 +99,10 @@ export function CartPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px] lg:items-start min-w-0 [&>*]:min-w-0">
           {/* Cart list — Figma 9:5261: "Shopping Cart (N items)" English title,
               brand-coloured bag icon, Select All + Delete All toolbar. */}
-          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
+          <div
+            data-figma-id="cart.list-card"
+            className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card"
+          >
             <div className="flex items-center gap-3 pb-4 border-b border-[var(--border-default)]">
               <ShoppingBag size={22} className="text-brand-700" />
               <h1 className="text-h3 text-[var(--fg-primary)]">

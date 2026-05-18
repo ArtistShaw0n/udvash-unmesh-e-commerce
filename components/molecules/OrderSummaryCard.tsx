@@ -47,6 +47,7 @@ export function OrderSummaryCard({
 }: OrderSummaryCardProps) {
   return (
     <aside
+      data-figma-id="cart.summary-card"
       className={clsx(
         // Only stick to viewport when the right rail actually exists
         // (lg+ grid). On mobile / tablet the card stacks below the cart

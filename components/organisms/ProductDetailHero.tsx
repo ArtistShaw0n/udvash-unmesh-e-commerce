@@ -72,7 +72,10 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
         {/* Figma 9:4771 — entire hero sits inside one rounded white card
             with shadow. Card padding ~32 on lg, smaller on sm. The inner
             grid is two columns (gallery + info) on lg, stacked below. */}
-        <div className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card p-5 sm:p-6 lg:p-8 grid grid-cols-1 gap-8 lg:gap-12 lg:grid-cols-2 lg:items-start">
+        <div
+          data-figma-id="product-detail.hero-card"
+          className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-card p-5 sm:p-6 lg:p-8 grid grid-cols-1 gap-8 lg:gap-12 lg:grid-cols-2 lg:items-start"
+        >
         {/* Gallery — min-w-0 lets the grid item shrink under the content's intrinsic width */}
         <div className="space-y-4 min-w-0">
           <div className="relative aspect-[4/5] w-full rounded-md overflow-hidden bg-[var(--bg-surface-muted)] border border-[var(--border-default)]">

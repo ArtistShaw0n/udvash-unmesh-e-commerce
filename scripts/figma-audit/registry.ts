@@ -64,6 +64,36 @@ export interface AuditEntry {
   tolerance?: Partial<Record<keyof ExpectedProps, number>>;
 }
 
+/**
+ * Per-route setup script. Runs as an `addInitScript` before navigation,
+ * so it executes in the page context before any app code does. Use for
+ * seeding localStorage / sessionStorage / cookies that the audited UI
+ * needs to render (e.g. cart items so /cart shows the list card vs
+ * the empty state).
+ */
+export interface RouteSetup {
+  route: string;
+  /** JS body executed in page context before navigation. */
+  initScript: string;
+  /** Why this setup exists — shown in the audit report. */
+  reason: string;
+}
+
+export const routeSetups: RouteSetup[] = [
+  {
+    route: "/cart",
+    reason: "/cart renders an empty-state when the cart is empty; seed one item so the cart list card mounts.",
+    initScript: `
+      try {
+        window.localStorage.setItem(
+          'udvash:cart-v1',
+          JSON.stringify([{ slug: 'udvash-physics-parallel-text-hsc-2026', quantity: 1, selected: true }])
+        );
+      } catch (e) {}
+    `,
+  },
+];
+
 export const VIEWPORT = { width: 1920, height: 1080 } as const;
 
 /**
@@ -194,5 +224,101 @@ export const registry: AuditEntry[] = [
     // pixel-exact 44 height, add a `size="header"` variant to Button.
     expected: { h: 44, bg: "#006d77" },
     tolerance: { h: 4 },
+  },
+
+  // ---------- /products (Figma 9:6555) ----------
+  // Every page below shares the same Header + Footer (cream + teal),
+  // which the global selectors `header` / `footer` already audit. Per-
+  // route entries focus on each page's distinctive surfaces.
+  {
+    route: "/products",
+    figmaNodeId: "products.header",
+    selector: "header",
+    description: "/products — site header (cream, shared)",
+    expected: { bg: "#f7f9fb" },
+  },
+  {
+    route: "/products",
+    figmaNodeId: "9:5420",
+    selector: '[data-figma-id="9:5420"]',
+    description: "/products — Category filter section (white band)",
+    // Component is shared with home; Figma uses the same white band on
+    // both routes, so the expectation is the same.
+    expected: { bg: "#ffffff" },
+  },
+  {
+    route: "/products",
+    figmaNodeId: "products.footer",
+    selector: "footer",
+    description: "/products — footer (teal, shared)",
+    expected: { bg: "#006d77" },
+  },
+
+  // ---------- /cart (Figma 9:5261) ----------
+  {
+    route: "/cart",
+    figmaNodeId: "cart.header",
+    selector: "header",
+    description: "/cart — site header (cream, shared)",
+    expected: { bg: "#f7f9fb" },
+  },
+  {
+    route: "/cart",
+    figmaNodeId: "cart.list-card",
+    selector: '[data-figma-id="cart.list-card"]',
+    description: '/cart — "Shopping Cart" card (white, shadow, radius 10)',
+    expected: { bg: "#ffffff", borderRadius: 10 },
+  },
+  // The summary card only mounts when the cart has items; auditing
+  // that requires seeding the cart via cookies/localStorage before
+  // navigation. Deferred until a "warm-up" hook is added to audit.mjs.
+
+  // ---------- /products/[slug] (Figma 9:4771) ----------
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.header",
+    selector: "header",
+    description: "/products/[slug] — site header (cream, shared)",
+    expected: { bg: "#f7f9fb" },
+  },
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.hero-card",
+    selector: '[data-figma-id="product-detail.hero-card"]',
+    description: "/products/[slug] — Hero card (white, rounded, shadow)",
+    // rounded-lg = 20 in our token scale, matches Figma 9:4771 card.
+    expected: { bg: "#ffffff", borderRadius: 20 },
+  },
+
+  // ---------- /login (Figma 9:5082) ----------
+  {
+    route: "/login",
+    figmaNodeId: "login.header",
+    selector: "header",
+    description: "/login — site header (cream, shared)",
+    expected: { bg: "#f7f9fb" },
+  },
+  {
+    route: "/login",
+    figmaNodeId: "auth.card",
+    selector: '[data-figma-id="auth.card"]',
+    description: "/login — Auth card (white, rounded-md, shadow)",
+    expected: { bg: "#ffffff", borderRadius: 10 },
+  },
+
+  // ---------- /signup (Figma 9:5154) ----------
+  {
+    route: "/signup",
+    figmaNodeId: "signup.header",
+    selector: "header",
+    description: "/signup — site header (cream, shared)",
+    expected: { bg: "#f7f9fb" },
+  },
+  {
+    route: "/signup",
+    figmaNodeId: "auth.card",
+    selector: '[data-figma-id="auth.card"]',
+    description: "/signup — Auth card (white, rounded-md, shadow)",
+    expected: { bg: "#ffffff", borderRadius: 10 },
   },
 ];

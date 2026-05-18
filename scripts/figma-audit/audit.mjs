@@ -46,7 +46,12 @@ async function loadRegistry() {
     }
   }
   const mod = require_(join(__dirname, "registry.ts"));
-  return { entries: mod.registry, viewport: mod.VIEWPORT, resolveTolerance: mod.resolveTolerance };
+  return {
+    entries: mod.registry,
+    viewport: mod.VIEWPORT,
+    resolveTolerance: mod.resolveTolerance,
+    routeSetups: mod.routeSetups || [],
+  };
 }
 
 // ---------- Helpers ----------
@@ -100,15 +105,14 @@ async function probe(page, selector) {
 // ---------- Main ----------
 async function main() {
   const baseUrl = process.env.AUDIT_URL || "http://localhost:3000";
-  const { entries, viewport, resolveTolerance } = await loadRegistry();
+  const { entries, viewport, resolveTolerance, routeSetups } = await loadRegistry();
+  const setupByRoute = new Map(routeSetups.map((s) => [s.route, s]));
 
   console.log(`\n[audit] base URL: ${baseUrl}`);
   console.log(`[audit] viewport: ${viewport.width}×${viewport.height}`);
   console.log(`[audit] ${entries.length} registered entries\n`);
 
   const browser = await chromium.launch();
-  const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1 });
-  const page = await ctx.newPage();
 
   // Group entries by route to minimise navigations
   const byRoute = new Map();
@@ -122,19 +126,31 @@ async function main() {
 
   for (const [route, items] of byRoute) {
     const url = baseUrl + route;
+    // Per-route setup (e.g. seed localStorage) runs in page context
+    // BEFORE the navigation, so the app code sees the prepared state.
+    const setup = setupByRoute.get(route);
+    // Each route uses a fresh context so setup from one route doesn't
+    // bleed into the next.
+    const routeCtx = await browser.newContext({ viewport, deviceScaleFactor: 1 });
+    if (setup) {
+      console.log(`[audit] ${route}: applying setup — ${setup.reason}`);
+      await routeCtx.addInitScript({ content: setup.initScript });
+    }
+    const routePage = await routeCtx.newPage();
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 15_000 });
+      await routePage.goto(url, { waitUntil: "networkidle", timeout: 15_000 });
     } catch (e) {
       console.error(`[audit] FAILED to load ${url}: ${e.message}`);
       for (const item of items) {
         rows.push({ ...item, status: "load-fail", actual: null });
         failCount++;
       }
+      await routeCtx.close();
       continue;
     }
 
     for (const item of items) {
-      const actual = await probe(page, item.selector);
+      const actual = await probe(routePage, item.selector);
       if (!actual) {
         rows.push({ ...item, status: "missing", actual: null });
         failCount++;
@@ -155,6 +171,7 @@ async function main() {
       if (status === "fail") failCount++;
       rows.push({ ...item, status, actual, diffs });
     }
+    await routeCtx.close();
   }
 
   await browser.close();
