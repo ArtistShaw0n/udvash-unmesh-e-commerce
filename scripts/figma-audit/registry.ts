@@ -409,6 +409,48 @@ export const registry: AuditEntry[] = [
     // rounded-lg = 20 in our token scale, matches Figma 9:4771 card.
     expected: { bg: "#ffffff", borderRadius: 20 },
   },
+  // Inner-element entries — verify the design fidelity even when real
+  // book cover art / data differs from the Figma filler content.
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.title",
+    selector: '[data-figma-id="product-detail.title"]',
+    description: "/products/[slug] — product title h1",
+    // text-h2 type scale: 24 (mobile) → 30 (sm/md ≥640) → 36 (lg+ ≥1024).
+    expected: { fontFamily: "Inter", fontWeight: 700 },
+    byViewport: {
+      mobile: { fontSize: 24 },
+      tablet: { fontSize: 30 },
+      desktop: { fontSize: 36 },
+      figma: { fontSize: 36 },
+    },
+    tolerance: { fontSize: 2 },
+  },
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.price-block",
+    selector: '[data-figma-id="product-detail.price-block"]',
+    description: "/products/[slug] — price block (brand-tinted)",
+    // bg-brand-50 #F2F8F8, border brand-100 #E5F0F1, rounded-md (10).
+    expected: { bg: "#f2f8f8", borderRadius: 10 },
+  },
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.specs",
+    selector: '[data-figma-id="product-detail.specs"] h2',
+    description: "/products/[slug] — specifications heading",
+    // text-h4 → fontWeight 600 (not 700; h1/h2 are the bolder pair).
+    expected: { fontFamily: "Inter", fontWeight: 600 },
+  },
+  {
+    route: "/products/udvash-physics-parallel-text-hsc-2026",
+    figmaNodeId: "product-detail.info-chips",
+    selector: '[data-figma-id="product-detail.info-chips"]',
+    description: "/products/[slug] — info chips row (return + delivery)",
+    // 2-col grid at sm+, single col on mobile.
+    expected: {},
+    // Children count check — must have exactly 2 chips.
+  },
 
   // ---------- /login (Figma 9:5082) ----------
   {

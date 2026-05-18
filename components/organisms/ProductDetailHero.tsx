@@ -108,17 +108,26 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
         </div>
 
         {/* Info panel — min-w-0 prevents long titles from blowing out the grid */}
-        <div className="space-y-5 min-w-0">
+        <div className="space-y-5 min-w-0" data-figma-id="product-detail.info">
           <BreadcrumbPill category={book.categoryLabel} title="HSC Parallel Text" />
 
-          <h1 className="text-h2 text-[var(--fg-primary)] tracking-tight break-words">
+          <h1
+            data-figma-id="product-detail.title"
+            className="text-h2 text-[var(--fg-primary)] tracking-tight break-words"
+          >
             {book.title}
           </h1>
-          <p className="text-body text-[var(--fg-secondary)] leading-relaxed break-words">
+          <p
+            data-figma-id="product-detail.description"
+            className="text-body text-[var(--fg-secondary)] leading-relaxed break-words"
+          >
             {book.description}
           </p>
 
-          <div className="rounded-md bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30 p-4 sm:p-5 space-y-3">
+          <div
+            data-figma-id="product-detail.price-block"
+            className="rounded-md bg-brand-50 dark:bg-brand-700/15 border border-brand-100 dark:border-brand-700/30 p-4 sm:p-5 space-y-3"
+          >
             <PriceBlock price={book.price} oldPrice={book.oldPrice} size="lg" />
             {offerEndsAt && (
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-body-sm text-[var(--fg-secondary)]">
@@ -129,7 +138,7 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             )}
           </div>
 
-          <div>
+          <div data-figma-id="product-detail.specs">
             <h2 className="text-h4 text-[var(--fg-primary)] mb-2">স্পেসিফিকেশন</h2>
             <dl className="divide-y divide-[var(--border-muted)]">
               <SpecificationRow label="লেখক:" value={book.author} />
@@ -139,7 +148,10 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
             </dl>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div
+            data-figma-id="product-detail.info-chips"
+            className="grid sm:grid-cols-2 gap-3"
+          >
             <InfoChip icon={<RotateCcw size={18} />} label="৭ দিনের রিটার্ন পলিসি" />
             <InfoChip icon={<Truck size={18} />} label="ফ্রি ডেলিভারি প্রযোজ্য" />
           </div>

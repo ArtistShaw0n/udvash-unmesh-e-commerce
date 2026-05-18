@@ -4,12 +4,9 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import {
   ProductDetailHero,
-  ProductGridSection,
-  RecentlyViewedSection,
-  ReviewsSection,
 } from "@/components/organisms";
 import { StructuredData } from "@/components/atoms";
-import { getAllBooks, getBookBySlug, getRelatedBooks } from "@/lib/books";
+import { getAllBooks, getBookBySlug } from "@/lib/books";
 import { productLd, breadcrumbLd } from "@/lib/structured-data";
 
 interface PageProps {
@@ -37,8 +34,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const book = getBookBySlug(slug);
   if (!book) notFound();
 
-  const related = getRelatedBooks(book, 4);
-
   return (
     <>
       <StructuredData
@@ -63,19 +58,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       <ProductDetailHero book={book} offerEndsAt={OFFER_END} />
 
-      <ReviewsSection slug={book.slug} />
-
-      {related.length > 0 && (
-        <ProductGridSection
-          title="সম্পর্কিত বই"
-          subtitle="এই ক্যাটেগরির অন্যান্য বইসমূহ"
-          seeAllHref={`/products?category=${book.category}`}
-          books={related}
-          tone="muted"
-        />
-      )}
-
-      <RecentlyViewedSection excludeSlug={book.slug} />
+      {/* Reviews + Related + Recently Viewed sections lived here
+          previously. Removed to match Figma node 9:4771, which only
+          shows the hero card. Each is a real e-commerce retention
+          surface — bring them back per a future product decision,
+          ideally below an explicit "More on this book" header so the
+          design intent is clear. The components themselves
+          (ReviewsSection, ProductGridSection, RecentlyViewedSection)
+          are still exported from components/organisms and ready to
+          drop back in. */}
     </>
   );
 }
