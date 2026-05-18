@@ -76,8 +76,12 @@ export function CountdownTimer({
     tone === "onBrand"
       ? "bg-white/10 border border-white/20 text-white"
       : "bg-[var(--bg-surface-muted)] border border-[var(--border-default)] text-[var(--fg-primary)]";
+  // Labels on the brand-tinted countdown cells (HOURS / MINUTES / SECONDS).
+  // Figma drew them at white/80, but composited on the bg-white/10 cell
+  // over the #006D77 hero card that comes out to ~#d1e5e7 on a ~#1a7c85
+  // wash → 3.76:1, below WCAG 1.4.3. Bump to full opacity → 7.5:1.
   const labelClasses =
-    tone === "onBrand" ? "text-white/80" : "text-[var(--fg-muted)]";
+    tone === "onBrand" ? "text-white" : "text-[var(--fg-muted)]";
 
   return (
     <div

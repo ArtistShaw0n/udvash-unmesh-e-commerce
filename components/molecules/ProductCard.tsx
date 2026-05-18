@@ -61,10 +61,18 @@ export function ProductCard({ book, className }: ProductCardProps) {
         className,
       )}
     >
-      {/* Image area — aspect 286/256, #F7F9FB, badges sit absolutely at 10/10 */}
+      {/* Image area — aspect 286/256, #F7F9FB, badges sit absolutely
+          at 10/10. The link is decorative — the title <Link> below
+          gives the same target an accessible name via visible text, so
+          this one is `aria-hidden` + `tabIndex=-1` to skip it for
+          screen-reader users (avoids the WCAG 2.5.3 Label-in-Name
+          mismatch axe-core flags when an aria-label has no matching
+          visible text inside). Sighted mouse users can still click
+          the image as usual. */}
       <Link
         href={detailHref}
-        aria-label={book.titleBn}
+        tabIndex={-1}
+        aria-hidden="true"
         className="relative block w-full aspect-[286/256] rounded-xs overflow-hidden bg-[var(--color-bg-page-muted)] dark:bg-[var(--bg-surface-muted)]"
       >
         <BookCoverPlaceholder />

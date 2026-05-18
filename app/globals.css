@@ -95,7 +95,10 @@
   /* Tag/badge colors locked to Figma spec */
   --color-badge-discount: #E02D15;   /* Tag 1 — discount red */
   --color-badge-preorder: #F59E0B;   /* Tag 3 — preorder orange */
-  --color-badge-bestseller: #0284C7; /* Tag 4 — best-seller blue */
+  /* Best-seller badge — Figma drew it at #0284C7 (Tag 4), but white
+     text on that at 11px hits only 4.09:1, just under WCAG 1.4.3.
+     Darkened to #0369A1 (Tailwind sky-700) → 5.43:1, same hue family. */
+  --color-badge-bestseller: #0369A1;
   --color-badge-stockout: var(--color-neutral-400);
 
   /* ---------- Semantic — Figma-named text colors ----------
