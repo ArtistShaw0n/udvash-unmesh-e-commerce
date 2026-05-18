@@ -93,7 +93,7 @@ export function CartItemRow({
               </p>
               {item.unitPrice && (
                 <p className="text-caption text-[var(--fg-muted)] tabular-nums">
-                  {toBengaliNumber(item.unitPrice.toLocaleString("en-US"))}৳/বই
+                  {toBengaliNumber(item.unitPrice.toLocaleString("en-US"))}৳/unit
                 </p>
               )}
             </div>
@@ -123,7 +123,7 @@ export function CartItemRow({
           </p>
           {item.unitPrice && (
             <p className="text-caption text-[var(--fg-muted)]">
-              {toBengaliNumber(item.unitPrice.toLocaleString("en-US"))}৳/বই
+              {toBengaliNumber(item.unitPrice.toLocaleString("en-US"))}৳/unit
             </p>
           )}
         </div>
