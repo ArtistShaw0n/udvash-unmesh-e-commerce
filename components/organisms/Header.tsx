@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
 import { Logo, Button } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
@@ -17,9 +17,19 @@ export interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { itemCount, hydrated: cartHydrated } = useCart();
   const { user, hydrated: authHydrated, logout } = useAuth();
   const toast = useToast();
+
+  // Figma divergence: the home page header sits on a white band (matches
+  // the white hero/filter/flash sections below); every other page header
+  // sits on the cream page bg (matches the body). One Header component
+  // serves both — choose the bg from the current route.
+  const isHome = pathname === "/";
+  const headerBg = isHome
+    ? "bg-[var(--bg-surface)]"  // white
+    : "bg-[var(--bg-page)]";    // cream #F7F9FB
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -70,10 +80,8 @@ export function Header({ className }: HeaderProps) {
   return (
     <header
       className={clsx(
-        // Figma renders the header on the same white band as the hero
-        // wrapper (section §1 in Figma). Keep it explicit so it doesn't
-        // change colour when the global --bg-page token shifts.
-        "sticky top-0 z-40 w-full bg-[var(--bg-surface)] border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
+        "sticky top-0 z-40 w-full border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
+        headerBg,
         className,
       )}
     >
