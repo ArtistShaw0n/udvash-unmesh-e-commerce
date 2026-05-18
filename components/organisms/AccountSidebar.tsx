@@ -28,7 +28,7 @@ export function AccountSidebar({ className }: { className?: string }) {
   }
 
   return (
-    <aside className={clsx("rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 sm:p-3 sticky top-24", className)}>
+    <aside className={clsx("rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-2 sm:p-3 lg:sticky lg:top-24", className)}>
       <nav>
         <ul className="space-y-1">
           {ITEMS.map(({ label, href, icon: Icon, exact }) => {

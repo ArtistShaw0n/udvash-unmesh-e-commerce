@@ -36,7 +36,10 @@ export function WhatsAppButton() {
         />
       )}
 
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] flex flex-col items-end gap-3">
+      {/* On mobile the MobileBottomNav is ~64px tall along the bottom edge,
+          so anchor the WhatsApp FAB above it. Also respect iOS safe-area
+          (notch / home indicator) via env(safe-area-inset-bottom). */}
+      <div className="fixed right-4 sm:right-6 z-[60] flex flex-col items-end gap-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]">
         {open && (
           <div
             role="dialog"

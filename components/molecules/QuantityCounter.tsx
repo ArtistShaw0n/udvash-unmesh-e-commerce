@@ -74,8 +74,12 @@ export function QuantityCounter({
         onClick={() => setNext(current - 1)}
         disabled={current <= min}
         aria-label="Decrease quantity"
+        // Visual size from Figma is 16-20px; click target is extended via
+        // an invisible pseudo-element so hit-area clears the WCAG 2.5.8
+        // AA 24px minimum without growing the rendered button.
         className={clsx(
-          "inline-flex items-center justify-center text-[#676767] hover:text-[var(--fg-primary)] disabled:opacity-40 transition-colors",
+          "relative inline-flex items-center justify-center text-[#676767] hover:text-[var(--fg-primary)] disabled:opacity-40 transition-colors",
+          "before:absolute before:content-[''] before:-inset-3",
           dims.stepBtn,
         )}
       >
@@ -94,8 +98,12 @@ export function QuantityCounter({
         onClick={() => setNext(current + 1)}
         disabled={current >= max}
         aria-label="Increase quantity"
+        // Visual size from Figma is 16-20px; click target is extended via
+        // an invisible pseudo-element so hit-area clears the WCAG 2.5.8
+        // AA 24px minimum without growing the rendered button.
         className={clsx(
-          "inline-flex items-center justify-center text-[#676767] hover:text-[var(--fg-primary)] disabled:opacity-40 transition-colors",
+          "relative inline-flex items-center justify-center text-[#676767] hover:text-[var(--fg-primary)] disabled:opacity-40 transition-colors",
+          "before:absolute before:content-[''] before:-inset-3",
           dims.stepBtn,
         )}
       >

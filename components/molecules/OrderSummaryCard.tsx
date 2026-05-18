@@ -48,7 +48,10 @@ export function OrderSummaryCard({
   return (
     <aside
       className={clsx(
-        "rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-5",
+        // Only stick to viewport when the right rail actually exists
+        // (lg+ grid). On mobile / tablet the card stacks below the cart
+        // list — making it `sticky` there would cover cart items.
+        "rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card lg:sticky lg:top-24 space-y-5",
         className,
       )}
     >

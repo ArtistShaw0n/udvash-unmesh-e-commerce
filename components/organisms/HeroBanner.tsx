@@ -69,9 +69,9 @@ export function HeroBanner({
           - At lg+: overflow-visible so the absolutely positioned book
             can stick out below per Figma.
       */}
-      <div className="relative rounded-lg bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 lg:px-0 lg:py-0 lg:h-[400px] lg:overflow-visible overflow-hidden">
+      <div className="relative rounded-lg bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden">
         {/* Mobile / tablet — stacked single-column layout. */}
-        <div className="lg:hidden space-y-6">
+        <div className="xl:hidden space-y-6">
           <HeroContent
             badge={badge}
             title={title}
@@ -84,7 +84,7 @@ export function HeroBanner({
         {/* Desktop — absolute positioning per Figma. Container is 1296px
             wide with the card spanning its full width; content is offset
             via left padding. */}
-        <div className="hidden lg:block relative h-full w-full">
+        <div className="hidden xl:block relative h-full w-full">
           {/* Text block — left 91, top 33, width 560 per Figma */}
           <div className="absolute top-[33px] left-[91px] w-[560px] flex flex-col gap-10">
             <HeroContent
@@ -114,7 +114,7 @@ export function HeroBanner({
 
         {/* Mobile/tablet dots — bottom-anchored, doesn't use the absolute
             positioning of the desktop layout. */}
-        <div className="lg:hidden mt-4 flex justify-center">
+        <div className="xl:hidden mt-4 flex justify-center">
           <CarouselDots count={3} active={0} tone="onDark" />
         </div>
       </div>

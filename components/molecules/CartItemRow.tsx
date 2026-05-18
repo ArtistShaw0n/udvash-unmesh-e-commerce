@@ -75,9 +75,10 @@ export function CartItemRow({
               type="button"
               onClick={onRemove}
               aria-label="Remove item"
-              className="flex-shrink-0 w-7 h-7 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:text-discount-600 hover:bg-discount-50 dark:hover:bg-discount-900/30 transition-colors"
+              // 36×36 visual + invisible extension to ~44 click target.
+              className="relative flex-shrink-0 w-9 h-9 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:text-discount-600 hover:bg-discount-50 dark:hover:bg-discount-900/30 transition-colors before:absolute before:content-[''] before:-inset-1"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           </div>
           <div className="flex items-end justify-between gap-2 mt-1">

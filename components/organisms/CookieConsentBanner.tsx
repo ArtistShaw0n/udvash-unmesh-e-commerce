@@ -17,10 +17,12 @@ export function CookieConsentBanner() {
 
   return (
     <div
-      role="dialog"
-      aria-label="Cookie consent"
+      // Non-modal banner — keep aria-live for the update, drop the
+      // redundant dialog role (no focus trap, doesn't need to be a dialog).
       aria-live="polite"
-      className="fixed bottom-0 inset-x-0 z-[55] p-3 sm:p-4 pointer-events-none"
+      // On mobile, sit above the MobileBottomNav (~64px) + iOS home
+      // indicator. On sm+, lift off the bottom edge with safe-area pad.
+      className="fixed inset-x-0 z-[55] p-3 sm:p-4 pointer-events-none bottom-[calc(4rem+env(safe-area-inset-bottom))] sm:bottom-[env(safe-area-inset-bottom)]"
     >
       <div className="container-site pointer-events-auto">
         <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-card-hover p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">

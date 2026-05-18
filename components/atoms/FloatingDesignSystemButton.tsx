@@ -11,11 +11,13 @@ export function FloatingDesignSystemButton() {
       href="/design-system"
       aria-label="Open Design System"
       title="Design System"
-      // Offset above the WhatsApp button (which lives at bottom-4/right-4
-      // with a 56px footprint). Stacking them at the same corner makes
-      // the chat icon visually disappear behind the palette icon.
+      // Stack above the WhatsApp button. On mobile WA sits 5rem above the
+      // safe-area; this FAB needs to clear another 56px + 16px gap above
+      // that. On sm+ WA sits 1.5rem above safe-area; this FAB needs to
+      // clear ~88px (FAB height + gap) above that.
       className="
-        fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50
+        fixed right-4 sm:right-6 z-50
+        bottom-[calc(9rem+env(safe-area-inset-bottom))] sm:bottom-[calc(7rem+env(safe-area-inset-bottom))]
         inline-flex items-center justify-center
         w-12 h-12 sm:w-14 sm:h-14
         rounded-full

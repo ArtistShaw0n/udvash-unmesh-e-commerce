@@ -444,7 +444,7 @@ export function CheckoutFlow() {
           </div>
 
           {/* Summary */}
-          <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card sticky top-24 space-y-4">
+          <aside className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card lg:sticky lg:top-24 space-y-4">
             <h3 className="text-h3 text-[var(--fg-primary)]">Order Summary</h3>
             <dl className="space-y-2">
               <SummaryRow
