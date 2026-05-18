@@ -30,7 +30,11 @@ export default function HomePage() {
         badge="নতুন এডিশন ২০২৬"
         title="HSC প্যারালাল টেক্সট এখন আরও গোছানো"
         description="পদার্থবিজ্ঞান, রসায়ন, গণিত ও জীববিজ্ঞানের সম্পূর্ণ প্রস্তুতি এক সেটেই — প্রি-অর্ডার করলেই পাচ্ছেন বিশেষ ছাড় এবং ফ্রি ডেলিভারি।"
-        primaryCta={{ label: "Buy Now", href: "/products" }}
+        // CTA labels lifted verbatim from Figma node 9:5401. The earlier
+        // "Add to Cart → Buy Now everywhere" pass swapped this primary
+        // CTA's content too, but the Figma source for the hero
+        // specifically keeps the Bengali phrasing; restoring it.
+        primaryCta={{ label: "কার্ট-এ যোগ করুন", href: "/products" }}
         secondaryCta={{ label: "বিস্তারিত দেখুন", href: "/products" }}
         imageSrc="/hero/book.png"
         imageAlt="ষষ্ঠ শ্রেণি প্যারালাল টেক্সট — বাংলা ১ম পত্র"
