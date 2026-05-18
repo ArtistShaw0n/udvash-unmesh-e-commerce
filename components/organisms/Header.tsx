@@ -23,19 +23,33 @@ export function Header({ className }: HeaderProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  // Close menu on outside-click / Escape
+  // Close menu on outside-click / Escape. On Escape, restore focus to
+  // the trigger (so keyboard users land back where they started).
   useEffect(() => {
     function onPointer(e: MouseEvent) {
       if (!menuRef.current) return;
       if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        triggerRef.current?.focus();
+      }
     }
     if (menuOpen) {
       document.addEventListener("mousedown", onPointer);
       document.addEventListener("keydown", onKey);
+      // Focus the first interactive item in the menu so screen-reader
+      // users can navigate into it immediately after opening.
+      const firstItem = menuRef.current?.querySelector<HTMLElement>(
+        '[role="menuitem"], a, button',
+      );
+      // Skip the trigger itself if it happens to be inside menuRef
+      if (firstItem && firstItem !== triggerRef.current) {
+        firstItem.focus();
+      }
     }
     return () => {
       document.removeEventListener("mousedown", onPointer);
@@ -87,11 +101,27 @@ export function Header({ className }: HeaderProps) {
             {showBadge && (
               // Figma badge — bg #E02D15 (Tag 1), pill shape, Poppins SemiBold
               // 12, white. Anchored to the icon's top-right corner.
-              <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1.5 rounded-pill bg-[#E02D15] text-white font-poppins font-semibold text-[12px] leading-none inline-flex items-center justify-center">
+              // aria-hidden because the count is already announced via the
+              // Link's aria-label AND the live region below.
+              <span
+                aria-hidden="true"
+                className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1.5 rounded-pill bg-[#E02D15] text-white font-poppins font-semibold text-[12px] leading-none inline-flex items-center justify-center"
+              >
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
           </Link>
+
+          {/* Visually-hidden live region that announces cart count changes
+              to screen readers. Updates polite-ly so it doesn't interrupt
+              other ARIA announcements. */}
+          {cartHydrated && (
+            <span aria-live="polite" aria-atomic="true" className="sr-only">
+              {itemCount === 0
+                ? "Cart is empty"
+                : `${itemCount} ${itemCount === 1 ? "item" : "items"} in cart`}
+            </span>
+          )}
 
           {!authHydrated ? (
             // Stable placeholder so SSR and CSR widths match (responsive width).
@@ -99,6 +129,7 @@ export function Header({ className }: HeaderProps) {
           ) : isLoggedIn ? (
             <div ref={menuRef} className="relative">
               <button
+                ref={triggerRef}
                 type="button"
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"

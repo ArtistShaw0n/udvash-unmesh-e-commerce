@@ -3,18 +3,29 @@ import { clsx } from "@/lib/clsx";
 export interface ThumbnailButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
+  /**
+   * 1-based index used to compose an accessible name when no explicit
+   * `aria-label` is provided. Required for icon-only buttons to satisfy
+   * WCAG 4.1.2.
+   */
+  index?: number;
 }
 
 export function ThumbnailButton({
   active = false,
+  index,
   className,
   type = "button",
+  "aria-label": ariaLabel,
   ...rest
 }: ThumbnailButtonProps) {
+  const computedLabel =
+    ariaLabel ?? (index !== undefined ? `View image ${index}` : "View image");
   return (
     <button
       type={type}
       aria-pressed={active}
+      aria-label={computedLabel}
       className={clsx(
         "relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-[var(--bg-surface-muted)] transition-all flex-shrink-0",
         active

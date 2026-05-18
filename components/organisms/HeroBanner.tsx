@@ -70,8 +70,11 @@ export function HeroBanner({
             can stick out below per Figma.
       */}
       <div className="relative rounded-lg bg-[#006D77] text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden">
-        {/* Mobile / tablet — stacked single-column layout. */}
-        <div className="xl:hidden space-y-6">
+        {/* Single content tree — typography + layout switches via the
+            responsive utility chain inside HeroContent + positioning
+            wrapper. Rendering it once keeps a single `<h1>` in the DOM
+            so screen readers don't encounter the title twice. */}
+        <div className="space-y-6 xl:space-y-0 xl:absolute xl:top-[33px] xl:left-[91px] xl:w-[560px] xl:flex xl:flex-col xl:gap-10">
           <HeroContent
             badge={badge}
             title={title}
@@ -81,40 +84,16 @@ export function HeroBanner({
           />
         </div>
 
-        {/* Desktop — absolute positioning per Figma. Container is 1296px
-            wide with the card spanning its full width; content is offset
-            via left padding. */}
-        <div className="hidden xl:block relative h-full w-full">
-          {/* Text block — left 91, top 33, width 560 per Figma */}
-          <div className="absolute top-[33px] left-[91px] w-[560px] flex flex-col gap-10">
-            <HeroContent
-              badge={badge}
-              title={title}
-              description={description}
-              primaryCta={primaryCta}
-              secondaryCta={secondaryCta}
-              variant="desktop"
-            />
-          </div>
-
-          {/* Book image — top 56, size 358×415. Figma anchors at left 838
-              within a 1296-wide card, leaving 100px from the right edge.
-              Anchoring via `right` instead of `left` keeps that 100px
-              consistent at any container width (e.g. 1216 at 1440vw vs
-              1296 in the Figma frame). */}
-          <div className="absolute top-[56px] right-[100px] w-[358px] h-[415px]">
-            <HeroBookIllustration imageSrc={imageSrc} imageAlt={imageAlt} />
-          </div>
-
-          {/* Carousel dots — Figma ml-616 mt-378. Horizontally centered. */}
-          <div className="absolute bottom-[14px] left-1/2 -translate-x-1/2">
-            <CarouselDots count={3} active={0} tone="onDark" />
-          </div>
+        {/* Book image — only at xl+ where the Figma absolute layout
+            kicks in. Below xl the stacked card hides the book to keep
+            the title legible without competing imagery. */}
+        <div className="hidden xl:block absolute top-[56px] right-[100px] w-[358px] h-[415px]">
+          <HeroBookIllustration imageSrc={imageSrc} imageAlt={imageAlt} />
         </div>
 
-        {/* Mobile/tablet dots — bottom-anchored, doesn't use the absolute
-            positioning of the desktop layout. */}
-        <div className="xl:hidden mt-4 flex justify-center">
+        {/* Carousel dots — anchored to the bottom of the card on xl+,
+            below the content stack at smaller viewports. */}
+        <div className="mt-4 flex justify-center xl:mt-0 xl:absolute xl:bottom-[14px] xl:left-1/2 xl:-translate-x-1/2">
           <CarouselDots count={3} active={0} tone="onDark" />
         </div>
       </div>
@@ -132,14 +111,12 @@ function HeroContent({
   description,
   primaryCta,
   secondaryCta,
-  variant = "mobile",
 }: {
   badge?: string;
   title: string;
   description: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  variant?: "mobile" | "desktop";
 }) {
   return (
     <>
@@ -150,24 +127,12 @@ function HeroContent({
           </span>
         )}
         <div className="flex flex-col gap-5">
-          <h1
-            className={clsx(
-              "font-inter font-extrabold text-white tracking-[-1.0992px]",
-              variant === "desktop"
-                ? "text-[40px] leading-[50px]"
-                : "text-[28px] leading-[36px] sm:text-[32px] sm:leading-[40px]",
-            )}
-          >
+          {/* Typography ramps through the breakpoint chain so a single
+              <h1> serves every viewport — no duplicate heading in the DOM. */}
+          <h1 className="font-inter font-extrabold text-white tracking-[-1.0992px] text-[28px] leading-[36px] sm:text-[32px] sm:leading-[40px] xl:text-[40px] xl:leading-[50px]">
             {title}
           </h1>
-          <p
-            className={clsx(
-              "font-poppins font-normal text-white tracking-[-0.4395px]",
-              variant === "desktop"
-                ? "text-[18px] leading-[28px] w-[545px]"
-                : "text-[16px] leading-[24px] max-w-xl",
-            )}
-          >
+          <p className="font-poppins font-normal text-white tracking-[-0.4395px] text-[16px] leading-[24px] max-w-xl xl:text-[18px] xl:leading-[28px] xl:max-w-none xl:w-[545px]">
             {description}
           </p>
         </div>

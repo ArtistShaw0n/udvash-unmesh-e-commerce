@@ -84,9 +84,14 @@ export function ProductDetailHero({ book, offerEndsAt, className }: ProductDetai
               </Badge>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3" role="tablist" aria-label="Book image thumbnails">
             {[0, 1, 2].map((i) => (
-              <ThumbnailButton key={i} active={i === activeThumb} onClick={() => setActiveThumb(i)} />
+              <ThumbnailButton
+                key={i}
+                index={i + 1}
+                active={i === activeThumb}
+                onClick={() => setActiveThumb(i)}
+              />
             ))}
           </div>
           <Button
