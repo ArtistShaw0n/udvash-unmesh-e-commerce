@@ -130,7 +130,8 @@ export function SearchAutocomplete({
           e.preventDefault();
           submit(q);
         }}
-        className="relative flex items-center w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500"
+        // Figma: bg white, border 1px #E5F0F1 (= brand-100), radius 10.
+        className="relative flex items-center w-full rounded-md border border-brand-100 bg-white dark:bg-[var(--bg-surface)] dark:border-[var(--border-default)] focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500 transition-colors"
       >
         <span className="pl-4 text-[var(--fg-muted)] flex items-center pointer-events-none">
           <Search size={18} />

@@ -24,6 +24,21 @@ function compute(target: Date): TimeLeft {
   };
 }
 
+/**
+ * Segmented countdown timer for the Flash Sale banner.
+ *
+ * Cell spec from Figma node 9:5585 (Flash Sale right-side container):
+ *   Cell        89.328 × 94, gap 16, border-radius 16
+ *   onBrand     bg rgba(255,255,255,0.10), border 1px rgba(255,255,255,0.20)
+ *   default     bg var(--bg-surface-muted), text inherits foreground
+ *   Number      Poppins Bold 36 / 40 line-height, tracking 0.3691, center
+ *   Label       Poppins Regular 12 / 16, white 80% (or muted on light bg)
+ *   Inner pad   pt 17, pb 1, px 21, gap 4 between number + label
+ *
+ * Inline variants (no boxed cells) are intentionally not handled here —
+ * see CountdownInline for the chip-format alternative used on product
+ * pages.
+ */
 export function CountdownTimer({
   targetDate,
   tone = "onBrand",
@@ -57,32 +72,33 @@ export function CountdownTimer({
           { value: left?.m, label: "Min" },
         ];
 
-  const segClasses =
+  const cellClasses =
     tone === "onBrand"
-      ? "bg-white/15 text-white"
-      : "bg-[var(--bg-surface-muted)] text-[var(--fg-primary)]";
+      ? "bg-white/10 border border-white/20 text-white"
+      : "bg-[var(--bg-surface-muted)] border border-[var(--border-default)] text-[var(--fg-primary)]";
   const labelClasses =
-    tone === "onBrand" ? "text-white/70" : "text-[var(--fg-muted)]";
+    tone === "onBrand" ? "text-white/80" : "text-[var(--fg-muted)]";
 
   return (
     <div
-      className={clsx("flex items-stretch gap-2 sm:gap-3", className)}
+      className={clsx("flex items-stretch gap-3 sm:gap-4", className)}
       aria-label="Countdown"
     >
       {segments.map((seg, i) => (
         <div
           key={i}
           className={clsx(
-            "flex flex-col items-center justify-center rounded-md min-w-[56px] sm:min-w-[64px] px-3 py-2",
-            segClasses,
+            // Figma: 89.328 × 94, radius 16, pt-17 px-21 pb-1, gap-4 inner
+            "flex flex-col items-center w-[72px] h-[80px] sm:w-[89px] sm:h-[94px] rounded-2xl pt-3 sm:pt-[17px] px-3 sm:px-[21px] pb-px gap-1",
+            cellClasses,
           )}
         >
-          <span className="text-h3 font-bold leading-none tabular-nums">
+          <span className="font-poppins font-bold text-[28px] sm:text-[36px] leading-[40px] tabular-nums tracking-[0.0103em] text-center w-full">
             {seg.value !== undefined ? String(seg.value).padStart(2, "0") : "--"}
           </span>
           <span
             className={clsx(
-              "text-caption font-semibold uppercase tracking-wider mt-1",
+              "font-poppins font-normal text-[12px] leading-4 text-center w-full",
               labelClasses,
             )}
           >

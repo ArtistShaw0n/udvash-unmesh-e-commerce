@@ -56,7 +56,10 @@ export function Header({ className }: HeaderProps) {
   return (
     <header
       className={clsx(
-        "sticky top-0 z-40 w-full bg-[var(--bg-surface)] border-b border-[var(--border-default)]",
+        // Figma "Background" #F7F9FB — the cream/page-muted color, not pure
+        // white. Subtle bottom border defines the chrome edge against the
+        // hero card below.
+        "sticky top-0 z-40 w-full bg-[#F7F9FB] dark:bg-[var(--bg-surface)] border-b border-[#E8EEF4] dark:border-[var(--border-default)]",
         className,
       )}
     >
@@ -81,7 +84,9 @@ export function Header({ className }: HeaderProps) {
             <ShoppingBag size={20} className="text-[var(--fg-primary)] sm:hidden" />
             <ShoppingBag size={22} className="text-[var(--fg-primary)] hidden sm:block" />
             {showBadge && (
-              <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 rounded-full bg-discount-600 text-white text-caption font-bold inline-flex items-center justify-center">
+              // Figma badge — bg #E02D15 (Tag 1), pill shape, Poppins SemiBold
+              // 12, white. Anchored to the icon's top-right corner.
+              <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1.5 rounded-pill bg-[#E02D15] text-white font-poppins font-semibold text-[12px] leading-none inline-flex items-center justify-center">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
