@@ -30,31 +30,73 @@ export function Header({ className }: HeaderProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  // Close menu on outside-click / Escape. On Escape, restore focus to
-  // the trigger (so keyboard users land back where they started).
+  // Outside-click closes the menu; keyboard navigation inside the menu
+  // matches the standard WAI-ARIA menu pattern:
+  //   - Escape: close + return focus to the trigger
+  //   - ArrowDown / ArrowUp: move focus through menuitems (wrapping)
+  //   - Home / End: jump to first / last menuitem
+  //   - Tab: closes the menu (treated like a focus-out)
+  // The menuitems themselves stay native <a>/<button> so Enter/Space
+  // activate them via the default browser behaviour.
   useEffect(() => {
     function onPointer(e: MouseEvent) {
       if (!menuRef.current) return;
       if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     }
+    function getItems(): HTMLElement[] {
+      if (!menuRef.current) return [];
+      return Array.from(
+        menuRef.current.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+      );
+    }
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setMenuOpen(false);
         triggerRef.current?.focus();
+        return;
+      }
+      // Only intercept arrow keys when focus is inside the menu — don't
+      // hijack page-level arrow scrolling otherwise.
+      if (!menuRef.current?.contains(document.activeElement)) return;
+      const items = getItems();
+      if (items.length === 0) return;
+      const idx = items.findIndex((el) => el === document.activeElement);
+      switch (e.key) {
+        case "ArrowDown": {
+          e.preventDefault();
+          const next = items[(idx + 1) % items.length];
+          next?.focus();
+          break;
+        }
+        case "ArrowUp": {
+          e.preventDefault();
+          const prev = items[(idx - 1 + items.length) % items.length];
+          prev?.focus();
+          break;
+        }
+        case "Home": {
+          e.preventDefault();
+          items[0]?.focus();
+          break;
+        }
+        case "End": {
+          e.preventDefault();
+          items[items.length - 1]?.focus();
+          break;
+        }
+        case "Tab":
+          // Tab leaves the menu — close so focus doesn't end up stuck
+          // inside a hidden dropdown.
+          setMenuOpen(false);
+          break;
       }
     }
     if (menuOpen) {
       document.addEventListener("mousedown", onPointer);
       document.addEventListener("keydown", onKey);
-      // Focus the first interactive item in the menu so screen-reader
-      // users can navigate into it immediately after opening.
-      const firstItem = menuRef.current?.querySelector<HTMLElement>(
-        '[role="menuitem"], a, button',
-      );
-      // Skip the trigger itself if it happens to be inside menuRef
-      if (firstItem && firstItem !== triggerRef.current) {
-        firstItem.focus();
-      }
+      // Focus the first menuitem so SR users navigate into it immediately.
+      const items = getItems();
+      items[0]?.focus();
     }
     return () => {
       document.removeEventListener("mousedown", onPointer);
@@ -180,6 +222,7 @@ export function Header({ className }: HeaderProps) {
                   <div className="my-1 border-t border-[var(--border-muted)]" />
                   <button
                     type="button"
+                    role="menuitem"
                     onClick={handleLogout}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-body-sm font-semibold text-discount-600 hover:bg-discount-50 dark:hover:bg-discount-900/20 transition-colors"
                   >

@@ -50,6 +50,11 @@ export function CheckoutFlow() {
     city: "",
     zip: "",
   });
+  // Per-field errors so each invalid input gets its own inline message
+  // + red outline, per WCAG 3.3.1 (Error Identification) / 3.3.3
+  // (Error Suggestion). Cleared on edit so the user sees correction
+  // feedback as they type.
+  const [addrErrors, setAddrErrors] = useState<Partial<Record<keyof AddressInput, string>>>({});
   const [payment, setPayment] = useState<PaymentMethodId>("bkash");
   const [promo, setPromo] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -158,10 +163,19 @@ export function CheckoutFlow() {
   const selectedAddress = addresses.find((a) => a.id === addressId);
 
   async function handleSaveNewAddress() {
-    if (!newAddr.recipientName || !newAddr.phone || !newAddr.line1 || !newAddr.city) {
-      toast.error("সব ঘর পূরণ করুন");
+    const errs: Partial<Record<keyof AddressInput, string>> = {};
+    if (!newAddr.recipientName.trim()) errs.recipientName = "প্রাপকের নাম দিন";
+    if (!newAddr.phone.trim()) errs.phone = "ফোন নাম্বার দিন";
+    else if (!/^[\d\s+\-]{10,}$/.test(newAddr.phone.trim()))
+      errs.phone = "সঠিক ফোন নাম্বার দিন";
+    if (!newAddr.line1.trim()) errs.line1 = "ঠিকানা দিন";
+    if (!newAddr.city.trim()) errs.city = "শহর দিন";
+    if (Object.keys(errs).length > 0) {
+      setAddrErrors(errs);
+      toast.error("সব আবশ্যক ঘর পূরণ করুন");
       return;
     }
+    setAddrErrors({});
     const created = await addAddress(newAddr, addresses.length === 0);
     if (!created) {
       toast.error("ঠিকানা যোগ করা যায়নি");
@@ -171,6 +185,16 @@ export function CheckoutFlow() {
     setAdding(false);
     setNewAddr({ label: "বাসা", recipientName: "", phone: "", line1: "", city: "", zip: "" });
     toast.success("ঠিকানা যোগ হয়েছে");
+  }
+
+  /**
+   * Field-edit helper. Updates the field value AND clears any error on
+   * that field so the user sees the red outline lift as soon as they
+   * type a valid value.
+   */
+  function setAddrField<K extends keyof AddressInput>(key: K, value: AddressInput[K]) {
+    setNewAddr((prev) => ({ ...prev, [key]: value }));
+    if (addrErrors[key]) setAddrErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
   function nextStep() {
@@ -261,42 +285,59 @@ export function CheckoutFlow() {
                       id="addr-label"
                       label="লেবেল (বাসা / অফিস)"
                       value={newAddr.label}
-                      onChange={(e) => setNewAddr({ ...newAddr, label: e.target.value })}
+                      onChange={(e) => setAddrField("label", e.target.value)}
                     />
                     <FormField
                       id="addr-name"
                       label="প্রাপকের নাম"
                       placeholder="আপনার নাম"
                       value={newAddr.recipientName}
-                      onChange={(e) => setNewAddr({ ...newAddr, recipientName: e.target.value })}
+                      onChange={(e) => setAddrField("recipientName", e.target.value)}
+                      error={addrErrors.recipientName}
+                      required
+                      aria-required="true"
                     />
                     <FormField
                       id="addr-phone"
                       label="ফোন"
                       placeholder="০১XXXXXXXXX"
                       value={newAddr.phone}
-                      onChange={(e) => setNewAddr({ ...newAddr, phone: e.target.value })}
+                      onChange={(e) => setAddrField("phone", e.target.value)}
+                      error={addrErrors.phone}
+                      required
+                      aria-required="true"
+                      type="tel"
+                      autoComplete="tel"
                     />
                     <FormField
                       id="addr-line"
                       label="ঠিকানা"
                       placeholder="বাড়ি, রোড, এলাকা"
                       value={newAddr.line1}
-                      onChange={(e) => setNewAddr({ ...newAddr, line1: e.target.value })}
+                      onChange={(e) => setAddrField("line1", e.target.value)}
+                      error={addrErrors.line1}
+                      required
+                      aria-required="true"
+                      autoComplete="street-address"
                     />
                     <FormField
                       id="addr-city"
                       label="শহর"
                       placeholder="ঢাকা"
                       value={newAddr.city}
-                      onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })}
+                      onChange={(e) => setAddrField("city", e.target.value)}
+                      error={addrErrors.city}
+                      required
+                      aria-required="true"
+                      autoComplete="address-level2"
                     />
                     <FormField
                       id="addr-zip"
                       label="পোস্ট কোড"
                       placeholder="১২১৯"
                       value={newAddr.zip ?? ""}
-                      onChange={(e) => setNewAddr({ ...newAddr, zip: e.target.value })}
+                      onChange={(e) => setAddrField("zip", e.target.value)}
+                      autoComplete="postal-code"
                     />
                     <div className="flex gap-3">
                       <Button variant="primary" onClick={handleSaveNewAddress}>সেভ করুন</Button>

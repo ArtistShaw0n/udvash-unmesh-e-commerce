@@ -27,6 +27,7 @@ export default function AddressesPage() {
   const [editing, setEditing] = useState<UserAddress | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<AddressInput>(EMPTY);
+  const [errors, setErrors] = useState<Partial<Record<keyof AddressInput, string>>>({});
   const [confirmDelete, setConfirmDelete] = useState<UserAddress | null>(null);
 
   if (!user) return null;
@@ -34,6 +35,7 @@ export default function AddressesPage() {
   function openCreate() {
     setEditing(null);
     setForm(EMPTY);
+    setErrors({});
     setCreating(true);
   }
 
@@ -48,6 +50,7 @@ export default function AddressesPage() {
       city: a.city,
       zip: a.zip,
     });
+    setErrors({});
     setCreating(true);
   }
 
@@ -55,13 +58,30 @@ export default function AddressesPage() {
     setCreating(false);
     setEditing(null);
     setForm(EMPTY);
+    setErrors({});
+  }
+
+  // Update one field + clear its error so the red outline lifts as
+  // the user types a valid value (WCAG 3.3.1 / 3.3.3 — error suggestion).
+  function setField<K extends keyof AddressInput>(key: K, value: AddressInput[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
   async function save() {
-    if (!form.recipientName.trim() || !form.phone.trim() || !form.line1.trim() || !form.city.trim()) {
-      toast.error("সব ঘর পূরণ করুন");
+    const errs: Partial<Record<keyof AddressInput, string>> = {};
+    if (!form.recipientName.trim()) errs.recipientName = "প্রাপকের নাম দিন";
+    if (!form.phone.trim()) errs.phone = "ফোন নাম্বার দিন";
+    else if (!/^[\d\s+\-]{10,}$/.test(form.phone.trim()))
+      errs.phone = "সঠিক ফোন নাম্বার দিন";
+    if (!form.line1.trim()) errs.line1 = "ঠিকানা দিন";
+    if (!form.city.trim()) errs.city = "শহর দিন";
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      toast.error("সব আবশ্যক ঘর পূরণ করুন");
       return;
     }
+    setErrors({});
     if (editing) {
       await updateAddress(editing.id, form);
       toast.success("ঠিকানা আপডেট হয়েছে");
@@ -131,40 +151,58 @@ export default function AddressesPage() {
             id="addr-label"
             label="লেবেল"
             value={form.label}
-            onChange={(e) => setForm({ ...form, label: e.target.value })}
+            onChange={(e) => setField("label", e.target.value)}
             placeholder="বাসা / অফিস"
           />
           <FormField
             id="addr-name"
             label="প্রাপকের নাম"
             value={form.recipientName}
-            onChange={(e) => setForm({ ...form, recipientName: e.target.value })}
+            onChange={(e) => setField("recipientName", e.target.value)}
+            error={errors.recipientName}
+            required
+            aria-required="true"
+            autoComplete="name"
           />
           <FormField
             id="addr-phone"
             label="ফোন"
             value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            onChange={(e) => setField("phone", e.target.value)}
             placeholder="০১XXXXXXXXX"
+            error={errors.phone}
+            required
+            aria-required="true"
+            type="tel"
+            autoComplete="tel"
           />
           <FormField
             id="addr-line1"
             label="ঠিকানা"
             value={form.line1}
-            onChange={(e) => setForm({ ...form, line1: e.target.value })}
+            onChange={(e) => setField("line1", e.target.value)}
             placeholder="বাড়ি, রোড, এলাকা"
+            error={errors.line1}
+            required
+            aria-required="true"
+            autoComplete="street-address"
           />
           <FormField
             id="addr-city"
             label="শহর"
             value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
+            onChange={(e) => setField("city", e.target.value)}
+            error={errors.city}
+            required
+            aria-required="true"
+            autoComplete="address-level2"
           />
           <FormField
             id="addr-zip"
             label="পোস্ট কোড"
             value={form.zip ?? ""}
-            onChange={(e) => setForm({ ...form, zip: e.target.value })}
+            onChange={(e) => setField("zip", e.target.value)}
+            autoComplete="postal-code"
           />
           <div className="flex gap-3 justify-end">
             <Button variant="secondary" onClick={closeForm}>বাতিল</Button>
