@@ -49,6 +49,16 @@ export interface ExpectedProps {
   borderRadius?: number;
 }
 
+/** Named viewports the runner tests at. */
+export type ViewportName = "mobile" | "tablet" | "desktop" | "figma";
+
+export const VIEWPORTS: Record<ViewportName, { width: number; height: number }> = {
+  mobile: { width: 375, height: 812 },   // iPhone SE / 12 mini
+  tablet: { width: 768, height: 1024 },  // iPad portrait
+  desktop: { width: 1440, height: 900 }, // common laptop
+  figma: { width: 1920, height: 1080 },  // Figma reference frame
+};
+
 export interface AuditEntry {
   /** Route to navigate to (e.g. "/"). */
   route: string;
@@ -58,8 +68,22 @@ export interface AuditEntry {
   selector: string;
   /** Human-readable description, used in the diff report. */
   description: string;
-  /** Properties we expect to match the live render. */
+  /**
+   * Default expectation (applies at every viewport unless overridden
+   * by `byViewport`).
+   */
   expected: ExpectedProps;
+  /**
+   * Per-viewport overrides. Useful when an element legitimately changes
+   * shape across breakpoints (e.g. card padding shrinks on mobile, hero
+   * book is hidden below xl). Each entry is merged on top of `expected`.
+   */
+  byViewport?: Partial<Record<ViewportName, ExpectedProps>>;
+  /**
+   * Skip this entry on these viewports. Use when the element legitimately
+   * isn't rendered (e.g. desktop-only search bar at mobile).
+   */
+  skipOn?: ViewportName[];
   /** Per-property tolerances (px / ratio); defaults to 0 for exact match. */
   tolerance?: Partial<Record<keyof ExpectedProps, number>>;
 }
@@ -94,7 +118,8 @@ export const routeSetups: RouteSetup[] = [
   },
 ];
 
-export const VIEWPORT = { width: 1920, height: 1080 } as const;
+/** Legacy single-viewport export — kept as an alias for `figma`. */
+export const VIEWPORT = VIEWPORTS.figma;
 
 /**
  * Default tolerances — sub-pixel rounding and 1px border noise are not bugs.
@@ -125,6 +150,11 @@ export const registry: AuditEntry[] = [
     selector: "header",
     description: "Home — site header band",
     expected: { bg: "#f7f9fb", h: 80 },
+    // On mobile, the search bar drops to a second row inside the
+    // header, so the header band is taller (chrome row h-14 = 56 + the
+    // mobile search row + padding ≈ 117). This is intentional, not a
+    // regression.
+    byViewport: { mobile: { h: 117 } },
   },
   {
     route: "/",
@@ -194,17 +224,30 @@ export const registry: AuditEntry[] = [
     selector: '[data-figma-id="header.logo"] img',
     description: "Home — Header logo image",
     expected: { w: 180, h: 36 },
+    // Responsive scale: `!h-7 sm:!h-8 md:!h-9` → 28/32/36px.
+    // Image aspect is preserved (w:h ≈ 5:1). Tablet @ 768 hits Tailwind
+    // md breakpoint exactly so it gets the desktop size; only the
+    // mobile (<sm, 640) viewport actually scales down.
+    byViewport: {
+      mobile: { w: 140, h: 28 },
+    },
   },
   {
     route: "/",
     figmaNodeId: "header.search",
     selector: '[data-figma-id="header.search"]',
     description: "Home — Header search bar wrapper (width slot)",
-    // Width-only check on the wrapper; the actual pill style lives in
-    // the inner <form> targeted below.
+    // The desktop search bar is hidden below sm (mobile shows it in a
+    // second row under the header chrome). Width-only check on the
+    // wrapper; the actual pill style lives in the inner <form>.
     expected: { w: 712 },
     // 4px tolerance — flex-1 sub-pixel rounding can drift a hair.
     tolerance: { w: 4 },
+    // At tablet, the flex-1 wrapper is constrained by the cluster
+    // around it: container 768 − 64 padding − ~344 (logo + gaps + cta)
+    // = ~285. That's the natural cap; not a regression.
+    byViewport: { tablet: { w: 285 } },
+    skipOn: ["mobile"],
   },
   {
     route: "/",
@@ -213,6 +256,7 @@ export const registry: AuditEntry[] = [
     description: "Home — Header search bar pill (the actual input box)",
     // Figma pill: bg-white, 1px brand-100 border, radius 10, height ~48
     expected: { bg: "#ffffff", borderRadius: 10 },
+    skipOn: ["mobile"],
   },
   {
     route: "/",
@@ -220,9 +264,11 @@ export const registry: AuditEntry[] = [
     selector: '[data-figma-id="header.cta"]',
     description: "Home — Header Login/Register CTA",
     // Figma CTA: brand-600 pill, ~140 wide, 44 tall. Button atom "md"
-    // size renders 40 tall — within 4px tolerance for now; if you want
-    // pixel-exact 44 height, add a `size="header"` variant to Button.
+    // size renders 41 tall on desktop — within 4px tolerance.
+    // Mobile uses Button `sm` size (37 tall) so the chrome stays
+    // compact alongside the smaller logo.
     expected: { h: 44, bg: "#006d77" },
+    byViewport: { mobile: { h: 37 } },
     tolerance: { h: 4 },
   },
 

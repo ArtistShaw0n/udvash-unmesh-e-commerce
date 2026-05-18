@@ -48,7 +48,7 @@ async function loadRegistry() {
   const mod = require_(join(__dirname, "registry.ts"));
   return {
     entries: mod.registry,
-    viewport: mod.VIEWPORT,
+    viewports: mod.VIEWPORTS,
     resolveTolerance: mod.resolveTolerance,
     routeSetups: mod.routeSetups || [],
   };
@@ -105,12 +105,18 @@ async function probe(page, selector) {
 // ---------- Main ----------
 async function main() {
   const baseUrl = process.env.AUDIT_URL || "http://localhost:3000";
-  const { entries, viewport, resolveTolerance, routeSetups } = await loadRegistry();
+  const { entries, viewports, resolveTolerance, routeSetups } = await loadRegistry();
   const setupByRoute = new Map(routeSetups.map((s) => [s.route, s]));
 
+  // Allow narrowing via env var: AUDIT_VIEWPORTS=mobile,desktop
+  const wanted = (process.env.AUDIT_VIEWPORTS || "mobile,tablet,desktop,figma")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => viewports[s]);
+
   console.log(`\n[audit] base URL: ${baseUrl}`);
-  console.log(`[audit] viewport: ${viewport.width}×${viewport.height}`);
-  console.log(`[audit] ${entries.length} registered entries\n`);
+  console.log(`[audit] viewports: ${wanted.join(", ")}`);
+  console.log(`[audit] ${entries.length} registered entries × ${wanted.length} viewports\n`);
 
   const browser = await chromium.launch();
 
@@ -123,67 +129,83 @@ async function main() {
 
   const rows = [];
   let failCount = 0;
+  let passCount = 0;
+  let skipCount = 0;
 
-  for (const [route, items] of byRoute) {
-    const url = baseUrl + route;
-    // Per-route setup (e.g. seed localStorage) runs in page context
-    // BEFORE the navigation, so the app code sees the prepared state.
-    const setup = setupByRoute.get(route);
-    // Each route uses a fresh context so setup from one route doesn't
-    // bleed into the next.
-    const routeCtx = await browser.newContext({ viewport, deviceScaleFactor: 1 });
-    if (setup) {
-      console.log(`[audit] ${route}: applying setup — ${setup.reason}`);
-      await routeCtx.addInitScript({ content: setup.initScript });
-    }
-    const routePage = await routeCtx.newPage();
-    try {
-      await routePage.goto(url, { waitUntil: "networkidle", timeout: 15_000 });
-    } catch (e) {
-      console.error(`[audit] FAILED to load ${url}: ${e.message}`);
-      for (const item of items) {
-        rows.push({ ...item, status: "load-fail", actual: null });
-        failCount++;
+  for (const vpName of wanted) {
+    const viewport = viewports[vpName];
+    console.log(`\n[audit] ─── viewport: ${vpName} (${viewport.width}×${viewport.height}) ───`);
+
+    for (const [route, items] of byRoute) {
+      const url = baseUrl + route;
+      const setup = setupByRoute.get(route);
+      const routeCtx = await browser.newContext({ viewport, deviceScaleFactor: 1 });
+      if (setup) {
+        await routeCtx.addInitScript({ content: setup.initScript });
       }
-      await routeCtx.close();
-      continue;
-    }
-
-    for (const item of items) {
-      const actual = await probe(routePage, item.selector);
-      if (!actual) {
-        rows.push({ ...item, status: "missing", actual: null });
-        failCount++;
+      const routePage = await routeCtx.newPage();
+      try {
+        await routePage.goto(url, { waitUntil: "networkidle", timeout: 15_000 });
+      } catch (e) {
+        console.error(`[audit]   ${route} (${vpName}): load failed — ${e.message}`);
+        for (const item of items) {
+          if (item.skipOn?.includes(vpName)) {
+            skipCount++;
+            continue;
+          }
+          rows.push({ ...item, viewport: vpName, status: "load-fail", actual: null });
+          failCount++;
+        }
+        await routeCtx.close();
         continue;
       }
-      const diffs = [];
-      for (const [key, expectedVal] of Object.entries(item.expected)) {
-        const actualVal =
-          key === "bg" || key === "color"
-            ? rgbToHex(actual[key])
-            : actual[key];
-        const tol = resolveTolerance(item, key);
-        if (!withinTol(actualVal, expectedVal, tol)) {
-          diffs.push({ key, expected: expectedVal, actual: actualVal, tol });
+
+      for (const item of items) {
+        if (item.skipOn?.includes(vpName)) {
+          skipCount++;
+          continue;
         }
+        // Merge byViewport overrides on top of default expectations
+        const expectedMerged = { ...item.expected, ...(item.byViewport?.[vpName] || {}) };
+        const actual = await probe(routePage, item.selector);
+        if (!actual) {
+          rows.push({ ...item, viewport: vpName, status: "missing", actual: null });
+          failCount++;
+          continue;
+        }
+        const diffs = [];
+        for (const [key, expectedVal] of Object.entries(expectedMerged)) {
+          const actualVal =
+            key === "bg" || key === "color"
+              ? rgbToHex(actual[key])
+              : actual[key];
+          const tol = resolveTolerance(item, key);
+          if (!withinTol(actualVal, expectedVal, tol)) {
+            diffs.push({ key, expected: expectedVal, actual: actualVal, tol });
+          }
+        }
+        const status = diffs.length === 0 ? "pass" : "fail";
+        if (status === "fail") failCount++;
+        else passCount++;
+        rows.push({ ...item, viewport: vpName, status, actual, diffs });
       }
-      const status = diffs.length === 0 ? "pass" : "fail";
-      if (status === "fail") failCount++;
-      rows.push({ ...item, status, actual, diffs });
+      await routeCtx.close();
     }
-    await routeCtx.close();
   }
 
   await browser.close();
+  console.log(`\n[audit] summary: ${passCount} passed, ${failCount} failed, ${skipCount} skipped\n`);
 
   // ---------- Reporting ----------
   const reportLines = [];
   reportLines.push(`# Figma audit report`);
   reportLines.push("");
   reportLines.push(`- base URL: \`${baseUrl}\``);
-  reportLines.push(`- viewport: ${viewport.width}×${viewport.height}`);
-  reportLines.push(`- entries: ${rows.length}`);
-  reportLines.push(`- failures: ${failCount}`);
+  reportLines.push(`- viewports tested: ${wanted.join(", ")}`);
+  reportLines.push(`- checks: ${rows.length + skipCount}`);
+  reportLines.push(`- passed: ${passCount}`);
+  reportLines.push(`- skipped: ${skipCount}`);
+  reportLines.push(`- failed: ${failCount}`);
   reportLines.push("");
 
   const fails = rows.filter((r) => r.status !== "pass");
@@ -193,22 +215,22 @@ async function main() {
     reportLines.push(`## Failures`);
     reportLines.push("");
     reportLines.push(
-      "| route | node | description | property | expected | actual |",
+      "| viewport | route | node | description | property | expected | actual |",
     );
-    reportLines.push("|---|---|---|---|---|---|");
+    reportLines.push("|---|---|---|---|---|---|---|");
     for (const r of fails) {
       if (r.status === "missing") {
         reportLines.push(
-          `| \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | — | (element found) | **missing** (selector \`${r.selector}\` not in DOM) |`,
+          `| ${r.viewport} | \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | — | (element found) | **missing** (selector \`${r.selector}\` not in DOM) |`,
         );
       } else if (r.status === "load-fail") {
         reportLines.push(
-          `| \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | — | (page loads) | **load failed** |`,
+          `| ${r.viewport} | \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | — | (page loads) | **load failed** |`,
         );
       } else {
         for (const d of r.diffs) {
           reportLines.push(
-            `| \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | ${d.key} | \`${d.expected}\` | \`${d.actual}\` |`,
+            `| ${r.viewport} | \`${r.route}\` | ${r.figmaNodeId} | ${r.description} | ${d.key} | \`${d.expected}\` | \`${d.actual}\` |`,
           );
         }
       }
@@ -220,12 +242,12 @@ async function main() {
   reportLines.push("");
   reportLines.push("<details><summary>expand</summary>");
   reportLines.push("");
-  reportLines.push("| route | node | bg | w | h | font | radius |");
-  reportLines.push("|---|---|---|---|---|---|---|");
+  reportLines.push("| viewport | route | node | bg | w | h | font | radius |");
+  reportLines.push("|---|---|---|---|---|---|---|---|");
   for (const r of rows) {
     if (!r.actual) continue;
     reportLines.push(
-      `| \`${r.route}\` | ${r.figmaNodeId} | ${rgbToHex(r.actual.bg) || "-"} | ${r.actual.w} | ${r.actual.h} | ${r.actual.fontSize}/${r.actual.fontWeight} | ${r.actual.borderRadius} |`,
+      `| ${r.viewport} | \`${r.route}\` | ${r.figmaNodeId} | ${rgbToHex(r.actual.bg) || "-"} | ${r.actual.w} | ${r.actual.h} | ${r.actual.fontSize}/${r.actual.fontWeight} | ${r.actual.borderRadius} |`,
     );
   }
   reportLines.push("");
