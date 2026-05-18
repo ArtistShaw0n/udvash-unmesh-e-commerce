@@ -2,16 +2,14 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Filter, X } from "lucide-react";
-import { Button, Checkbox } from "@/components/atoms";
 import { Dropdown } from "@/components/atoms/Dropdown";
 import { LoadMoreButton, ProductCard } from "@/components/molecules";
 import { CategoryFilterSection } from "@/components/organisms";
 import { CATEGORIES, toBengaliNumber } from "@/lib/site";
 import type { Book } from "@/lib/books";
-import { clsx } from "@/lib/clsx";
 
-const PER_PAGE = 8;
+// Figma 9:6555 grid is 5 rows × 4 cols = 20 cards initial load.
+const PER_PAGE = 20;
 
 type SortValue = "popular" | "newest" | "price-asc" | "price-desc" | "rating";
 
@@ -23,43 +21,15 @@ const SORT_OPTIONS = [
   { label: "রেটিং", value: "rating" },
 ];
 
-const PRICE_BRACKETS = [
-  { label: "সব দাম", min: 0, max: Infinity },
-  { label: "৳০ — ৳৫০০", min: 0, max: 500 },
-  { label: "৳৫০০ — ৳১০০০", min: 500, max: 1000 },
-  { label: "৳১০০০ — ৳২০০০", min: 1000, max: 2000 },
-  { label: "৳২০০০+", min: 2000, max: Infinity },
-];
-
 interface Filters {
   category: string;
   sort: SortValue;
-  priceIdx: number;
-  freeDelivery: boolean;
-  inStockOnly: boolean;
-  discountOnly: boolean;
 }
-
-const DEFAULT_FILTERS: Filters = {
-  category: "all",
-  sort: "popular",
-  priceIdx: 0,
-  freeDelivery: false,
-  inStockOnly: false,
-  discountOnly: false,
-};
 
 function readFromUrl(params: URLSearchParams): Filters {
   return {
     category: params.get("category") ?? "all",
     sort: (params.get("sort") as SortValue) ?? "popular",
-    priceIdx: Math.max(
-      0,
-      Math.min(PRICE_BRACKETS.length - 1, Number(params.get("price") ?? 0)),
-    ),
-    freeDelivery: params.get("free") === "1",
-    inStockOnly: params.get("instock") === "1",
-    discountOnly: params.get("discount") === "1",
   };
 }
 
@@ -67,10 +37,6 @@ function writeToUrl(f: Filters): URLSearchParams {
   const p = new URLSearchParams();
   if (f.category !== "all") p.set("category", f.category);
   if (f.sort !== "popular") p.set("sort", f.sort);
-  if (f.priceIdx > 0) p.set("price", String(f.priceIdx));
-  if (f.freeDelivery) p.set("free", "1");
-  if (f.inStockOnly) p.set("instock", "1");
-  if (f.discountOnly) p.set("discount", "1");
   return p;
 }
 
@@ -82,12 +48,29 @@ export function ProductsBrowser({ books }: { books: Book[] }) {
   );
 }
 
+/**
+ * /products — Figma node 9:6555.
+ *
+ *   Layout (1920 frame, 312 gutters → 1296 content):
+ *     Category section   1920×270 — centered title "Category" (Poppins
+ *                        SemiBold 30) + 7-pill row, 52px tall, gap 12
+ *     Main block         1920×3602, padding 312 → 1296 content
+ *       Toolbar          1296×56 — left: h1 "সকল বই" 36px + subtitle
+ *                        "Academic সেকশনের জনপ্রিয় বিক্রিত বইসমূহ" 20px;
+ *                        right: sort dropdown 145×40
+ *       Grid             5 rows × 4 cols, card 306×520, col-gap 24,
+ *                        row-gap 50
+ *       Load more        152×34 button + "Showing X of Y products"
+ *                        counter beneath
+ *
+ *   The earlier "compact sidebar" variant of this page is gone — Figma
+ *   doesn't have it. URL params are kept for `category` and `sort` only.
+ */
 function ProductsBrowserInner({ books }: { books: Book[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<Filters>(() => readFromUrl(searchParams));
   const [page, setPage] = useState(1);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Push filter state back into the URL for shareable filtered pages
   useEffect(() => {
@@ -101,17 +84,13 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
     setPage(1);
   }
 
-  const filtered = useMemo(() => {
-    const bracket = PRICE_BRACKETS[filters.priceIdx];
-    return books.filter((b) => {
-      if (filters.category !== "all" && b.category !== filters.category) return false;
-      if (b.price < bracket.min || b.price > bracket.max) return false;
-      if (filters.freeDelivery && !b.freeDelivery) return false;
-      if (filters.inStockOnly && b.stock !== "in-stock") return false;
-      if (filters.discountOnly && (!b.oldPrice || b.oldPrice <= b.price)) return false;
-      return true;
-    });
-  }, [books, filters]);
+  const filtered = useMemo(
+    () =>
+      filters.category === "all"
+        ? books
+        : books.filter((b) => b.category === filters.category),
+    [books, filters.category],
+  );
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -123,7 +102,7 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
       case "price-desc":
         return arr.sort((a, b) => b.price - a.price);
       case "rating":
-        // Without ratings on Book, fall back to bestsellers first
+        // No rating field on Book — bestsellers first as proxy.
         return arr.sort((a, b) => {
           const aBest = a.badge?.type === "bestseller" ? 1 : 0;
           const bBest = b.badge?.type === "bestseller" ? 1 : 0;
@@ -137,202 +116,61 @@ function ProductsBrowserInner({ books }: { books: Book[] }) {
   const visible = sorted.slice(0, page * PER_PAGE);
   const hasMore = visible.length < sorted.length;
 
-  const activeCount =
-    (filters.priceIdx > 0 ? 1 : 0) +
-    (filters.freeDelivery ? 1 : 0) +
-    (filters.inStockOnly ? 1 : 0) +
-    (filters.discountOnly ? 1 : 0);
-
-  function reset() {
-    setFilters(DEFAULT_FILTERS);
-    setPage(1);
-  }
-
-  // Desktop sidebar and mobile drawer both render this panel — same
-  // controls, separate inputs. Prefix IDs so labels resolve to the right
-  // input (duplicate IDs are an a11y violation and break `htmlFor`).
-  const renderFilterPanel = (scope: "desktop" | "mobile") => (
-    // Compact filter sidebar — small checkboxes (16×16, the conventional
-    // "settings panel" size) + tight row spacing so the section reads as
-    // a dense, scannable rail not a tall column.
-    <div className="space-y-4">
-      <Section title="দাম">
-        <div className="space-y-1">
-          {PRICE_BRACKETS.map((b, i) => (
-            <label key={b.label} className="flex items-center gap-2 cursor-pointer py-0.5">
-              <input
-                type="radio"
-                name={`price-${scope}`}
-                checked={filters.priceIdx === i}
-                onChange={() => updateFilter("priceIdx", i)}
-                className="accent-brand-600 w-4 h-4"
-              />
-              <span className="text-body-sm text-[var(--fg-secondary)]">{b.label}</span>
-            </label>
-          ))}
-        </div>
-      </Section>
-      <Section title="অপশন">
-        <div className="space-y-1.5">
-          <Checkbox
-            id={`${scope}-ff-free`}
-            size="sm"
-            label="ফ্রি ডেলিভারি"
-            checked={filters.freeDelivery}
-            onChange={(e) => updateFilter("freeDelivery", e.target.checked)}
-          />
-          <Checkbox
-            id={`${scope}-ff-stock`}
-            size="sm"
-            label="স্টকে আছে"
-            checked={filters.inStockOnly}
-            onChange={(e) => updateFilter("inStockOnly", e.target.checked)}
-          />
-          <Checkbox
-            id={`${scope}-ff-disc`}
-            size="sm"
-            label="ডিসকাউন্ট চলছে"
-            checked={filters.discountOnly}
-            onChange={(e) => updateFilter("discountOnly", e.target.checked)}
-          />
-        </div>
-      </Section>
-      {activeCount > 0 && (
-        <Button variant="secondary" size="sm" fullWidth onClick={reset}>
-          সব ফিল্টার রিসেট
-        </Button>
-      )}
-    </div>
-  );
-
   return (
     <>
       <CategoryFilterSection
-        title="ক্যাটাগরি"
-        variant="compact"
+        title="Category"
+        variant="centered"
         categories={[...CATEGORIES]}
         defaultCategory={filters.category}
         onChange={(slug) => updateFilter("category", slug)}
       />
 
       <section className="section-pad-sm">
-        <div className="container-site space-y-6">
-          {/* Toolbar — filter trigger (mobile) + result count + sort. The h1
-              "সকল বই" was removed per user request; the section title from
-              CategoryFilterSection above is enough to anchor the page. */}
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-body-sm text-[var(--fg-secondary)]">
-              {toBengaliNumber(filtered.length)} টি বই পাওয়া গেছে
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setMobileOpen(true)}
-                className="lg:hidden relative inline-flex items-center gap-1.5 h-10 px-3 rounded-md border border-[var(--border-strong)] bg-[var(--bg-surface)] text-body-sm font-semibold text-[var(--fg-primary)]"
-              >
-                <Filter size={14} /> ফিল্টার
-                {activeCount > 0 && (
-                  <span className="inline-flex w-5 h-5 items-center justify-center rounded-full bg-brand-600 text-white text-caption font-bold">
-                    {activeCount}
-                  </span>
-                )}
-              </button>
-              <Dropdown
-                options={SORT_OPTIONS}
-                defaultValue={filters.sort}
-                onChange={(v) => updateFilter("sort", v as SortValue)}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[240px_1fr] min-w-0 [&>*]:min-w-0">
-            <aside className="hidden lg:block sticky top-24 self-start rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 shadow-card">
-              {renderFilterPanel("desktop")}
-            </aside>
-
-            <div>
-              {visible.length > 0 ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {visible.map((b) => (
-                    <ProductCard key={b.slug} book={b} />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-20 text-center text-body text-[var(--fg-muted)] rounded-md border border-dashed border-[var(--border-default)]">
-                  কোনো বই এই ফিল্টারে পাওয়া যায়নি।
-                  <div className="mt-3">
-                    <Button variant="secondary" size="sm" onClick={reset}>
-                      ফিল্টার রিসেট
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {hasMore && (
-                <div className="text-center pt-6">
-                  <LoadMoreButton onClick={() => setPage((p) => p + 1)} />
-                </div>
-              )}
-
-              <p className="text-center text-body-sm text-[var(--fg-muted)] pt-4">
-                {toBengaliNumber(sorted.length)}টি বইয়ের মধ্যে {toBengaliNumber(visible.length)}টি দেখানো হচ্ছে
+        <div className="container-site space-y-8">
+          {/* Toolbar — Figma 9:6571 1296×56.
+              Left: h1 "সকল বই" 30/36 SemiBold #3D3D3D + subtitle 14/20 Inter #676767.
+              Right: sort dropdown 145×40 anchored top-right. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-1">
+              <h1 className="font-poppins font-semibold text-[24px] sm:text-[30px] leading-9 tracking-[-0.012em] capitalize text-[#3D3D3D] dark:text-[var(--fg-primary)]">
+                সকল বই
+              </h1>
+              <p className="font-inter font-normal text-[14px] leading-5 tracking-[-0.011em] text-[#676767] dark:text-[var(--fg-secondary)]">
+                Academic সেকশনের জনপ্রিয় বিক্রিত বইসমূহ
               </p>
             </div>
+            <Dropdown
+              options={SORT_OPTIONS}
+              defaultValue={filters.sort}
+              onChange={(v) => updateFilter("sort", v as SortValue)}
+            />
+          </div>
+
+          {/* Grid — full-width 4-col on lg+, 24px col gap, 50px row gap (Figma). */}
+          {visible.length > 0 ? (
+            <div className="grid gap-x-6 gap-y-[50px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              {visible.map((b) => (
+                <ProductCard key={b.slug} book={b} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center text-body text-[var(--fg-muted)] rounded-md border border-dashed border-[var(--border-default)]">
+              এই ক্যাটাগরিতে কোনো বই পাওয়া যায়নি।
+            </div>
+          )}
+
+          {/* Load-more + counter — Figma 9:7230. Counter shows total/visible
+              regardless of hasMore so users can see the page size. */}
+          <div className="flex flex-col items-center gap-3 pt-2">
+            {hasMore && <LoadMoreButton onClick={() => setPage((p) => p + 1)} />}
+            <p className="font-poppins font-normal text-[14px] leading-4 text-[#676767] dark:text-[var(--fg-muted)]">
+              Showing {toBengaliNumber(visible.length)} of {toBengaliNumber(sorted.length)}{" "}
+              products
+            </p>
           </div>
         </div>
       </section>
-
-      {/* Mobile filter drawer */}
-      <div
-        className={clsx(
-          "lg:hidden fixed inset-0 z-50 transition-opacity",
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
-        )}
-      >
-        <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
-          onClick={() => setMobileOpen(false)}
-          aria-hidden="true"
-        />
-        <div
-          className={clsx(
-            "absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-[var(--bg-surface)] shadow-card-hover transition-transform overflow-y-auto",
-            mobileOpen ? "translate-x-0" : "translate-x-full",
-          )}
-          role="dialog"
-          aria-label="Filters"
-        >
-          <div className="sticky top-0 bg-[var(--bg-surface)] border-b border-[var(--border-default)] flex items-center justify-between p-4">
-            <h3 className="text-h4 text-[var(--fg-primary)]">ফিল্টার</h3>
-            <button
-              type="button"
-              onClick={() => setMobileOpen(false)}
-              aria-label="Close filters"
-              className="w-8 h-8 inline-flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:bg-[var(--bg-surface-muted)]"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          <div className="p-5">{renderFilterPanel("mobile")}</div>
-        </div>
-      </div>
     </>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <p className="text-caption font-bold uppercase tracking-wider text-[var(--fg-muted)] mb-2">
-        {title}
-      </p>
-      {children}
-    </div>
   );
 }
