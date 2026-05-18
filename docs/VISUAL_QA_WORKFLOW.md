@@ -121,6 +121,22 @@ mcp__e1db3251...__get_design_context  nodeId=<section-id>  fileKey=UPIWiRG0dPEiZ
 
 If the response is too big, the dump is saved to a file path included in the error — `jq` it for `bg-[#...]` / `text-[#...]` patterns. If a section "inherits" (no own fill), trace up the parent chain until you hit a node that paints.
 
+**Trust but verify with pixel sampling.** `get_design_context` can mislabel a section's bg when a prominent child paints a different colour — a code-gen tool will sometimes infer "this section is white" from the dominant inner element instead of the outer band. The header bug in this commit chain happened because the Figma metadata reported the home header as "child paints white" — but the actual outer band fill was `#F7F9FB` cream. The white was just the search-input pill inside.
+
+Ground-truth by pixel-sampling the Figma screenshot of the node:
+
+```python
+from PIL import Image
+img = Image.open('/tmp/figma-node-XXXX.png').convert('RGB')
+# Sample the EDGES of the section, not the centre — centres often
+# fall inside child elements that paint over the outer band.
+edge_samples = [(10, 10), (width-10, 10), (10, height-10), (width-10, height-10)]
+for x, y in edge_samples:
+    print(f'({x},{y}): {img.getpixel((x,y))}')
+```
+
+Use `mcp__e1db3251...__get_screenshot` to fetch the PNG, `curl` it down, then sample at the corners and along each edge. The corner colours are the section's true outer fill.
+
 Produce a table per page:
 
 | # | Section | Figma node id | y / h | Figma bg hex |
