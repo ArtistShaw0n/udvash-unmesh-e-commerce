@@ -34,15 +34,13 @@ const bengali = Hind_Siliguri({
   variable: "--font-bengali",
   subsets: ["bengali"],
   weight: ["400", "600", "700"],
-  // `optional` instead of `swap` — the browser gives the font ~100ms
-  // to load before committing to the fallback. On Vercel's edge CDN
-  // the woff2 files (35-47 KB each) usually arrive in time, so most
-  // users get Hind Siliguri. On slow connections the Bengali text
-  // stays in the system fallback (Noto Sans Bengali / SolaimanLipi),
-  // which is the right tradeoff for LCP — Lighthouse counted the
-  // hero h1's font-swap as the largest contentful paint, dragging
-  // LCP to 3.4s.
-  display: "optional",
+  // `swap` — render fallback immediately, swap to Hind Siliguri once
+  // loaded. Tried `optional` (no swap if late) but it didn't move LCP
+  // (Lighthouse pegged LCP to the hero description paragraph, not the
+  // h1 — and that text uses Poppins, not Hind Siliguri). Bengali
+  // typographic quality is more important on this site than the
+  // hypothetical 100ms saved on slow networks.
+  display: "swap",
 });
 
 const poppins = Poppins({
