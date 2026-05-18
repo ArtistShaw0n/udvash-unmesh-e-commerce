@@ -10,6 +10,11 @@ export interface ProductGridSectionProps {
   books: Book[];
   tone?: "default" | "muted";
   className?: string;
+  /**
+   * Optional Figma node id. Wired to `data-figma-id` so the audit runner
+   * can map this rendered grid to its source-of-truth design node.
+   */
+  figmaNodeId?: string;
 }
 
 /**
@@ -33,9 +38,11 @@ export function ProductGridSection({
   books,
   tone = "default",
   className,
+  figmaNodeId,
 }: ProductGridSectionProps) {
   return (
     <section
+      data-figma-id={figmaNodeId}
       className={clsx(
         "section-pad-sm",
         tone === "muted" && "bg-[var(--color-bg-page-muted)] dark:bg-[var(--bg-surface-muted)]",

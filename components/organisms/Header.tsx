@@ -81,9 +81,17 @@ export function Header({ className }: HeaderProps) {
     >
       <div className="container-site flex items-center gap-3 sm:gap-6 h-14 sm:h-16 md:h-20">
         {/* Logo shrinks on mobile so the right-side CTA fits */}
-        <Logo size="md" className="!h-7 sm:!h-8 md:!h-9" />
+        <div data-figma-id="header.logo" className="flex-shrink-0">
+          <Logo size="md" className="!h-7 sm:!h-8 md:!h-9" />
+        </div>
 
-        <div className="flex-1 max-w-2xl mx-2 hidden sm:block">
+        <div
+          data-figma-id="header.search"
+          // Figma 712px — was max-w-2xl (672px) which capped 40px narrower
+          // than the design intends, throwing the rest of the header
+          // cluster off-centre.
+          className="flex-1 max-w-[712px] mx-2 hidden sm:block"
+        >
           <SearchAutocomplete />
         </div>
 
@@ -187,6 +195,7 @@ export function Header({ className }: HeaderProps) {
               href="/login"
               variant="primary"
               size={{ base: "sm", md: "md" }}
+              data-figma-id="header.cta"
             >
               <span className="sm:hidden">Login</span>
               <span className="hidden sm:inline">Login/Register</span>

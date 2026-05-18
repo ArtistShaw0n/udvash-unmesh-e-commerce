@@ -57,6 +57,7 @@ export function HeroBanner({
 }: HeroBannerProps) {
   return (
     <section
+      data-figma-id="9:5401"
       // Figma §2: the Hero section is a full-bleed WHITE band that
       // contains a teal rounded card. Earlier we let it fall through to
       // the (cream) page bg, which made the surrounding gutters cream
@@ -75,7 +76,10 @@ export function HeroBanner({
           - At lg+: overflow-visible so the absolutely positioned book
             can stick out below per Figma.
       */}
-      <div className="relative rounded-lg bg-brand-600 text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden">
+      <div
+        data-figma-id="9:5403"
+        className="relative rounded-lg bg-brand-600 text-white px-6 py-10 sm:px-10 sm:py-12 xl:px-0 xl:py-0 xl:h-[400px] xl:overflow-visible overflow-hidden"
+      >
         {/* Single content tree — typography + layout switches via the
             responsive utility chain inside HeroContent + positioning
             wrapper. Rendering it once keeps a single `<h1>` in the DOM

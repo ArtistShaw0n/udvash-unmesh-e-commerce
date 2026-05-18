@@ -48,6 +48,7 @@ export default function HomePage() {
         seeAllHref="/products"
         books={fill(popular, 4)}
         tone="muted"
+        figmaNodeId="9:5434"
       />
 
       <FlashSaleBanner
@@ -63,6 +64,7 @@ export default function HomePage() {
         seeAllHref="/products?category=academic"
         books={fill(academic, 4)}
         tone="muted"
+        figmaNodeId="9:5601"
       />
 
       <ProductGridSection
@@ -71,6 +73,7 @@ export default function HomePage() {
         seeAllHref="/products?category=admission"
         books={fill(admission, 4)}
         tone="muted"
+        figmaNodeId="9:5742"
       />
     </>
   );
