@@ -105,6 +105,64 @@ If a box is unchecked, the commit isn't ready.
 
 ---
 
+## Per-section Figma vs. live audit
+
+The closed-loop above catches "things that look broken." It doesn't always catch "things that look fine but quietly diverge from Figma" — a section painted the wrong colour, a heading sized one step too small, padding off by 8 px. Those slip through because the page still looks pleasant; the diff is only visible side-by-side with the design.
+
+When the user reports "section X is wrong" or you suspect token drift, run this **three-layer audit**:
+
+### Layer 1 — Figma fill extraction (the source of truth)
+
+For each top-level section on the page, use the Figma MCP:
+
+```
+mcp__e1db3251...__get_design_context  nodeId=<section-id>  fileKey=UPIWiRG0dPEiZ595DDlqT0
+```
+
+If the response is too big, the dump is saved to a file path included in the error — `jq` it for `bg-[#...]` / `text-[#...]` patterns. If a section "inherits" (no own fill), trace up the parent chain until you hit a node that paints.
+
+Produce a table per page:
+
+| # | Section | Figma node id | y / h | Figma bg hex |
+|---|---------|---------------|-------|--------------|
+
+### Layer 2 — live DOM extraction (what we actually ship)
+
+In the dev preview, navigate to the route and eval:
+
+```js
+Array.from(document.querySelectorAll('section, header, footer, main > div'))
+  .filter(el => el.getBoundingClientRect().height > 50)
+  .map(el => ({
+    hint: el.querySelector('h1,h2,h3')?.textContent?.trim().slice(0,30)
+          || (el.className?.toString()||'').slice(0,30),
+    bg: getComputedStyle(el).backgroundColor,
+    h: Math.round(el.getBoundingClientRect().height)
+  }))
+```
+
+That gives the real rgb() of every top-level section, with a human hint (the section's first heading) so you can match each row to Figma.
+
+### Layer 3 — diff table
+
+Side-by-side, row by row:
+
+| # | Section | Figma | Live rgb() | Match? | File:line of offending class |
+|---|---------|-------|------------|--------|------------------------------|
+
+Where they diverge, use `grep -rn "bg-\[var(--bg-page)\]" components/organisms` (or similar) to locate the offender. Fix one section at a time, re-run Layer 2, commit.
+
+### When to run this audit
+
+- After any token-level change (`--bg-page`, brand palette, semantic colours).
+- After a Figma update where the designer changes section fills.
+- When a user reports a visual regression on a specific section.
+- Before flagging a page as "Figma-aligned" — don't trust eyeballing.
+
+This is the audit that found the home page was rendering uniformly cream when Figma alternates white/cream/white/cream/cream/cream/teal bands.
+
+---
+
 ## Known follow-ups not in this commit
 
 Things the cross-page sweep surfaced but weren't in scope for the immediate fix:
