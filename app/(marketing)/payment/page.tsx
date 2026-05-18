@@ -21,7 +21,10 @@ export default function PaymentPage() {
 
       <h2 className="text-h3 text-[var(--fg-primary)] pt-4">আমরা যেসব পদ্ধতি সাপোর্ট করি</h2>
       <div className="not-prose mt-3">
-        <div className="bg-neutral-100 rounded-md p-3">
+        {/* Inner panel — use the page-bg cream so the payments strip
+            reads as a quiet inset against the white StaticPageLayout
+            card, instead of a stale hardcoded neutral-100. */}
+        <div className="bg-[var(--bg-page)] rounded-md p-3 border border-[var(--border-muted)]">
           <PaymentMethodsRow />
         </div>
       </div>
