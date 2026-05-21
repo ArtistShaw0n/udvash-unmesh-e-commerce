@@ -63,3 +63,4 @@ export { SectionLabel } from "./SectionLabel";
 export type { SectionLabelProps } from "./SectionLabel";
 
 export { ThemeToggle } from "./ThemeToggle";
+export type { ThemeToggleProps } from "./ThemeToggle";

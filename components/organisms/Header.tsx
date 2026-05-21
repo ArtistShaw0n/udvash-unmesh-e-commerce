@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, User as UserIcon, ChevronDown, LogOut, Package, Shield } from "lucide-react";
-import { Logo, Button } from "@/components/atoms";
+import { Logo, Button, ThemeToggle } from "@/components/atoms";
 import { SearchAutocomplete } from "@/components/molecules";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
@@ -175,6 +175,8 @@ export function Header({ className }: HeaderProps) {
                 : `${itemCount} ${itemCount === 1 ? "item" : "items"} in cart`}
             </span>
           )}
+
+          <ThemeToggle />
 
           {!authHydrated ? (
             // Stable placeholder so SSR and CSR widths match (responsive width).

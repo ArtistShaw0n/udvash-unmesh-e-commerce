@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, ShoppingBag, User, Package } from "lucide-react";
+import { ThemeToggle } from "@/components/atoms";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/lib/auth-context";
 import { clsx } from "@/lib/clsx";
@@ -51,7 +52,7 @@ export function MobileBottomNav() {
       aria-label="Primary mobile navigation"
       className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-[var(--bg-surface)] border-t border-[var(--border-default)] pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {items.map(({ label, href, icon: Icon, badge }) => {
           const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
           return (
@@ -82,6 +83,9 @@ export function MobileBottomNav() {
             </li>
           );
         })}
+        <li>
+          <ThemeToggle variant="nav" />
+        </li>
       </ul>
     </nav>
   );
