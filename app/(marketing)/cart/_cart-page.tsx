@@ -46,6 +46,7 @@ export function CartPage() {
 
   // Selected-only totals.
   const selectedResolved = resolved.filter((r) => r.entry.selected);
+  const selectedQty = selectedResolved.reduce((s, r) => s + r.entry.quantity, 0);
   const subtotal = selectedResolved.reduce(
     (sum, r) => sum + r.book.price * r.entry.quantity,
     0,
@@ -157,7 +158,7 @@ export function CartPage() {
 
           {/* Order summary */}
           <OrderSummaryCard
-            itemCount={selectedCount}
+            itemCount={selectedQty}
             subtotal={subtotal}
             vat={vat}
             shipping={shipping}
