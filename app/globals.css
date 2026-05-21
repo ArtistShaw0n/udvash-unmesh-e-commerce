@@ -207,18 +207,45 @@
 }
 
 .dark {
-  --bg-page: var(--color-navy-900);
-  --bg-surface: var(--color-navy-800);
-  --bg-surface-muted: var(--color-navy-700);
-  --bg-surface-strong: var(--color-brand-700);
+  /* === Backgrounds — zinc neutral (not blue-tinted navy) ===
+     Elevation hierarchy: page (darkest) → surface → surface-muted (lightest).
+     Zinc grays read as warm-neutral rather than cold-blue, matching
+     industry-standard dark UIs (GitHub Dark, Vercel, Linear, shadcn). */
+  --bg-page:           #09090b;   /* zinc-950 — deep canvas */
+  --bg-surface:        #18181b;   /* zinc-900 — cards, panels, modals */
+  --bg-surface-muted:  #27272a;   /* zinc-800 — hover fills, subtle zones */
+  --bg-surface-strong: var(--color-brand-700);  /* brand-coloured surfaces */
+  --bg-overlay:        rgb(0 0 0 / 0.7);
 
-  --fg-primary: var(--color-neutral-50);
-  --fg-secondary: var(--color-neutral-300);
-  --fg-muted: var(--color-neutral-400);
+  /* === Foreground — clear legibility hierarchy === */
+  --fg-primary:   #fafafa;        /* zinc-50  — headings, primary text */
+  --fg-secondary: #a1a1aa;        /* zinc-400 — body, secondary text */
+  --fg-muted:     #71717a;        /* zinc-500 — captions, placeholders */
+  --fg-on-strong: #ffffff;
+  --fg-on-brand:  #ffffff;
 
-  --border-default: var(--color-navy-700);
-  --border-strong: var(--color-navy-600);
-  --border-muted: var(--color-navy-800);
+  /* === Borders — visible but not harsh === */
+  --border-default: #3f3f46;      /* zinc-700 — card / input borders */
+  --border-strong:  #52525b;      /* zinc-600 — emphasized borders */
+  --border-muted:   #27272a;      /* zinc-800 — hairline dividers */
+
+  /* === Focus ring — brighter teal on dark bg === */
+  --ring-focus: #2dd4bf;          /* teal-400 */
+
+  /* === Shadows — stronger alpha so they read on dark surfaces === */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.6),
+    0 8px 10px -6px rgb(0 0 0 / 0.5);
+
+  /* === Figma-named text / bg tokens — override for dark bg ===
+     Components that use var(--color-text-*) directly without a dark:
+     class get the correct dark value through these cascade overrides. */
+  --color-text-title:    #fafafa;
+  --color-text-body:     #a1a1aa;
+  --color-text-secondary: #71717a;
+  --color-text-primary:  #fafafa;
+  --color-text-disabled: #3f3f46;
+  --color-bg-page-muted: #09090b;
 }
 
 /* ============================================
@@ -380,6 +407,19 @@ body {
 .badge-outline-preorder   { background: transparent; color: var(--color-warning-700);  box-shadow: inset 0 0 0 1.5px var(--color-warning-500); }
 .badge-outline-bestseller { background: transparent; color: var(--color-navy-800);     box-shadow: inset 0 0 0 1.5px var(--color-navy-800); }
 .badge-outline-stockout   { background: transparent; color: var(--color-neutral-600);  box-shadow: inset 0 0 0 1.5px var(--color-neutral-400); }
+
+/* Dark mode — badge soft & outline use hardcoded light palette values
+   that need explicit dark overrides (the solid variants are fine as-is
+   since their backgrounds are already vivid / not theme-dependent). */
+.dark .badge-soft-discount   { background: rgb(185 28  28  / 0.2); color: #fca5a5; }
+.dark .badge-soft-preorder   { background: rgb(180 83   9  / 0.2); color: #fcd34d; }
+.dark .badge-soft-bestseller { background: rgb(  3 105 161 / 0.2); color: #7dd3fc; }
+.dark .badge-soft-stockout   { background: rgb(100 116 139 / 0.2); color: #94a3b8; }
+
+.dark .badge-outline-discount   { color: #fca5a5; box-shadow: inset 0 0 0 1.5px rgb(252 165 165 / 0.5); }
+.dark .badge-outline-preorder   { color: #fcd34d; box-shadow: inset 0 0 0 1.5px rgb(252 211  77 / 0.5); }
+.dark .badge-outline-bestseller { color: #7dd3fc; box-shadow: inset 0 0 0 1.5px rgb(125 211 252 / 0.5); }
+.dark .badge-outline-stockout   { color: #94a3b8; box-shadow: inset 0 0 0 1.5px rgb(148 163 184 / 0.5); }
 
 /* Tag pill — Figma "Tag 1/3/4" spec:
    24px tall, 0 10px padding, 50px radius, 11px Poppins 500,

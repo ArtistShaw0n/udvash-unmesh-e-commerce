@@ -250,10 +250,10 @@ Swap them one at a time:
 
 | Context | Where | Status |
 |---|---|---|
-| `auth-context` | `/lib/auth-context.tsx` | ⏳ wire to `api.signup` / `api.login` / `api.me` |
-| `cart-context` | `/lib/cart-context.tsx` | ⏳ wire to `api.getCart` / `api.addToCart` etc. |
-| `orders-store` | `/lib/orders-store.tsx` | ⏳ wire to `api.listOrders` / `api.placeOrder` |
-| `reviews-store` | `/lib/reviews-store.tsx` | ⏳ wire to `api.listReviews` / `api.postReview` |
+| `auth-context` | `/lib/auth-context.tsx` | ✅ wired to `api.signup` / `api.login` / `api.me` + address CRUD |
+| `cart-context` | `/lib/cart-context.tsx` | ✅ wired to `api.getCart` / `api.addToCart` / `api.updateCartItem` etc. |
+| `orders-store` | `/lib/orders-store.tsx` | ✅ wired to `api.listOrders` / `api.placeOrder` / cancel / return |
+| `reviews-store` | `/lib/reviews-store.tsx` | ✅ wired to `api.listReviews` / `api.postReview` |
 
 Migration pattern: each `useXxx` hook keeps the same return shape but
 sources state from `api.xxx()` instead of localStorage. The UI doesn't

@@ -77,16 +77,19 @@ export function ThemeToggle({ className, variant = "icon" }: ThemeToggleProps) {
   }
 
   // "icon" variant — matches other header action buttons.
-  // Pre-mount: render an empty placeholder so layout width doesn't shift.
+  // Pre-mount: show Moon (light-mode default) so the icon is visible immediately.
   if (!mounted) {
     return (
       <button
         aria-label="Toggle theme"
         className={clsx(
-          "inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-md",
+          "inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-md text-[var(--fg-primary)]",
           className,
         )}
-      />
+      >
+        <Moon size={20} className="sm:hidden" aria-hidden="true" />
+        <Moon size={22} className="hidden sm:block" aria-hidden="true" />
+      </button>
     );
   }
 

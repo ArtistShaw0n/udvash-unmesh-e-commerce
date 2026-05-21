@@ -179,8 +179,13 @@ export function Header({ className }: HeaderProps) {
           <ThemeToggle />
 
           {!authHydrated ? (
-            // Stable placeholder so SSR and CSR widths match (responsive width).
-            <div className="w-24 sm:w-32 h-9 sm:h-10 rounded-md bg-[var(--bg-surface-muted)] animate-pulse" />
+            // Show Login button during SSR/pre-hydration — replaced by user
+            // menu if logged in. A brief layout shift on login is acceptable;
+            // an invisible skeleton is not.
+            <Button href="/login" variant="primary" size={{ base: "sm", md: "md" }}>
+              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">Login/Register</span>
+            </Button>
           ) : isLoggedIn ? (
             <div ref={menuRef} className="relative">
               <button
