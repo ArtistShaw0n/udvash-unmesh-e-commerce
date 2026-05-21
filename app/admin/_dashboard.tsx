@@ -93,7 +93,7 @@ export function AdminDashboard() {
       {stats && (
         <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-card">
           <h2 className="text-h3 text-[var(--fg-primary)]">অর্ডার স্ট্যাটাস ব্রেকডাউন</h2>
-          <div className="grid gap-3 sm:grid-cols-5 mt-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 mt-4">
             {(["placed", "confirmed", "shipped", "delivered", "cancelled"] as const).map(
               (status) => {
                 const labels = {

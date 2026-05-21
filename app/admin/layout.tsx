@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="min-h-screen flex bg-[var(--bg-page)]">
         <AdminSidebar />
         <div className="flex-1 min-w-0 lg:ml-64">
-          <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">{children}</main>
+          <main className="px-4 sm:px-6 lg:px-8 pt-14 pb-6 sm:py-8 lg:pt-8">{children}</main>
         </div>
       </div>
     </AdminGuard>
