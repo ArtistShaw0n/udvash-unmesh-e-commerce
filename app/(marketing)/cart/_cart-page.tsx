@@ -23,6 +23,7 @@ export function CartPage() {
     items,
     hydrated,
     itemCount,
+    uniqueCount,
     selectedCount,
     allSelected,
     toggleSelected,
@@ -115,7 +116,7 @@ export function CartPage() {
               <Checkbox
                 label={
                   selectAllIndeterminate
-                    ? `Select All (${toBengaliNumber(selectedCount)} / ${toBengaliNumber(itemCount)})`
+                    ? `Select All (${toBengaliNumber(selectedCount)} / ${toBengaliNumber(uniqueCount)})`
                     : "Select All"
                 }
                 id="select-all"
